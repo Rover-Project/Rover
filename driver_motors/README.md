@@ -20,24 +20,7 @@ Permite controlar dois motores DC conectados a uma **Raspberry Pi** através de 
 - Raspberry Pi (qualquer modelo com GPIO)  
 - Python 3  
 - Bibliotecas listadas no arquivo `requirements.txt`  
-
 ---
-
-## Instalação das Dependências
-
-1. Atualize o sistema:
-```bash
-sudo apt update && sudo apt upgrade -y
-```
-2. Instale Python 3 e pip (caso não tenha):
-```bash
-sudo apt install python3 python3-pip -y
-```
-3. Navegue até a pasta do projeto e instale todas as dependências usando o **requirements.txt**:
-```bash
-pip install -r requirements.txt
-```
-
 ## Conexão dos Motores Ponte H L298N
 | Motor          | IN1/IN2 | GPIO Raspberry Pi |
 | -------------- | ------- | ----------------- |
@@ -50,14 +33,34 @@ pip install -r requirements.txt
 
 ## Uso
 
-1. Salve o código Python em um arquivo, por exemplo:
+1. Atualize o sistema:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
 
+2. Instale Python 3 e pip (caso não tenha):
+```bash
+sudo apt install python3 python3-pip -y
+```
+
+3. Clone o repositório com os drivers:
 ````bash
-git clone github
+git clone "https://github.com/AbstractGleidson/Rover.git"
 ````
 
-2. Execute o programa com privilégios de root:
+4. Navegue para a pasta dos driver de motor:
+````bash
+cd Rover/driver_motors
+````
+
+6. Instale todas as dependências usando o **requirements.txt**:
+```bash
+pip install -r requirements.txt
+```
+
+5. Execute o programa com privilégios de root:
 
 ````bash
-sudo python3 Rover/driver_motors/main.py
+sudo python3 src/main.py
 ````
+---
