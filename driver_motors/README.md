@@ -53,12 +53,12 @@ git clone "https://github.com/AbstractGleidson/Rover.git"
 cd Rover/driver_motors
 ````
 
-6. Instale todas as dependências usando o **requirements.txt**:
+5. Instale todas as dependências usando o **requirements.txt**:
 ```bash
 pip install -r requirements.txt
 ```
 
-5. Execute o programa com privilégios de root:
+6. Execute o programa com privilégios de root:
 
 ````bash
 sudo python3 src/main.py
