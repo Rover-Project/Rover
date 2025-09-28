@@ -1,0 +1,3 @@
+# Dependecias para o driver de m
+gpiozero>=2.2.3
+keyboard>=0.13.7
