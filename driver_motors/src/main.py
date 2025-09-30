@@ -3,10 +3,10 @@ import keyboard
 import time
 
 # Definir os pinos conforme os circuito
-l1 = None
-l2 = None
-r1 = None
-r2 = None
+l1 = 11
+l2 = 12
+r1 = 15
+r2 = 16
 
 # Definição dos pinos da ponte H 
 motor = Robot(left=(l1, l2), right=(r1, r2))

@@ -1,0 +1,5 @@
+-- GPIO pinout
+https://astroisk.nl/a-guide-to-the-raspberry-pi-5-gpio-header/
+https://forums.raspberrypi.com/viewtopic.php?t=382289
+
+--
