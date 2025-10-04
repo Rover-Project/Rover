@@ -38,49 +38,43 @@ Este guia demonstra como integrar e configurar a câmera IMX219 de 8 megapixels 
 
 ## Configuração de Software
 
-   **1. Atualizar o sistema:**
-   ````bash
-       sudo apt update 
-       sudo apt full-upgrade
-   ````
+**1. Atualizar o sistema:**
+````bash
+sudo apt update 
+sudo apt full-upgrade
+````
 
 
-   **2. Instalar dependências:**
+ **2. Instalar dependências:**
 
-   ````bash
-        sudo apt install -y python3-picamera2
-        sudo apt install -y python3-opencv 
-   ````
+````bash
+sudo apt install -y python3-picamera2
+sudo apt install -y python3-opencv 
+````
  ***
 
 ## Uso
 
-1. Instalar dependências:
-```bash
-  sudo apt install -y python3-picamera2
-  sudo apt install -y python3-opencv 
-```
-
-2. Clone o repositório com os drivers:
+1. Clone o repositório com os drivers:
 ````bash
 git clone "https://github.com/AbstractGleidson/Rover.git"
 ````
 
-3. Navegue para a pasta dos drivers de câmera:
+2. Navegue para a pasta dos drivers de câmera:
 ````bash
 cd Rover/driver_camera
 ````
-4. Execute os programas com privilégios de root
+3. Execute os programas com privilégios de root
 
-    4.1 - Captura simples com a câmera
+    3.1 - Captura simples com a câmera
    ````bash
    sudo python3 src/captura_imagem_simples.py
    ````
-   4.2 - Captura em tempo de execução
+   3.2 - Captura em tempo de execução
    ````bash
    sudo python3 src/captura_imagem_tempo_de_execução.py
    ````
-   4.3 - Captura não volátil de imagem
+   3.3 - Captura não volátil de imagem
    ````bash
    sudo python3 src/captura_imagem_salvar.py
    ````
