@@ -72,7 +72,7 @@ cd Rover/driver_camera
    ````
    3.2 - Captura em tempo de execução
    ````bash
-   sudo python3 src/captura_imagem_tempo_de_execução.py
+   sudo python3 src/captura_imagem_tempo_de_execucao.py
    ````
    3.3 - Captura não volátil de imagem
    ````bash
