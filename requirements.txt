@@ -2,3 +2,5 @@
 gpiozero
 keyboard
 guizero
+picamera2
+opencv
