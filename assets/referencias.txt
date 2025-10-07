@@ -14,4 +14,3 @@ https://en.wikipedia.org/wiki/Single-board_computer
 
 -- Projeto como um todo
 https://www.instructables.com/Brookstone-Rover-Massive-Upgrade/
-

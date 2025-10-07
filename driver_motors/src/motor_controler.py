@@ -1,60 +1,62 @@
 from guizero import App, PushButton, Text, Box
-from gpiozero import Motor, Device
-from gpiozero.pins.mock import MockFactory, MockPWMPin
+from gpiozero import Robot
+from ..constantes import LEFT_MOTOR_1, LEFT_MOTOR_2, RIGHT_MOTOR_1, RIGHT_MOTOR_2
 
-# Simulador GPIO
-Device.pin_factory = MockFactory(pin_class=MockPWMPin)
-
-# Motores simulados
-motor_left = Motor(17, 18)
-motor_right = Motor(22, 23)
-
+# Criacao do motor, junto com a definicao dos pinos
+motor = Robot(left=(LEFT_MOTOR_1, LEFT_MOTOR_2), right=(RIGHT_MOTOR_1, RIGHT_MOTOR_2))
 motor_speed = 0.5
 
-# --- Funções de controle ---
+# Funcoes de controle
 forward_pressed = backward_pressed = left_pressed = right_pressed = False
 
 def move_forward_loop():
+    """
+        Move os dois motores para frente com a velocidade atual
+    """  
     if forward_pressed:
-        motor_left.forward(speed=motor_speed)  # type: ignore
-        motor_right.forward(speed=motor_speed) #type: ignore
+        motor.forward(motor_speed) #type: ignore
         print("Frente")
         app.tk.after(100, move_forward_loop)
     else:
-        motor_left.stop()
-        motor_right.stop()
+        motor.stop()
 
 def move_backward_loop():
+    """
+        Move os dois motores para tras com a velocidade atual
+    """
     if backward_pressed:
-        motor_left.backward(speed=motor_speed) # type: ignore
-        motor_right.backward(speed=motor_speed) # type: ignore
+        motor.backward(speed=motor_speed) # type: ignore
         print("Trás")
         app.tk.after(100, move_backward_loop)
     else:
-        motor_left.stop()
-        motor_right.stop()
+        motor.stop()
 
 def move_left_loop():
+    """
+        Move apenas o motor esquerdo para frente com a velocidade atual
+    """
     if left_pressed:
-        motor_left.backward(speed=motor_speed) # type: ignore
-        motor_right.forward(speed=motor_speed) # type: ignore
+        motor.left(speed=motor_speed) # type: ignore
         print("Esquerda")
         app.tk.after(100, move_left_loop)
     else:
-        motor_left.stop()
-        motor_right.stop()
+        motor.stop()
 
 def move_right_loop():
+    """
+        Move apenas o motor direito para frente com a velocidade atual
+    """ 
     if right_pressed:
-        motor_left.forward(speed=motor_speed) # type: ignore
-        motor_right.backward(speed=motor_speed) # type: ignore
+        motor.right(speed=motor_speed) # type: ignore
         print("Direita")
         app.tk.after(100, move_right_loop)
     else:
-        motor_left.stop()
-        motor_right.stop()
+        motor.stop()
 
 def increase_speed():
+    """
+        Aumenta a velociade 10%, ate chegar ao maximo, 1.
+    """
     global motor_speed
     
     if motor_speed + 0.1 > 1:
@@ -67,6 +69,9 @@ def increase_speed():
     print(f"Velocidade atual: {motor_speed:.1f}")
 
 def decrease_speed():
+    """
+        Diminui a velocidade 10%, ate chegar ao minimo, 0.
+    """
     global motor_speed
 
     if motor_speed - 0.1 < 0:
