@@ -21,7 +21,7 @@ def capturar_foto_documentos():
     picam2.start()
 
     # Cria timestamp
-    timestamp = datetime.now().strftime("%Y/%m/%d_%H-%M-%S")
+    timestamp = datetime.now().strftime("%Y/%m/%d_%H/%M/%S")
 
     # Nome completo do arquivo
     nome_arquivo = f"{nome_base}_{timestamp}.jpg"
@@ -36,4 +36,5 @@ def capturar_foto_documentos():
 
 # Executa a função
 capturar_foto_documentos()
+
 
