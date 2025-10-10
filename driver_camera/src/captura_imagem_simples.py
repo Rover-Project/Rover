@@ -1,22 +1,38 @@
 from picamera2 import Picamera2
-import cv2
+from datetime import datetime
+import os
 
-# Inicializa a câmera picam2 = Picamera2()
+def capturar_foto_documentos():
+    picam2 = Picamera2()
 
-# Configura a resolução
-config = picam2.create_preview_configuration(main={"size": (640, 480)})
-picam2.configure(config)
+    # Nome base do arquivo
+    nome_base = input("Digite o nome da foto (sem extensão): ").strip()
+    if not nome_base:
+        nome_base = "foto"
 
-# Inicia captura
-picam2.start()
+    # Caminho da pasta Imagens do usuário
+    pasta_imagens = os.path.expanduser("~/Imagens")
+    if not os.path.exists(pasta_imagens):
+        os.makedirs(pasta_imagens)
 
-# Captura uma imagem
-frame = picam2.capture_array()
+    # Configura a câmera com resolução padrão (IMX219)
+    config = picam2.create_still_configuration(main={"size": (3280, 2464)})
+    picam2.configure(config)
+    picam2.start()
 
-# Mostra a imagem capturada
-frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-cv2.imshow("Imagem Capturada", frame_bgr)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    # Cria timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-# Resultado esperado: O código deve abrir uma janela com a imagem capturada pela câmera. Se aparecer, está tudo certo com a instalação e configuração do software.
+    # Nome completo do arquivo
+    nome_arquivo = f"{nome_base}_{timestamp}.jpg"
+    caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
+
+    # Captura a foto
+    picam2.capture_file(caminho_completo)
+    picam2.stop()
+
+    print(f"Foto salva em: {caminho_completo}")
+
+
+# Executa a função
+capturar_foto_documentos()
