@@ -25,16 +25,18 @@ def capturar_camera_interativa():
         except ValueError:
             print("Digite números válidos.")
 
-    # FPS
-    while True:
-        try:
-            fps = int(input("Digite o FPS desejado (frames por segundo): "))
-            if fps > 0:
-                break
-            else:
-                print("FPS deve ser positivo.")
-        except ValueError:
-            print("Digite um número válido.")
+    # FPS (apenas para vídeo)
+    fps = 0
+    if modo == "video":
+        while True:
+            try:
+                fps = int(input("Digite o FPS desejado (frames por segundo): "))
+                if fps > 0:
+                    break
+                else:
+                    print("FPS deve ser positivo.")
+            except ValueError:
+                print("Digite um número válido.")
 
     # Rotação
     while True:
@@ -66,7 +68,11 @@ def capturar_camera_interativa():
                 print("Digite um número válido.")
 
     # Configuração da câmera
-    config = picam2.create_video_configuration(main={"size": (width, height), "format": "RGB888"})
+    if modo == "foto":
+        config = picam2.create_still_configuration(main={"size": (width, height)})
+    else:  # vídeo
+        config = picam2.create_video_configuration(main={"size": (width, height), "format": "RGB888"}, controls={"FrameRate": fps})
+
     picam2.configure(config)
     picam2.rotation = rotacao
     picam2.start()
@@ -77,8 +83,8 @@ def capturar_camera_interativa():
         picam2.capture_file(caminho)
         print(f"Foto salva em {caminho}")
     else:
-        caminho = f"{nome_arquivo}.h264"
-        picam2.start_recording(caminho)
+        caminho = f"{nome_arquivo}.mp4"
+        picam2.start_recording(output=caminho)  # Corrigido: output obrigatório
         print(f"Gravando vídeo por {duracao} segundos...")
         time.sleep(duracao)
         picam2.stop_recording()
