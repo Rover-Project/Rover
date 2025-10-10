@@ -2,13 +2,8 @@ from picamera2 import Picamera2
 from datetime import datetime
 import os
 
-def capturar_foto_documentos():
+def capturar_fotos_continuas():
     picam2 = Picamera2()
-
-    # Nome base do arquivo
-    nome_base = input("Digite o nome da foto (sem extensão): ").strip()
-    if not nome_base:
-        nome_base = "foto"
 
     # Caminho da pasta Imagens do usuário
     pasta_imagens = os.path.expanduser("~/Imagens")
@@ -20,21 +15,33 @@ def capturar_foto_documentos():
     picam2.configure(config)
     picam2.start()
 
-    # Cria timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    print("=== Captura de fotos interativa ===")
+    
+    while True:
+        # Nome base do arquivo
+        nome_base = input("Digite o nome da foto (sem extensão, pressione Enter para 'foto'): ").strip()
+        if not nome_base:
+            nome_base = "foto"
 
-    # Nome completo do arquivo
-    nome_arquivo = f"{nome_base}_{timestamp}.jpg"
-    caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
+        # Cria timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Captura a foto
-    picam2.capture_file(caminho_completo)
+        # Nome completo do arquivo
+        nome_arquivo = f"{nome_base}_{timestamp}.jpg"
+        caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
+
+        # Captura a foto
+        picam2.capture_file(caminho_completo)
+        print(f"Foto salva em: {caminho_completo}")
+
+        # Pergunta se o usuário quer continuar
+        continuar = input("Deseja tirar outra foto? (s/n): ").strip().lower()
+        if continuar != "s":
+            break
+
     picam2.stop()
-
-    print(f"Foto salva em: {caminho_completo}")
+    print("Sessão de fotos encerrada.")
 
 
 # Executa a função
-capturar_foto_documentos()
-
-
+capturar_fotos_continuas()
