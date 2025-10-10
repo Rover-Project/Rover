@@ -1,10 +1,9 @@
 from picamera2 import Picamera2
-from picamera2.encoders import JpegEncoder
-from picamera2.outputs import FileOutput
+from PIL import Image
 from datetime import datetime
 import os
 
-def capturar_foto_rotacionada():
+def capturar_foto_rotacionada_pil():
     picam2 = Picamera2()
 
     # Pasta para salvar fotos
@@ -18,8 +17,16 @@ def capturar_foto_rotacionada():
         nome_base = "foto"
 
     # Resolução
-    width = int(input("Digite a largura (pixels): "))
-    height = int(input("Digite a altura (pixels): "))
+    while True:
+        try:
+            width = int(input("Digite a largura (pixels): "))
+            height = int(input("Digite a altura (pixels): "))
+            if width > 0 and height > 0:
+                break
+            else:
+                print("Valores devem ser positivos.")
+        except ValueError:
+            print("Digite números válidos.")
 
     # Rotação
     while True:
@@ -37,16 +44,27 @@ def capturar_foto_rotacionada():
     nome_arquivo = f"{nome_base}_{timestamp}.jpg"
     caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
 
-    # Configuração da câmera para foto, com rotação aplicada
-    config = picam2.create_still_configuration(main={"size": (width, height)}, transform=rotacao)
+    # Configuração da câmera
+    config = picam2.create_still_configuration(main={"size": (width, height)})
     picam2.configure(config)
     picam2.start()
 
-    # Captura
-    picam2.capture_file(caminho_completo)
+    # Captura a foto
+    caminho_temp = os.path.join(pasta_imagens, "temp.jpg")
+    picam2.capture_file(caminho_temp)
     picam2.stop()
+
+    # Abre a foto com PIL e aplica a rotação
+    imagem = Image.open(caminho_temp)
+    if rotacao != 0:
+        imagem = imagem.rotate(-rotacao, expand=True)  # negativo para girar no sentido horário
+    imagem.save(caminho_completo)
+
+    # Remove arquivo temporário
+    os.remove(caminho_temp)
 
     print(f"Foto salva em: {caminho_completo}")
 
 
-capturar_foto_rotacionada()
+# Executa a função
+capturar_foto_rotacionada_pil()
