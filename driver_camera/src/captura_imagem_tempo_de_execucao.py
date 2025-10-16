@@ -3,7 +3,7 @@ import cv2
 
 # Inicializa a câmera
 picam2 = Picamera2()
-config = picam2.create_preview_configuration(main={"size": (640, 480)})
+config = picam2.create_preview_configuration(main={"size": (1280, 720)})
 picam2.configure(config)
 picam2.start()
 
@@ -22,4 +22,5 @@ while True:
 cv2.destroyAllWindows()
 
 # O resultado esperado é a visualização de um vídeo ao vivo, com baixa latência, que permanece em execução até que o usuário pressione a tecla q para encerrar.
+
 
