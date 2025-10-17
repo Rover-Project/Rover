@@ -46,12 +46,43 @@ sudo apt full-upgrade
 
 
  **2. Instalar dependências:**
-
 ````bash
 sudo apt install -y python3-picamera2
 sudo apt install -y python3-opencv 
 ````
- ***
+
+**3. Teste de reconhecimento da câmera:**
+````bash
+rpicam-hello --list-cameras
+
+# A flag --list-cameras mostra todas as câmeras detectadas pelo sistema,
+# com informações como o modelo, a resolução e o número do dispositivo (cam0, cam1 etc).
+
+````
+
+**4. Forçando o reconhecimento manualmente:**
+
+- Em alguns casos a câmera não é automaticamente detectada pela Raspberry Pi, sendo necessário editar o arquivo config.txt da Raspberry Pi para forçar o reconhecimento manual do sensor.
+
+````bash
+# Acesse o arquivo config.txt da Raspberry Pi
+
+sudo nano /boot/config.txt
+
+# Dentro do arquivo config.txt adicione as linhas de comando a seguir (de preferência no final do arquivo):
+
+camera_auto_detect=0
+dtoverlay=imx219,cam0
+
+# O parâmetro "imx219" indica o sendor de imagem da câmera, e o mesmo deve ser modificado dependendo da câmera que estiver sendo utilizada
+# por exemplo (imx477, ov5647, imx519, etc.):
+
+dtoverlay=<nome_do_sensor>,cam0
+
+# O parâmetro "cam0" indica que a câmera está conectada à porta CSI0, caso estivesse na porta CSI1, deve ser usado:
+
+dtoverlay=<nome_do_sensor>,cam1
+ ````
 
 ## Uso
 
