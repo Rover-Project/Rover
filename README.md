@@ -11,6 +11,7 @@ O projeto inclui suporte a:
 ## Estrutura do Repositório
 
 - `driver_motors/` - Scripts e drivers para controle dos motores DC via ponte H.  
+- `driver_camera/` - Scripts e drivers para controle de camêras via MSI da raspberry.
 
 ## Instalação
 

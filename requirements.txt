@@ -1,6 +1,11 @@
-# Dependecias para o driver de motores
+# Pacotes de baixo nível específicos para Raspberry Pi e GPIO
 gpiozero
-keyboard
-guizero
+
+# Gerenciamento de câmera libcamera (somente na Raspberry Pi OS)
 picamera2
-opencv
+
+# Manipulação de imagens e visão computacional
+opencv-python
+
+# Biblioteca de manipulação de imagens (substitui 'pilow')
+Pillow
