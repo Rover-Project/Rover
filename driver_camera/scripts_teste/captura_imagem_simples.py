@@ -3,7 +3,7 @@ import time
 import os
 
 # Intervalo entre fotos em segundos
-INTERVALO = 5   # tire uma foto a cada 5s
+INTERVALO = 1   # tire uma foto a cada 1s
 
 # Criar pasta se não existir
 pasta = "timelapse"
