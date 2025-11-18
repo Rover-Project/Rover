@@ -9,3 +9,8 @@ opencv-python
 
 # Biblioteca de manipulação de imagens (substitui 'pilow')
 Pillow
+
+rpi.gpio
+picamera2
+opencv-python
+numpy
