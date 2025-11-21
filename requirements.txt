@@ -2,7 +2,7 @@
 gpiozero
 
 # Gerenciamento de câmera libcamera (somente na Raspberry Pi OS)
-picamera2
+#picamera2
 
 # Manipulação de imagens e visão computacional
 opencv-python
