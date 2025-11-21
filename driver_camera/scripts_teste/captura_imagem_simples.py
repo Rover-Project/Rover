@@ -57,7 +57,7 @@ def capturar_n_fotos_rotacionadas():
 
     for i in range(1, n + 1):
         # Nome seguro e numerado
-        nome_arquivo = f"foto_3280x2464{i:04d}.jpg"
+        nome_arquivo = f"foto_3280x2464_{i:04d}_{timestamp}.jpg"
         caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
 
         # Captura temporária
