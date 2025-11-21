@@ -72,7 +72,7 @@ def capturar_n_fotos_rotacionadas():
 
         print(f"Foto {i}/{n} salva em: {caminho_completo}")
 
-        time.sleep(0.5)  # opcional — pausa entre capturas
+        time.sleep(1,5)  # opcional — pausa entre capturas
 
     picam2.stop()
     os.remove(caminho_temp)
