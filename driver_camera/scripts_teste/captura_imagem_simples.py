@@ -1,30 +1,34 @@
 from picamera2 import Picamera2
-import time
+from datetime import datetime
 import os
 
-# Intervalo entre fotos em segundos
-INTERVALO = 1   # tire uma foto a cada 1s
-
-# Criar pasta se não existir
-pasta = "timelapse"
-os.makedirs(pasta, exist_ok=True)
-
+# Inicializa a câmera
 picam2 = Picamera2()
-config = picam2.create_still_configuration({"size": (1920, 1080)})
-picam2.configure(config)
+rotacao = 90
+cfg = picam2.create_still_configuration(main={"size": (3280, 2464)}, transform=Transform(rotation=rotacao))
+picam2.configure(cfg)
 picam2.start()
 
-print("Timelapse iniciado. Pressione Ctrl+C para parar.")
+# Pasta onde as fotos serão salvas
+pasta = "/home/rover/Imagens/TestesDoNovoSensor"
+os.makedirs(pasta, exist_ok=True)
 
-contador = 1
-try:
-    while True:
-        nome_arquivo = f"{pasta}/foto_{contador:04d}.jpg"
-        picam2.capture_file(nome_arquivo)
-        print(f"📸 Foto capturada: {nome_arquivo}")
-        contador += 1
-        time.sleep(INTERVALO)
+print("=== Sistema de Captura de Fotos ===")
+print("Pressione ENTER para capturar uma foto.")
+print("Digite 'q' e pressione ENTER para sair.\n")
 
-except KeyboardInterrupt:
-    print("\nTimelapse finalizado.")
-    picam2.stop()
+while True:
+    comando = input("Comando: ")
+
+    if comando.lower() == "q":
+        print("Encerrando o programa...")
+        break
+
+    # Capturar foto com data e hora
+    nome = datetime.now().strftime("img_%Y%m%d_%H%M%S.jpg")
+    caminho = os.path.join(pasta, nome)
+
+    picam2.capture_file(caminho)
+    print(f"Foto capturada e salva em: {caminho}")
+
+picam2.stop()
