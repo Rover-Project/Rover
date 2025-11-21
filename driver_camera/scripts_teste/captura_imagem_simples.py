@@ -2,25 +2,27 @@ from picamera2 import Picamera2
 from PIL import Image
 from datetime import datetime
 import os
+import time
 
-def capturar_foto_rotacionada_pil():
+def capturar_n_fotos_rotacionadas():
     picam2 = Picamera2()
 
     # Pasta para salvar fotos
     pasta_imagens = os.path.expanduser("~/Imagens")
     os.makedirs(pasta_imagens, exist_ok=True)
 
-    # Gera nome automático com contador + timestamp
-    contador = 1
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # ==== QUANTAS FOTOS? ====
     while True:
-        nome_arquivo = f"foto_{contador:04d}_{timestamp}.jpg"
-        caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
-        if not os.path.exists(caminho_completo):
-            break
-        contador += 1
+        try:
+            n = int(input("Quantas fotos deseja tirar? "))
+            if n > 0:
+                break
+            else:
+                print("Digite um valor maior que zero.")
+        except ValueError:
+            print("Digite um número válido.")
 
-    # Resolução
+    # ==== RESOLUÇÃO ====
     while True:
         try:
             width = int(input("Digite a largura (pixels): "))
@@ -32,7 +34,7 @@ def capturar_foto_rotacionada_pil():
         except ValueError:
             print("Digite números válidos.")
 
-    # Rotação
+    # ==== ROTAÇÃO ====
     while True:
         try:
             rotacao = int(input("Digite a rotação (0, 90, 180, 270): "))
@@ -43,26 +45,40 @@ def capturar_foto_rotacionada_pil():
         except ValueError:
             print("Digite um número válido.")
 
-    # Configuração da câmera
+    # ==== CONFIGURA A CÂMERA UMA VEZ ====
     config = picam2.create_still_configuration(main={"size": (width, height)})
     picam2.configure(config)
     picam2.start()
 
-    # Captura em arquivo temporário
-    caminho_temp = os.path.join(pasta_imagens, "temp.jpg")
-    picam2.capture_file(caminho_temp)
+    print("\nIniciando captura de fotos...\n")
+
+    # Gera timestamp único para todas as fotos dessa sessão
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    for i in range(1, n + 1):
+        # Nome seguro e numerado
+        nome_arquivo = f"foto_{i:04d}_{timestamp}.jpg"
+        caminho_completo = os.path.join(pasta_imagens, nome_arquivo)
+
+        # Captura temporária
+        caminho_temp = os.path.join(pasta_imagens, "temp.jpg")
+        picam2.capture_file(caminho_temp)
+
+        # Abre, rotaciona e salva
+        imagem = Image.open(caminho_temp)
+        if rotacao != 0:
+            imagem = imagem.rotate(-rotacao, expand=True)
+        imagem.save(caminho_completo)
+
+        print(f"Foto {i}/{n} salva em: {caminho_completo}")
+
+        time.sleep(0.5)  # opcional — pausa entre capturas
+
     picam2.stop()
-
-    # PIL: abre, rotaciona, salva com nome final
-    imagem = Image.open(caminho_temp)
-    if rotacao != 0:
-        imagem = imagem.rotate(-rotacao, expand=True)
-    imagem.save(caminho_completo)
-
     os.remove(caminho_temp)
 
-    print(f"Foto salva em: {caminho_completo}")
+    print("\nCaptura finalizada com sucesso!")
 
 
 # Executa a função
-capturar_foto_rotacionada_pil()
+capturar_n_fotos_rotacionadas()
