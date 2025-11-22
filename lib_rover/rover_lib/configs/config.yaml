@@ -1,0 +1,16 @@
+# Configuração da GPIO para a ponte-H
+gpio:
+  motor_esquerdo:
+    in1: 17
+    in2: 27
+    ena: 22
+  motor_direito:
+    in3: 23
+    in4: 24
+    enb: 25
+
+# Configuração da câmera
+camera:
+  resolution: [3280, 2464]
+  fps: 30
+  preview_resolution: [640, 480]
