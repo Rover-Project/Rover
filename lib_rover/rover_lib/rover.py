@@ -3,7 +3,6 @@ import cv2
 from .modules.movement import MovementModule
 from .modules.camera import CameraModule
 from .modules.vision import VisionModule
-from .utils.constants import CAMERA_PREVIEW_RESOLUTION
 
 class Rover:
     

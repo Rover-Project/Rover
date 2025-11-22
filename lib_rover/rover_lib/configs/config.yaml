@@ -1,4 +1,6 @@
 # Configuração da GPIO para a ponte-H
+# Mapeamento de pinos GPIO (usando a numeração BCM) para a Ponte-H L298N
+# Estes são valores de exemplo. O usuário deve ajustá-los de acordo com a fiação real.
 gpio:
   motor_esquerdo:
     in1: 17
@@ -11,6 +13,6 @@ gpio:
 
 # Configuração da câmera
 camera:
-  resolution: [3280, 2464]
-  fps: 30
-  preview_resolution: [640, 480]
+  resolution: [3280, 2464] # Resolução máxima do sensor IMX219
+  fps: 30 # Taxa de quadros (Frames per Second)
+  preview_resolution: [640, 480] # Resolução para processamento de visão em tempo real

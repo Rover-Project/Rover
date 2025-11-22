@@ -1,6 +1,7 @@
 import time
 import cv2
 import numpy as np
+from ..utils.config_load import Config
 
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
@@ -27,9 +28,10 @@ except (ImportError, ModuleNotFoundError):
             return img
         def stop(self): pass
 
-from ..utils.constants import (
-    CAMERA_RESOLUTION, CAMERA_FPS, CAMERA_PREVIEW_RESOLUTION
-)
+# Carrega configuração da câmera
+CAMERA_RESOLUTION = tuple(Config.get("camera")["resolution"])
+CAMERA_FPS = int(Config.get("camera")["fps"])
+CAMERA_PREVIEW_RESOLUTION = tuple(Config.get("camera")["preview_resolution"])
 
 class CameraModule:
     """

@@ -11,11 +11,17 @@ except (RuntimeError, ModuleNotFoundError):
     print("AVISO: RPi.GPIO não detectado. Este módulo requer Raspberry Pi com RPi.GPIO instalado.")
     raise ImportError("RPi.GPIO não está disponível. Execute este código na Raspberry Pi.")
 
-from ...utils.constants import (
-    MOTOR_ESQUERDO_IN1, MOTOR_ESQUERDO_IN2, MOTOR_ESQUERDO_ENA,
-    MOTOR_DIREITO_IN3, MOTOR_DIREITO_IN4, MOTOR_DIREITO_ENB
-)
+from ...utils.config_load import Config 
 
+# Carregando configuração dos pinos da ponte-h
+gpio = Config.get("gpio")
+
+MOTOR_ESQUERDO_IN1 = gpio["motor_esquerdo"]["in1"]
+MOTOR_ESQUERDO_IN2 = gpio["motor_esquerdo"]["in2"]
+MOTOR_ESQUERDO_ENA = gpio["motor_esquerdo"]["ena"]
+MOTOR_DIREITO_IN3 = gpio["motor_direito"]["in3"]
+MOTOR_DIREITO_IN4 = gpio["motor_direito"]["in4"]
+MOTOR_DIREITO_ENB = gpio["motor_direito"]["enb"]
 
 class MotorDriver:
     """
