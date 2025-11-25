@@ -3,13 +3,11 @@
 # Estes são valores de exemplo. O usuário deve ajustá-los de acordo com a fiação real.
 gpio:
   motor_esquerdo:
-    in1: 17
-    in2: 27
-    ena: 22
+    in1: 12
+    in2: 11
   motor_direito:
-    in3: 23
-    in4: 24
-    enb: 25
+    in3: 15
+    in4: 16
 
 # Configuração da câmera
 camera:

@@ -4,7 +4,7 @@ Tenta ajustes pontuais para compensar diferenças entre motores.
 """
 import json
 import os
-from .commands import MovementCommands
+from robot import Robot
 
 
 class MotorCalibration:
@@ -84,7 +84,7 @@ class MotorCalibration:
         return left_calibrated, right_calibrated
 
 
-class MovementControl(MovementCommands):
+class MovementControl(Robot):
     """
     Controle avançado de movimento com compensação e calibração.
     """
