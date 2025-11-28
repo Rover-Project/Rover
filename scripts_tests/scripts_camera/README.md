@@ -95,18 +95,18 @@ git clone "https://github.com/AbstractGleidson/Rover.git"
 ````bash
 cd Rover/driver_camera
 ````
-3. Execute os programas com privilégios de root
+3. Execute os programas no seu terminal
 
     3.1 - Captura simples com a câmera
    ````bash
-   sudo python3 src/captura_imagem_simples.py
+   python3 captura_imagem_simples.py
    ````
    3.2 - Captura em tempo de execução
    ````bash
-   sudo python3 src/captura_imagem_tempo_de_execucao.py
+   python3 captura_imagem_tempo_de_execucao.py
    ````
    3.3 - Captura não volátil de imagem
    ````bash
-   sudo python3 src/captura_imagem_salvar.py
+   python3 captura_imagem_salvar.py
    ````
 ---
