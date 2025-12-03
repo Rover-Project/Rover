@@ -1,78 +1,92 @@
-from picamera2 import Picamera2
 import cv2
 import numpy as np
-import time
+import os
 
-# Configurações para detecção de círculos (ajustadas para olhos)
-MIN_DIST = 40
-MIN_RADIUS = 15
-MAX_RADIUS = 50
+def detectar_tampa_vermelha_otimizado(caminho_imagem, minDist=40, minRadius=10, maxRadius=120):
+    
+    if not os.path.exists(caminho_imagem):
+        print(f"ERRO: Arquivo não encontrado no caminho: {caminho_imagem}")
+        return
 
-def detectar_olhos_picam(h=640, w=480):
+    frame = cv2.imread(caminho_imagem)
+    if frame is None:
+        print("ERRO: Não foi possível carregar a imagem. Verifique se o caminho ou o formato estão corretos.")
+        return
+        
+    output = frame.copy() 
+
+    # 1. SEGMENTAÇÃO HSV OTIMIZADA PARA VERMELHO
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    # 1. Configurar e Iniciar a Câmera
-    picam = Picamera2()
+    # Faixa de Vermelho 1 (Próximo a 0 graus de HUE) - Mais tolerante
+    lower_red_1 = np.array([0, 80, 50])  # Diminui a saturação e o valor mínimo
+    upper_red_1 = np.array([10, 255, 255])
+    mask1 = cv2.inRange(hsv, lower_red_1, upper_red_1)
+
+    # Faixa de Vermelho 2 (Próximo a 180 graus de HUE) - Mais tolerante
+    lower_red_2 = np.array([160, 80, 50]) # Diminui a saturação e o valor mínimo
+    upper_red_2 = np.array([179, 255, 255])
+    mask2 = cv2.inRange(hsv, lower_red_2, upper_red_2)
+
+    # Combina as máscaras
+    mask = mask1 + mask2
+
+    # 2. PRÉ-PROCESSAMENTO NA MÁSCARA
+    # Aplica uma operação morfológica para fechar pequenos buracos no objeto detectado
+    kernel = np.ones((5, 5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     
-    # Configuração da câmera: define o formato e o tamanho da imagem de saída
-    camera_config = picam.create_preview_configuration(
-        main={"format": "RGB888", "size": (h, w)}
+    # Aplica a máscara para obter apenas a cor vermelha isolada
+    res = cv2.bitwise_and(frame, frame, mask=mask)
+
+    # Converte o resultado filtrado para escala de cinza
+    gray_masked = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+    
+    # Adiciona a detecção de bordas Canny antes do HoughCircles
+    # (Pode melhorar o desempenho do Hough se houver muitas bordas falsas)
+    edges = cv2.Canny(gray_masked, 50, 150) # Tente 50 e 150 como limiares
+
+    # 3. DETECÇÃO DE CÍRCULOS
+    circles = cv2.HoughCircles(
+        edges, # Usando as bordas detectadas em vez do gray_masked puro
+        cv2.HOUGH_GRADIENT,
+        dp=1.2,
+        minDist=minDist,
+        param1=100,
+        param2=30,
+        minRadius=minRadius,
+        maxRadius=maxRadius
     )
-    picam.configure(camera_config)
-    picam.start()
 
-    time.sleep(1) # Pequeno delay para estabilizar o sensor
+    # 4. DESENHAR RESULTADOS
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
 
-    print("Iniciando detecção de olhos via Picamera2. Pressione 'q' para sair.")
-
-    try:
-        while True:
-            # 2. Captura do Frame
-            # picam.capture_array() retorna um array NumPy (RGB)
-            frame = picam.capture_array()
-            output = frame.copy()
+        for (x, y, r) in circles[0, :]:
+            cv2.circle(output, (x, y), r, (0, 255, 0), 2)
+            cv2.circle(output, (x, y), 2, (0, 0, 255), 3)
             
-            # Converte de RGB para BGR (formato esperado pelo OpenCV)
-            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            cv2.putText(output, f"({x},{y}) r={r}", (x - 40, y - r - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            print(f"Círculo detectado: Centro=({x},{y}), Raio={r}")
+    else:
+        print("Nenhum círculo vermelho detectado com os parâmetros atuais.")
 
-            # 3. Processamento
-            gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
-            gray = cv2.medianBlur(gray, 5)
 
-            # 4. Detecção de círculos (olhos) usando HoughCircles
-            circles = cv2.HoughCircles(
-                gray,
-                cv2.HOUGH_GRADIENT,
-                dp=1,
-                minDist=MIN_DIST,
-                param1=100,
-                param2=30,  # Limiar de votos do centro do círculo
-                minRadius=MIN_RADIUS,
-                maxRadius=MAX_RADIUS
-            )
-
-            # 5. Desenhar Círculos
-            if circles is not None:
-                circles = np.uint16(np.around(circles))
-
-                for (x, y, r) in circles[0, :]:
-                    # Desenha o círculo na imagem original (output BGR)
-                    cv2.circle(frame_bgr, (x, y), r, (0, 255, 0), 2)  # Contorno
-                    cv2.circle(frame_bgr, (x, y), 2, (0, 0, 255), 3)  # Centro
-                    
-                    # Opcional: Exibe o raio e o centro
-                    cv2.putText(frame_bgr, f"r={r}", (x + 10, y - r), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-            # 6. Mostrar o resultado
-            cv2.imshow('Deteccao de Olhos - Ao Vivo (PiCam)', frame_bgr)
-
-            # 7. Interromper o loop: Pressione 'q' para sair
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    finally:
-        # Garante que a câmera e as janelas sejam fechadas
-        picam.stop()
-        cv2.destroyAllWindows()
+    # 5. MOSTRAR E ESPERAR
+    cv2.imshow("1. Imagem Original com Deteccao", output)
+    cv2.imshow("2. Mascara de Cor Aplicada (O que foi visto como Vermelho)", mask) # Mostra a máscara pura
+    cv2.imshow("3. Bordas Canny (Input para Hough)", edges) # Mostra as bordas
+    
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detectar_olhos_picam()
+    caminho_da_imagem = input("Digite o caminho completo da imagem (Ex: foto.jpg): ")
+    caminho_da_imagem = caminho_da_imagem.strip().replace('"', '').replace("'", '')
+    
+    # **IMPORTANTE:** Se a tampa for pequena ou grande demais, ajuste estes parâmetros:
+    # detectar_tampa_vermelha_otimizado(caminho_da_imagem, minRadius=20, maxRadius=100)
+    
+    detectar_tampa_vermelha_otimizado(caminho_da_imagem)
