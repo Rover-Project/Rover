@@ -13,43 +13,37 @@ def detectar_tampa_vermelha_otimizado(caminho_imagem, minDist=40, minRadius=10, 
         print("ERRO: Não foi possível carregar a imagem. Verifique se o caminho ou o formato estão corretos.")
         return
         
-    output = frame.copy() 
+    output = frame.copy()
 
     # 1. SEGMENTAÇÃO HSV OTIMIZADA PARA VERMELHO
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    # Faixa de Vermelho 1 (Próximo a 0 graus de HUE) - Mais tolerante
-    lower_red_1 = np.array([0, 80, 50])  # Diminui a saturação e o valor mínimo
+    # Faixa de Vermelho 1
+    lower_red_1 = np.array([0, 80, 50])
     upper_red_1 = np.array([10, 255, 255])
     mask1 = cv2.inRange(hsv, lower_red_1, upper_red_1)
 
-    # Faixa de Vermelho 2 (Próximo a 180 graus de HUE) - Mais tolerante
-    lower_red_2 = np.array([160, 80, 50]) # Diminui a saturação e o valor mínimo
+    # Faixa de Vermelho 2
+    lower_red_2 = np.array([160, 80, 50])
     upper_red_2 = np.array([179, 255, 255])
     mask2 = cv2.inRange(hsv, lower_red_2, upper_red_2)
 
-    # Combina as máscaras
     mask = mask1 + mask2
 
     # 2. PRÉ-PROCESSAMENTO NA MÁSCARA
-    # Aplica uma operação morfológica para fechar pequenos buracos no objeto detectado
     kernel = np.ones((5, 5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     
-    # Aplica a máscara para obter apenas a cor vermelha isolada
     res = cv2.bitwise_and(frame, frame, mask=mask)
 
-    # Converte o resultado filtrado para escala de cinza
     gray_masked = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     
-    # Adiciona a detecção de bordas Canny antes do HoughCircles
-    # (Pode melhorar o desempenho do Hough se houver muitas bordas falsas)
-    edges = cv2.Canny(gray_masked, 50, 150) # Tente 50 e 150 como limiares
+    edges = cv2.Canny(gray_masked, 50, 150)
 
     # 3. DETECÇÃO DE CÍRCULOS
     circles = cv2.HoughCircles(
-        edges, # Usando as bordas detectadas em vez do gray_masked puro
+        edges,
         cv2.HOUGH_GRADIENT,
         dp=1.2,
         minDist=minDist,
@@ -74,19 +68,26 @@ def detectar_tampa_vermelha_otimizado(caminho_imagem, minDist=40, minRadius=10, 
         print("Nenhum círculo vermelho detectado com os parâmetros atuais.")
 
 
-    # 5. MOSTRAR E ESPERAR
-    cv2.imshow("1. Imagem Original com Deteccao", output)
-    cv2.imshow("2. Mascara de Cor Aplicada (O que foi visto como Vermelho)", mask) # Mostra a máscara pura
-    cv2.imshow("3. Bordas Canny (Input para Hough)", edges) # Mostra as bordas
+    # 5. MOSTRAR E ESPERAR (CORRIGIDO: AGORA ESTÁ DENTRO DA FUNÇÃO)
+    largura_visualizacao = 1200
     
+    # Redimensiona a imagem MANTENDO A PROPORÇÃO
+    output_resized = cv2.resize(
+        output,
+        (largura_visualizacao, int(output.shape[0] * (largura_visualizacao / output.shape[1])))
+    )
+
+    # Agora mostre a imagem redimensionada
+    cv2.imshow("1. Imagem Original com Deteccao", output_resized)
+    cv2.imshow("2. Mascara de Cor Aplicada (O que foi visto como Vermelho)", mask)
+    cv2.imshow("3. Bordas Canny (Input para Hough)", edges)
+
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     caminho_da_imagem = input("Digite o caminho completo da imagem (Ex: foto.jpg): ")
     caminho_da_imagem = caminho_da_imagem.strip().replace('"', '').replace("'", '')
-    
-    # **IMPORTANTE:** Se a tampa for pequena ou grande demais, ajuste estes parâmetros:
-    # detectar_tampa_vermelha_otimizado(caminho_da_imagem, minRadius=20, maxRadius=100)
     
     detectar_tampa_vermelha_otimizado(caminho_da_imagem)
