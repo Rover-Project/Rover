@@ -67,12 +67,14 @@ def redCircleDetect(configHough: dict, nameFile):
         # Mostrar imagens
         openCv.imshow("Deteccao da Cor Capturada", frame)
         openCv.imshow("Mascara Atual", mask)
+        
+        key = (openCv.waitKey(1) & 0xFF)
 
-        if openCv.waitKey(1) & 0xFF == ord('s'):
-            saveConfig(configHough, nameFile)
-
-        if openCv.waitKey(1) & 0xFF == ord('q'):
+        if key == ord('q'):
             break
+        
+        if key == ord('s'):
+            saveConfig(configHough, nameFile)
 
     picam.stop()
     openCv.destroyAllWindows()

@@ -48,14 +48,18 @@ def colorDetect(nameColor: str, h=680, w=480, limiar=5):
 
         openCv.imshow("Imagem Original", frame)
         
-        if openCv.waitKey(1) & 0xFF == ord('s'):
+        key = (openCv.waitKey(1) & 0xFF)
+        
+        if key == ord('s'):
             saveConfig(color, nameColor)
 
-        if openCv.waitKey(1) & 0xFF == ord('q'):
+        if key & 0xFF == ord('q'):
             break
 
     picam.stop()
     openCv.destroyAllWindows()
 
 if __name__ == "__main__":
-    colorDetect()
+    
+    nameFile = input("Digite o nome do arquivo: ")
+    colorDetect(nameColor=nameFile)
