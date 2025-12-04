@@ -25,19 +25,19 @@ def colorDetect(nameColor: str, h=680, w=480, limiar=5):
 
         # Pixel central
         cx, cy = w // 2, h // 2
-        hsv_center = hsv[cy, cx]
+        hsv_center = list(hsv[cy, cx])
         
         # extraindo valores hsv
         color = {
             "low": {
-                "hue": hsv_center[0] - limiar, 
-                "saturation": hsv_center[1] - limiar, 
-                "value": hsv_center[2] - limiar
+                "hue": int(hsv_center[0] - limiar), 
+                "saturation": int(hsv_center[1] - limiar), 
+                "value": int(hsv_center[2] - limiar)
             },
             "high": {
-                "hue": hsv_center[0] + limiar, 
-                "saturation": hsv_center[1] + limiar, 
-                "value": hsv_center[2] + limiar
+                "hue": int(hsv_center[0] + limiar), 
+                "saturation": int(hsv_center[1] + limiar), 
+                "value": int(hsv_center[2] + limiar)
             }
         }
 
