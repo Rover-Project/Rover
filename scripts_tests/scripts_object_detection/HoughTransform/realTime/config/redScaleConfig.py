@@ -1,4 +1,4 @@
-#from picamera2 import Picamera2
+from picamera2 import Picamera2
 import cv2 as openCv
 import numpy
 import time
@@ -86,11 +86,11 @@ if __name__ == "__main__":
         height = int(input("Digite a altura da imagen: "))
         accumulator = int(input("Digite o valor do acumulador: "))
         minDist = float(input("Digite a distância mínima entre as esferas: "))
-        minRadius = float(input("Digite o raio mínimo para as esferas: "))
-        maxRadius = float(input("Digite o raio máximo para as esferas: "))
+        minRadius = int(input("Digite o raio mínimo para as esferas: "))
+        maxRadius = int(input("Digite o raio máximo para as esferas: "))
         nameFile = input("Nome do arquivo json para salvar a configuração: ")
 
-        config = {"accumulator": accumulator, "minDist": minDist, "minRadius": minRadius, "maxRadiues": maxRadius, "h": height, "w": width}
+        config = {"accumulator": accumulator, "minDist": minDist, "minRadius": minRadius, "maxRadius": maxRadius, "h": height, "w": width}
         redCircleDetect(config, nameFile)
 
     except:

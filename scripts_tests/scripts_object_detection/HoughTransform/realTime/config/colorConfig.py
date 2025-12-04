@@ -52,6 +52,7 @@ def colorDetect(nameColor: str, h=680, w=480, limiar=5):
         
         if key == ord('s'):
             saveConfig(color, nameColor)
+            print("Arquivo salvo!")
 
         if key & 0xFF == ord('q'):
             break
