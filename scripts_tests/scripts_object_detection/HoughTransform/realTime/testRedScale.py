@@ -13,11 +13,6 @@ def main(h=680, w=480):
     picam.start()
     time.sleep(1)
 
-    print("\n=== VISUALIZADOR HSV ===")
-    print("→ Aponte a bola vermelha para o centro da imagem.")
-    print("→ Os valores HSV do pixel central aparecerão no console.")
-    print("→ Pressione Q para sair.\n")
-
     # Limites iniciais (ajustados, mas você vai calibrar)
     lower_red1 = np.array([0, 70, 50])
     upper_red1 = np.array([10, 255, 255])
