@@ -3,7 +3,7 @@ import numpy
 import sys
 from pathlib import Path
 
-def RedCircleDetect(image_path, minDist=40, minRadius=10, maxRadius=120):
+def RedCircleDetect(image_path, minDist=200, minRadius=10, maxRadius=120):
 
     # Carrega a imagem
     image = openCv.imread(image_path)
@@ -38,9 +38,9 @@ def RedCircleDetect(image_path, minDist=40, minRadius=10, maxRadius=120):
         redImage,
         openCv.HOUGH_GRADIENT,
         dp=1.2,
-        minDist=minDist,
-        param1=100,
-        param2=15,
+        minDist=minDist, # Se a distancia minima for baixa, vai identificar o reflexo e sobras tambem
+        param1=100, 
+        param2=30, # Bom parametro para redScale
         minRadius=minRadius,
         maxRadius=maxRadius
     )
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     
     # Tenta pegar o caminho da imagem via argumento de linha de comando
     try:
-        path = Path.home() / sys.argv[1]
+        path = Path(__file__).parent.parent.parent / "assets" / sys.argv[1]
     except IndexError:
         print("Nenhum caminho foi passado")
     

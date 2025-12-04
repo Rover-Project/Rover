@@ -26,7 +26,7 @@ def main(image_path, minDist=40, minRadius=10, maxRadius=120):
         dp=1.2,
         minDist=minDist,
         param1=100,
-        param2=30,
+        param2=50, # O acumulador tava muito baixo, por isso tava detectando tantos falsos positivos
         minRadius=minRadius,
         maxRadius=maxRadius
     )
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     
     # Tenta pegar o caminho da imagem via argumento de linha de comando
     try:
-        path = Path.home() / sys.argv[1]
+        path = Path(__file__).parent.parent.parent / "assets" / sys.argv[1]
     except IndexError:
         print("Nenhum caminho foi passado")
     

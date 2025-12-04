@@ -3,7 +3,7 @@ import cv2 as openCv
 import numpy
 import time
 
-def main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120):
+def main(h=680, w=480, minDist=200, minRadius=10, maxRadius=120):
     # Inicializa a câmera
     picam = Picamera2()
 
@@ -43,7 +43,7 @@ def main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120):
             dp=1.2,
             minDist=minDist,
             param1=100,
-            param2=15,     
+            param2=30, # Bom parametro para o acumulador de redScale     
             minRadius=minRadius,
             maxRadius=maxRadius
         )

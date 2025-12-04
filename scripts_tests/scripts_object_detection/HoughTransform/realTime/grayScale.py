@@ -32,7 +32,7 @@ def main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120):
             dp=1.2,           # razão de resolução
             minDist=minDist,       # distância mínima entre centros
             param1=100,       # limite do Canny
-            param2=30,        # limiar para detectar centro do círculo
+            param2=50,        # limiar para detectar centro do círculo
             minRadius=minRadius,     # raio mínimo
             maxRadius=maxRadius     # raio máximo
         )
