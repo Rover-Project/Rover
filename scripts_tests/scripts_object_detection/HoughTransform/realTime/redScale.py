@@ -15,7 +15,7 @@ def main(acumulado: int, h=680, w=480, minDist=200, minRadius=10, maxRadius=120)
 
     print("Detectando esferas na cor capturada (H≈120). Pressione 'q' para sair.")
 
-    # Faixa HSV baseada nos valores que você enviou
+    # Tom de vermelho padrao com uma iluminacao media
     lower_color = numpy.array([115, 200, 100])
     upper_color = numpy.array([130, 255, 255])
 
