@@ -1,0 +1,8 @@
+{
+    "accumulator": 30,
+    "minDist": 100.0,
+    "minRadius": 50.0,
+    "maxRadiues": 200.0,
+    "h": 480,
+    "w": 640
+}
