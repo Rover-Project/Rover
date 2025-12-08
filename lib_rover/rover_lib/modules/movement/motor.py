@@ -115,4 +115,3 @@ class Motor:
             
             self._initialized = False
             print("MotorDriver: recursos liberados.")
-

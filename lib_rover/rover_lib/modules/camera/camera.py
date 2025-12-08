@@ -1,7 +1,7 @@
 import time
 import cv2
 import numpy as np
-from ..utils.config_load import Config
+from ...utils.config_manager import Config
 
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi

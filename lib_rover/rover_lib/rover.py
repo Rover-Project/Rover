@@ -1,17 +1,20 @@
 import time
 import cv2
-from .modules.movement import MovementModule
-from .modules.camera import CameraModule
-from .modules.vision import VisionModule
+from .modules.movement.robot import Robot 
+from .modules.camera.camera import CameraModule
+from .modules.vision.vision import VisionModule
+from utils.config_manager import Config
 
 class Rover:
     
     # Classe principal da biblioteca Rover, responsável por inicializar e coordenar os módulos de Movimento, Câmera e Visão.
     
-    def __init__(self, pwm_frequency=100):
+    def __init__(self, pwm_frequency=1000):
+
+        pins_motors = Config.get("gpio")
 
         print("inicializando Rover...")
-        self.movement = MovementModule(pwm_frequency=pwm_frequency)
+        self.movement = Robot(left=pins_motors["motor_esquerdo"], right=pins_motors["motor_direito"], pwm_frequency=pwm_frequency)
         self.camera = CameraModule()
         self.vision = VisionModule(self.camera.get_preview_resolution())
         print("Rover inicializado com sucesso.")

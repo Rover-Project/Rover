@@ -3,7 +3,7 @@ Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
 from motor import Motor
-
+from motorCalibration import MotorCalibration
 
 class Robot:
     """
@@ -23,6 +23,7 @@ class Robot:
         # Crias instâncias para controlas os motores
         self.left_motor = Motor(left, pwm_frequency)
         self.right_motor = Motor(right, pwm_frequency)
+        self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
         
         # Inicias os motores
         self.left_motor.initialize()
@@ -122,7 +123,7 @@ class Robot:
         
         return True
     
-    def move(self, speed_left, speed_right):
+    def move(self, speed_left, speed_right, calibration=False):
         """
         Controla os motores individualmente.
         
@@ -131,6 +132,7 @@ class Robot:
                                Positivo = frente, Negativo = trás
             speed_right (float): Velocidade do motor direito (-100 a 100)
                                 Positivo = frente, Negativo = trás
+            calibration: Aplicar calibração nos motores
         """
         # determina direção e velocidade para cada motor
         if speed_left > 0:
@@ -152,6 +154,9 @@ class Robot:
         else:
             right_dir = 'stop'
             right_speed = 0
+            
+        if calibration:
+            left_speed, right_speed = self.calibration.getCalibration(left_speed=left_speed, right_speed=right_speed) # Calibra as velocidades
         
         self.left_motor.set_movement(left_speed, left_dir)
         self.right_motor.set_movement(right_speed, right_dir)
