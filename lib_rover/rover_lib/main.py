@@ -13,9 +13,13 @@ if __name__ == "__main__":
     circleDetect.cameraStart(HEIGHT, WIDTH)  # Inicia a câmera
     
     pins_motors = Config.get("gpio")
+    
+    letf = (int(pins_motors["motor_esquerdo"][0]), int(pins_motors["motor_esquerdo"][1]))
+    right = (int(pins_motors["motor_direito"][0]), int(pins_motors["motor_direito"][1]))
+    
     robot = Robot(
-        left=pins_motors["motor_esquerdo"],
-        right=pins_motors["motor_direito"]
+        left=letf,
+        right=right
     )
     
     x_center = {
