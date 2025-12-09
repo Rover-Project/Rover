@@ -1,7 +1,7 @@
-from circleDetect import CircleDetect
 from modules.movement.robot import Robot
 from utils.config_manager import Config
 import time
+from circleDetect import CircleDetect
 
 if __name__ == "__main__":
     HEIGHT = 640
