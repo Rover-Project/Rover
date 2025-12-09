@@ -3,7 +3,7 @@ import cv2 as openCv
 import numpy
 
 class CircleDetect:
-    def __init__(self, acumulado=30, minDist=200, minRadius=10, maxRadius=120):
+    def __init__(self, acumulado=25, minDist=200, minRadius=10, maxRadius=120):
         self.acumulado = acumulado
         self.minDist = minDist
         self.minRadius = minRadius
