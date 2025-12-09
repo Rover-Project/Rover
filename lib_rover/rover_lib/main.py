@@ -2,6 +2,8 @@ from modules.movement.robot import Robot
 from utils.config_manager import Config
 import time
 from circleDetect import CircleDetect
+import cv2 as openCv
+import numpy
 
 if __name__ == "__main__":
     HEIGHT = 640
@@ -28,7 +30,31 @@ if __name__ == "__main__":
     }
 
     while True:
-        circles = circleDetect.getCircle()
+        circles, mask, frame = circleDetect.getCircle()
+        
+        # Desenhar círculos detectados
+        if circles is not None:
+            circles = numpy.uint16(numpy.around(circles))
+
+            for (x, y, r) in circles[0, :]:
+                openCv.circle(frame, (x, y), r, (0, 255, 0), 2)  # círculo
+                openCv.circle(frame, (x, y), 2, (0, 0, 255), 3)  # centro
+                openCv.putText(
+                    frame, 
+                    f"({x},{y}) r={r}", 
+                    (x - 40, y - r - 10),
+                    openCv.FONT_HERSHEY_SIMPLEX, 
+                    0.5, 
+                    (255, 255, 255), 
+                    2
+                )
+
+        # Mostrar imagens
+        openCv.imshow("Deteccao da Cor Capturada", frame)
+        openCv.imshow("Mascara Atual", mask)
+
+        if openCv.waitKey(1) & 0xFF == ord('q'):
+            break
 
         if circles is None:
             print("Nenhum circulo foi detectado")
