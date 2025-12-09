@@ -7,10 +7,10 @@ camera:
   - 3280
   - 2464
 gpio:
-  motor_direito:
+  motor_esquerdo:
     in3: 15
     in4: 16
-  motor_esquerdo:
+  motor_direito:
     in1: 12
     in2: 11
 motor_calibration:
