@@ -6,16 +6,16 @@ import cv2 as openCv
 import numpy
 
 def turn_righ(robot: Robot, speed=100.0):
-    robot.move(speed_right=(speed * 0.6), speed_left=0)
+    robot.move(speed_right=(speed * 0.6), speed_left=-speed)
 
 def turn_left(robot: Robot, speed=100.0):
-    robot.move(speed_right=(-speed * 0.6), speed_left=0)
+    robot.move(speed_right=(-speed * 0.5), speed_left=speed)
   
 def forward(robot: Robot, speed=100.0):
     robot.move(speed_right=speed * 0.6, speed_left=speed)
 
 def backward(robot: Robot, speed=100.0):
-    robot.move(speed_right=-(speed * 0.6), speed_left=-speed)
+    robot.move(speed_right=-(speed * 0.5), speed_left=-speed)
 
 if __name__ == "__main__":
 
