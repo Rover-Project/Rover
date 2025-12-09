@@ -25,8 +25,8 @@ if __name__ == "__main__":
     )
 
     x_center = {
-        "low": (WIDTH // 2) - THRES,
-        "high": (WIDTH // 2) + THRES
+        "low": (HEIGHT // 2) - THRES,
+        "high": (HEIGHT // 2) + THRES
     }
 
     while True:
