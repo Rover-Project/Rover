@@ -1,6 +1,6 @@
 from circleDetect import CircleDetect
-from movement.robot import Robot
-from utils.config_manager import Config
+from ..modules.movement.robot import Robot
+from ..utils.config_manager import Config
 import time
 
 if __name__ == "__main__":
