@@ -14,8 +14,8 @@ if __name__ == "__main__":
     
     pins_motors = Config.get("gpio")
     
-    letf = (int(pins_motors["motor_esquerdo"][0]), int(pins_motors["motor_esquerdo"][1]))
-    right = (int(pins_motors["motor_direito"][0]), int(pins_motors["motor_direito"][1]))
+    letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
     
     robot = Robot(
         left=letf,
