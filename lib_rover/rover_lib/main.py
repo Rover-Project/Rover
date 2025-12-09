@@ -1,4 +1,4 @@
-from lib_rover.rover_lib.circleDetect import CircleDetect
+from circleDetect import CircleDetect
 from modules.movement.robot import Robot
 from utils.config_manager import Config
 import time
