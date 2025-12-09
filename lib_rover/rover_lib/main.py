@@ -74,5 +74,7 @@ if __name__ == "__main__":
 
                 elif x < x_center["low"]:
                     robot.turn_left(SPEED)
+                else:
+                    robot.stop()
 
         time.sleep(0.5)
