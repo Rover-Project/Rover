@@ -8,8 +8,8 @@ import numpy
 if __name__ == "__main__":
     HEIGHT = 640
     WIDTH = 480
-    THRES = 10  # Delimita um espaço no eixo X para considerar o centro
-    SPEED = 100  # Velocidade de rotação
+    THRES = 30  # Delimita um espaço no eixo X para considerar o centro
+    SPEED = 50  # Velocidade de rotação
 
     circleDetect = CircleDetect()
     circleDetect.cameraStart(HEIGHT, WIDTH)  # Inicia a câmera
