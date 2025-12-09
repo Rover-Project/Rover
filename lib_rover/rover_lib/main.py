@@ -24,10 +24,9 @@ if __name__ == "__main__":
     )
     
     image = numpy.array([480 * numpy.zeros(480)])
+    openCv.imshow("Controler", image)
     
     while True:
-        openCv.imshow("Controler", image)
-        
         key = openCv.waitKey(0) & 0xFF
         
         if key == ord("a"):
