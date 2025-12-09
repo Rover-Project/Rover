@@ -23,7 +23,11 @@ if __name__ == "__main__":
         right=right
     )
     
+    image = numpy.array([480 * numpy.zeros(480)])
+    
     while True:
+        openCv.imshow("Controler", image)
+        
         key = openCv.waitKey(0) & 0xFF
         
         if key == ord("a"):
@@ -31,7 +35,11 @@ if __name__ == "__main__":
         elif key == ord("d"):
             turn_righ(robot)
         elif key == ord("q"):
+            
             break
+    
+    openCv.destroyAllWindows()
+        
         
         
     
