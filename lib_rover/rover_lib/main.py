@@ -65,16 +65,14 @@ if __name__ == "__main__":
                 print("Multiplos circulos detectados")
                 robot.stop()
             else:
-                print(circles[0][0])
-                robot.stop()
-                # x, y, r = circles[0]  # Agora circles[0] já contém (x, y, r)
+                x, y, r = circles[0][0]  # Agora circles[0] já contém (x, y, r)
 
-                # print(f"Circulo unico detectado: centro - ({x}, {y}); raio - {r}")
+                print(f"Circulo unico detectado: centro - ({x}, {y}); raio - {r}")
 
-                # if x > x_center["high"]:
-                #     robot.turn_right(SPEED)
+                if x > x_center["high"]:
+                    robot.turn_right(SPEED)
 
-                # elif x < x_center["low"]:
-                #     robot.turn_left(SPEED)
+                elif x < x_center["low"]:
+                    robot.turn_left(SPEED)
 
         time.sleep(1)
