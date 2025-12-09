@@ -11,7 +11,7 @@ def turn_righ(robot: Robot, speed=100.0):
 def turn_left(robot: Robot, speed=100.0):
     robot.move(speed_right=(-speed * 0.6), speed_left=0)
   
-def fordward(robot: Robot, speed=100.0):
+def forward(robot: Robot, speed=100.0):
     robot.move(speed_right=speed * 0.6, speed_left=speed)
 
 def backward(robot: Robot, speed=100.0):
@@ -39,7 +39,9 @@ if __name__ == "__main__":
             turn_left(robot)
         elif key == ord("d"):
             turn_righ(robot)
-        elif key == ord("f"):
+        elif key == ord("w"):
+            forward(robot)
+        elif key == ord("s"):
             forward(robot)
         elif key == ord("q"):
             break
