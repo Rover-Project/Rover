@@ -9,13 +9,13 @@ def turn_righ(robot: Robot, speed=100.0):
     robot.move(speed_right=(speed * 0.6), speed_left=-speed)
 
 def turn_left(robot: Robot, speed=100.0):
-    robot.move(speed_right=(-speed * 0.5), speed_left=speed)
+    robot.move(speed_right=(-speed * 0.6), speed_left=speed)
   
 def forward(robot: Robot, speed=100.0):
-    robot.move(speed_right=speed * 0.6, speed_left=speed)
+    robot.move(speed_right=speed * 0.7, speed_left=speed)
 
 def backward(robot: Robot, speed=100.0):
-    robot.move(speed_right=(-speed * 0.5), speed_left=-speed)
+    robot.move(speed_right=(-speed * 0.7), speed_left=-speed)
 
 if __name__ == "__main__":
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         elif key == ord("w"):
             forward(robot)
         elif key == ord("s"):
-            forward(robot)
+            backward(robot)
         elif key == ord("q"):
             break
         else:
