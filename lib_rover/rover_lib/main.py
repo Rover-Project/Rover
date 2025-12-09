@@ -62,6 +62,13 @@ if __name__ == "__main__":
         left=letf,
         right=right
     )
+    
+    robot.cleanup()
+    
+    robot = Robot(
+        left=letf,
+        right=right
+    )
 
     x_center = {
         "low": (HEIGHT // 2) - THRES,
