@@ -35,8 +35,9 @@ if __name__ == "__main__":
         elif key == ord("d"):
             turn_righ(robot)
         elif key == ord("q"):
-            
             break
+        else:
+            robot.stop()
     
     openCv.destroyAllWindows()
         
