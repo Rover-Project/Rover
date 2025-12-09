@@ -61,13 +61,14 @@ if __name__ == "__main__":
             robot.turn_right(SPEED)  # Rotaciona procurando um círculo
 
         else:
-            if len(circles) > 1:
+            if len(circles[0]) > 1:
                 print("Multiplos circulos detectados")
                 robot.stop()
             else:
                 x, y, r = circles[0][0]  # Agora circles[0] já contém (x, y, r)
 
                 print(f"Circulo unico detectado: centro - ({x}, {y}); raio - {r}")
+                print(f"Tentando achar o centro: ({x_center['low']},{x_center['high']})")
 
                 if x > x_center["high"]:
                     robot.turn_right(SPEED)
