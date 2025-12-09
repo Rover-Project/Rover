@@ -75,4 +75,4 @@ if __name__ == "__main__":
                 elif x < x_center["low"]:
                     robot.turn_left(SPEED)
 
-        time.sleep(1)
+        time.sleep(0.5)
