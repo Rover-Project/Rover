@@ -1,6 +1,6 @@
 from circleDetect import CircleDetect
-from ...lib_rover.rover_lib.modules.movement.robot import Robot
-from ...lib_rover.rover_lib.utils.config_manager import Config
+from movement.robot import Robot
+from utils.config_manager import Config
 import time
 
 if __name__ == "__main__":
