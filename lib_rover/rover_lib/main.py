@@ -6,10 +6,10 @@ import cv2 as openCv
 import numpy
 
 def turn_righ(robot: Robot, speed=100.0):
-    robot.move(speed * 0.6, -speed)
+    robot.move(speed_right=(speed * 0.6), speed_left=(-speed))
     
 def turn_left(robot: Robot, speed=100.0):
-    robot.move(-speed * 0.5, speed)
+    robot.move(speed_right=(-speed * 0.5), speed_left=speed)
 
 if __name__ == "__main__":
     
@@ -35,7 +35,7 @@ if __name__ == "__main__":
             turn_righ(robot)
         elif key == ord("q"):
             break
-        else:
+        elif:
             robot.stop()
     
     openCv.destroyAllWindows()
