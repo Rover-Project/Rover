@@ -65,7 +65,7 @@ if __name__ == "__main__":
                 print("Multiplos circulos detectados")
                 robot.stop()
             else:
-                print(circles)
+                print(circles[0][0])
                 robot.stop()
                 # x, y, r = circles[0]  # Agora circles[0] já contém (x, y, r)
 
