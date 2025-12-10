@@ -48,7 +48,7 @@ if __name__ == "__main__":
     CENTER_LIMIAR = 100
     BUFFER_SIZE = 5  # quantidade de últimas detecções
     circle_buffer = deque(maxlen=BUFFER_SIZE)  # cria o buffer circular
-    RED_THRESHOLD = 5000
+    RED_THRESHOLD = 200000
 
     while True:
         frame = picam.capture_array()
