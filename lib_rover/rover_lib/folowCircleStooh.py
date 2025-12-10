@@ -132,19 +132,19 @@ if __name__ == "__main__":
         error_r = 50 - r  # raio desejado
 
         # Velocidade de avanço proporcional ao tamanho da bola
-        forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
+        forward_speed = int(max(min(Kp_forward * error_r, 100), 60))
 
         # Rotação usando apenas motor esquerdo
-        rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 0))
+        rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 60))
 
         # Motor esquerdo
-        if abs(error_x) > CENTER_THRES:  # fora do centro → gira
-            if error_x > 0:  # bola à esquerda → girar esquerda
+        if abs(error_x) > CENTER_THRES:  # fora do centro  gira
+            if error_x > 0:  # bola à esquerda  girar esquerda
                 left_motor_speed = -rotate_speed + forward_speed
-            else:            # bola à direita → girar direita
+            else:            # bola à direita  girar direita
                 left_motor_speed = rotate_speed + forward_speed
         else:
-            # Bola centralizada → segue reto
+            # Bola centralizada segue em frente
             left_motor_speed = forward_speed
 
         # Motor direito sempre para frente
