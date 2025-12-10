@@ -5,10 +5,6 @@ from collections import deque
 from picamera2 import Picamera2
 import time
 
-ultimo = None          # último círculo detectado
-consistencia = 0       # contagem de consistência
-LIMIAR_FRAMES = 5      # número mínimo de frames consistentes
-
 def gamma_correction(frame, gamma=1.9):
     """
         Manipula o brilho da imagem 
