@@ -122,35 +122,43 @@ if __name__ == "__main__":
                 robot.move(-60, 60)
             continue
 
-        # Controle proporcional
-        x, y, r = circleHistory
-        x = int(x)
-        y = int(y)
-        r = int(r)
-        
-        error_x = int(x_center - x)
-        error_r = 50 - int(r)  # raio desejado
+        # Controle proporcional corrigido
+x, y, r = circleHistory
+x = int(x)
+y = int(y)
+r = int(r)
 
-        # Velocidade de avanço
-        forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
+error_x = x_center - x
+error_r = 50 - r  # raio desejado
 
-        # Rotação usando apenas motor esquerdo
-        rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 0))
-        if error_x > 0:
-            left_motor_speed = -rotate_speed + forward_speed
-        else:
-            left_motor_speed = rotate_speed + forward_speed
+# Velocidade de avanço proporcional ao tamanho da bola
+forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
 
-        right_motor_speed = forward_speed
+# Rotação usando apenas motor esquerdo
+rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 0))
 
-        # Limita delta de velocidade
-        left_motor_speed = max(min(left_motor_speed, prev_left + max_delta), prev_left - max_delta)
-        right_motor_speed = max(min(right_motor_speed, prev_right + max_delta), prev_right - max_delta)
+# Motor esquerdo
+if abs(error_x) > CENTER_THRES:  # fora do centro → gira
+    if error_x > 0:  # bola à esquerda → girar esquerda
+        left_motor_speed = -rotate_speed + forward_speed
+    else:            # bola à direita → girar direita
+        left_motor_speed = rotate_speed + forward_speed
+else:
+    # Bola centralizada → segue reto
+    left_motor_speed = forward_speed
 
-        robot.move(left_motor_speed, right_motor_speed)
-        prev_left, prev_right = left_motor_speed, right_motor_speed
+# Motor direito sempre para frente
+right_motor_speed = forward_speed
 
-        time.sleep(0.05)
+# Limita delta de velocidade
+left_motor_speed = max(min(left_motor_speed, prev_left + max_delta), prev_left - max_delta)
+right_motor_speed = max(min(right_motor_speed, prev_right + max_delta), prev_right - max_delta)
+
+robot.move(left_motor_speed, right_motor_speed)
+prev_left, prev_right = left_motor_speed, right_motor_speed
+
+time.sleep(0.05)
+
 
     picam.stop()
     openCv.destroyAllWindows()
