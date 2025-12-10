@@ -2,8 +2,6 @@ import cv2
 import numpy as np
 import math
 from collections import deque
-from picamera2 import Picamera2
-import time
 
 ultimo = None          # último círculo detectado
 consistencia = 0       # contagem de consistência
@@ -312,16 +310,18 @@ def filtro_temporal(circ):
     return None
 
 def folowCircle():
-    picam = Picamera2()
-    config = picam.create_preview_configuration(main={"format": "RGB888", "size": (640, 640)})
-    picam.configure(config)
-    picam.start()
+    """Seguindo circulos detectados"""
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Erro ao acessar webcam!")
+        return
 
     while True:
-        time.sleep(0.3)
-        frame = picam.capture_array()
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-        #frame = cv2.resize(frame, (640, 640))
+        frame = cv2.resize(frame, (640, 640))
 
         # máscara da bola (usar sua função de segmentação)
         mask, _, _ = redSegmentationDuble(frame)
@@ -353,7 +353,7 @@ def folowCircle():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    picam.stop()
+    cap.release()
     cv2.destroyAllWindows()
     
 def inInterval(a, b, l):
@@ -367,28 +367,23 @@ def inInterval(a, b, l):
 
 def avCircle():
     """Suavia a deteccao de circulos"""
-    picam = Picamera2()
-    config = picam.create_preview_configuration(main={"format": "RGB888", "size": (640, 640)})
-    picam.configure(config)
-    
-    # Ajuste de exposição
-    picam.set_controls({
-        "AnalogueGain": 1.5,   # controla amplificação do sensor, <1 = mais escuro
-        "ExposureTime": 30000, # em microssegundos, menor = mais escuro
-    })
-    picam.start()
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Erro ao acessar webcam!")
+        return
 
     circleHistory = None  # média acumulada
     cont = 0
     LIMIAR = 20  # tolerância para considerar mesma bola
-    NO_DET_LIMIT = 20  # número máximo de frames sem detecção
+    NO_DET_LIMIT = 30  # número máximo de frames sem detecção
     noDetCounter = 0
 
-
     while True:
-        frame = picam.capture_array()
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-        #frame = cv2.resize(frame, (640, 640))
+        frame = cv2.resize(frame, (640, 640))
 
         mask, _, _ = redSegmentationDuble(frame)
         hough, _ = hough_robusto(mask)
@@ -423,7 +418,7 @@ def avCircle():
                 circleHistory = None
                 cont = 0
 
-        txt = "Nenhum circulo detectado"
+        txt = "Nenhum círculo detectado"
         if circleHistory and cont > 0:
             # calcula média real
             x = circleHistory[0] // cont
@@ -434,13 +429,13 @@ def avCircle():
             txt = f"X={x}  Y={y}  R={r}"
 
         cv2.putText(frame, txt, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        cv2.imshow("Deteccao Final", frame)
+        cv2.imshow("Deteccao Final (Estável)", frame)
         cv2.imshow("Mascara", mask)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    picam.stop()
+    cap.release()
     cv2.destroyAllWindows()
 
 avCircle()
