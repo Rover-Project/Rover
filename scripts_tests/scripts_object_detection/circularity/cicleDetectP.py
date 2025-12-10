@@ -370,6 +370,12 @@ def avCircle():
     picam = Picamera2()
     config = picam.create_preview_configuration(main={"format": "RGB888", "size": (640, 640)})
     picam.configure(config)
+    
+    # Ajuste de exposição
+    picam.set_controls({
+        "AnalogueGain": 1.0,   # controla amplificação do sensor, <1 = mais escuro
+        "ExposureTime": 10000, # em microssegundos, menor = mais escuro
+    })
     picam.start()
 
     circleHistory = None  # média acumulada
@@ -417,7 +423,7 @@ def avCircle():
                 circleHistory = None
                 cont = 0
 
-        txt = "Nenhum círculo detectado"
+        txt = "Nenhum circulo detectado"
         if circleHistory and cont > 0:
             # calcula média real
             x = circleHistory[0] // cont
