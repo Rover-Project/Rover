@@ -110,9 +110,9 @@ if __name__ == "__main__":
             elif last_circle:
                 last_x, last_y, last_r = last_circle
                 if last_x > WIDTH // 2:
-                    robot.move(-60, 60)  # gira para direita
+                    robot.move(60, -60)  # gira para direita
                 else:
-                    robot.move(60, -60)  # gira para esquerda
+                    robot.move(-60, 60)  # gira para esquerda
             else:
                 print("Nenhum circulo foi detectado")
                 robot.move(-60, 60)  # rotaciona procurando um círculo
