@@ -373,8 +373,8 @@ def avCircle():
     
     # Ajuste de exposição
     picam.set_controls({
-        "AnalogueGain": 1.0,   # controla amplificação do sensor, <1 = mais escuro
-        "ExposureTime": 10000, # em microssegundos, menor = mais escuro
+        "AnalogueGain": 1.5,   # controla amplificação do sensor, <1 = mais escuro
+        "ExposureTime": 30000, # em microssegundos, menor = mais escuro
     })
     picam.start()
 
