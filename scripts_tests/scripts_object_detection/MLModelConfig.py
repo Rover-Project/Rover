@@ -1,452 +1,267 @@
 """
-    python MLModelConfig.py --model path/to/model.pt --camera 0 --confidence 0.65
-    python MLModelConfig.py --model best_int8.tflite --camera 0
-    python MLModelConfig.py --model yolov8n.pt (baixa automático)
+MLModelConfig - Detector de objetos portável com suporte a múltiplos modelos
+Suporta: YOLO, TensorFlow Lite
 """
 
 import cv2
-import argparse
-import json
+import numpy as np
 import os
 import time
 from pathlib import Path
-from typing import Optional, Tuple, List
-
-try:
-    from ultralytics import YOLO
-    ULTRALYTICS_AVAILABLE = True
-except ImportError:
-    ULTRALYTICS_AVAILABLE = False
-    print("Aviso: ultralytics não instalado. Instale com: pip install ultralytics")
 
 
-class MLObjectDetector:
-    """
-    Detector de objetos usando modelos de Machine Learning.
+class MLModelConfig:
+    """Classe unificada para detecção de objetos com diferentes modelos ML"""
     
-    Suporta:
-    - YOLOv8 (diferentes tamanhos: nano, small, medium, large, xlarge)
-    - Modelos customizados treinados com YOLO
-    - Modelos em formato .pt, .onnx, .tflite
-    """
-    
-    def __init__(
-        self,
-        model_path: str,
-        camera_id: int = 0,
-        confidence: float = 0.65,
-        frame_width: int = 640,
-        frame_height: int = 480,
-        frame_skip: int = 2
-    ):
+    def __init__(self, model_path, model_type='auto', camera_id=0, confidence=0.5):
         """
-        Inicializa o detector de objetos.
-        
         Args:
-            model_path: Caminho para o modelo (.pt, .onnx, .tflite) ou nome do modelo YOLO
-            camera_id: ID da câmera a usar (padrão: 0)
-            confidence: Limiar de confiança para detecções (0.0-1.0)
-            frame_width: Largura do frame capturado
-            frame_height: Altura do frame capturado
-            frame_skip: Número de frames a pular entre detecções (1 a cada N+1 frames)
+            model_path: Caminho completo ou relativo ao modelo
+            model_type: 'yolo', 'tflite' ou 'auto' (detecta pela extensão)
+            camera_id: ID da câmera (0 = padrão)
+            confidence: Threshold de confiança (0.0-1.0)
         """
-        if not ULTRALYTICS_AVAILABLE:
-            raise ImportError("ultralytics é necessário. Instale com: pip install ultralytics")
-        
-        print(f"[INFO] Carregando modelo: {model_path}")
-        
-        # Carregar modelo (baixa automático se for nome padrão YOLO)
-        try:
-            self.model = YOLO(model_path, task='detect')
-            print(f"[OK] Modelo carregado com sucesso!")
-            print(f"[INFO] Tipo de modelo: {type(self.model)}")
-        except Exception as e:
-            print(f"[ERRO] Falha ao carregar modelo: {e}")
-            raise
-        
-        # Configuração da câmera
-        print(f"[INFO] Inicializando câmera {camera_id}")
+        self.model_path = self._resolve_model_path(model_path)
+        self.model_type = self._detect_model_type(model_type)
+        self.model = None
         self.cap = cv2.VideoCapture(camera_id)
         
-        if not self.cap.isOpened():
-            raise RuntimeError(f"Não foi possível abrir a câmera {camera_id}")
-        
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-        
-        # Configurações de detecção
+        # Configurações
         self.confidence = confidence
-        self.frame_width = frame_width
-        self.frame_height = frame_height
-        self.center_screen_x = frame_width // 2
-        self.center_screen_y = frame_height // 2
-        
-        # Configurações de filtragem
-        self.MIN_WIDTH = 20
-        self.MAX_WIDTH = frame_width - 50
-        self.MIN_HEIGHT = 20
-        self.MAX_HEIGHT = frame_height - 50
-        
-        # Pular frames para aumentar FPS visual
-        self.frame_skip = frame_skip
+        self.min_width = 20
+        self.max_width = 30000
+        self.frame_skip = 0
         self.frame_count = 0
         
-        # Histórico de detecções
-        self.last_boxes = []
-        self.last_detections = []
-        self.detection_count = 0
+        self._load_model()
+    
+    def _resolve_model_path(self, model_path):
+        """Resolve caminho relativo ou absoluto do modelo"""
+        path = Path(model_path)
         
-        print(f"[OK] Câmera inicializada com sucesso!")
-        print(f"[INFO] Resolução: {frame_width}x{frame_height}")
-        print(f"[INFO] Confiança: {confidence}")
-        print(f"[INFO] Frame skip: {frame_skip}")
-
-    def apply_size_filter(self, boxes: List[Tuple[int, int, int, int]]) -> List[Tuple[int, int, int, int]]:
-        """Filtra caixas por tamanho para remover ruído."""
-        filtered = []
-        for (x1, y1, x2, y2) in boxes:
-            width = x2 - x1
-            height = y2 - y1
-            
-            if (self.MIN_WIDTH <= width <= self.MAX_WIDTH and
-                self.MIN_HEIGHT <= height <= self.MAX_HEIGHT):
-                filtered.append((x1, y1, x2, y2))
+        if path.is_absolute():
+            return str(path)
         
-        return filtered
-
-    def get_navigation_command(self, center_x: int, object_width: int) -> str:
-        """Gera comando de navegação baseado na posição do objeto."""
-        dead_zone = 50
+        # Tenta no diretório atual
+        if path.exists():
+            return str(path.absolute())
         
-        if object_width > 200:
-            return "ALVO ALCANCADO - PARAR"
+        # Tenta em ./models/
+        models_dir = Path(__file__).parent / 'models' / model_path
+        if models_dir.exists():
+            return str(models_dir)
         
-        error_x = center_x - self.center_screen_x
+        # Tenta em ../../../models/
+        relative_models = Path(__file__).parent.parent / 'models' / model_path
+        if relative_models.exists():
+            return str(relative_models)
         
-        if abs(error_x) < dead_zone:
-            return "AVANCAR"
-        elif error_x < 0:
-            return f"<< ESQUERDA ({int(error_x)})"
-        else:
-            return f"DIREITA >> ({int(error_x)})"
-
-    def get_statistics(self) -> dict:
-        """Retorna estatísticas da detecção."""
-        return {
-            "frames_processados": self.frame_count,
-            "deteccoes_totais": self.detection_count,
-            "ultima_deteccao_count": len(self.last_boxes),
-            "confianca_limiar": self.confidence
-        }
-
-    def save_config(self, output_file: str) -> None:
-        """Salva configuração atual em arquivo JSON."""
-        config = {
-            "confidence": self.confidence,
-            "frame_width": self.frame_width,
-            "frame_height": self.frame_height,
-            "frame_skip": self.frame_skip,
-            "min_width": self.MIN_WIDTH,
-            "max_width": self.MAX_WIDTH,
-            "min_height": self.MIN_HEIGHT,
-            "max_height": self.MAX_HEIGHT,
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-        }
+        raise FileNotFoundError(f"Modelo não encontrado: {model_path}")
+    
+    def _detect_model_type(self, model_type):
+        """Detecta tipo de modelo pela extensão"""
+        if model_type != 'auto':
+            return model_type.lower()
         
-        with open(output_file, 'w') as f:
-            json.dump(config, f, indent=4)
+        ext = Path(self.model_path).suffix.lower()
+        if ext == '.tflite':
+            return 'tflite'
+        elif ext in ['.pt', '.onnx']:
+            return 'yolo'
         
-        print(f"[OK] Configuração salva em: {output_file}")
-
-    def load_config(self, config_file: str) -> None:
-        """Carrega configuração de arquivo JSON."""
+        return 'tflite'
+    
+    def _load_model(self):
+        """Carrega o modelo apropriado"""
+        if not os.path.exists(self.model_path):
+            raise FileNotFoundError(f"Arquivo não existe: {self.model_path}")
+        
+        print(f"[+] Carregando modelo {self.model_type.upper()}: {self.model_path}")
+        
+        if self.model_type == 'yolo':
+            self._load_yolo()
+        elif self.model_type == 'tflite':
+            self._load_tflite()
+        
+        # Configuração da câmera
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        print("[+] Câmera configurada 640x480")
+    
+    def _load_yolo(self):
+        """Carrega modelo YOLO"""
         try:
-            with open(config_file, 'r') as f:
-                config = json.load(f)
-            
-            self.confidence = config.get("confidence", self.confidence)
-            self.MIN_WIDTH = config.get("min_width", self.MIN_WIDTH)
-            self.MAX_WIDTH = config.get("max_width", self.MAX_WIDTH)
-            self.MIN_HEIGHT = config.get("min_height", self.MIN_HEIGHT)
-            self.MAX_HEIGHT = config.get("max_height", self.MAX_HEIGHT)
-            self.frame_skip = config.get("frame_skip", self.frame_skip)
-            
-            print(f"[OK] Configuração carregada de: {config_file}")
+            from ultralytics import YOLO
+            self.model = YOLO(self.model_path, task='detect')
+            print("[+] YOLO carregado com sucesso")
+        except ImportError:
+            raise ImportError("YOLO não instalado. Execute: pip install ultralytics")
+    
+    def _load_tflite(self):
+        """Carrega modelo TensorFlow Lite"""
+        Interpreter = None
+        
+        try:
+            from tflite_runtime.interpreter import Interpreter
+            print("[+] Usando tflite-runtime")
+        except ImportError:
+            try:
+                import tensorflow as tf
+                Interpreter = tf.lite.Interpreter
+                print("[+] Usando TensorFlow")
+            except ImportError:
+                raise ImportError("Instale 'tensorflow' ou 'tflite-runtime'")
+        
+        try:
+            self.model = Interpreter(model_path=self.model_path)
+            self.model.allocate_tensors()
+            print("[+] TFLite carregado com sucesso")
         except Exception as e:
-            print(f"[ERRO] Falha ao carregar configuração: {e}")
-
-    def run(self, show_stats: bool = True) -> None:
-        """
-        Executa o detector em tempo real.
+            raise RuntimeError(f"Erro ao carregar TFLite: {e}")
+    
+    def detect(self, frame):
+        """Detecta objetos no frame. Retorna: [(x1, y1, x2, y2, conf, class_id), ...]"""
+        if self.model_type == 'yolo':
+            return self._detect_yolo(frame)
+        elif self.model_type == 'tflite':
+            return self._detect_tflite(frame)
+        return []
+    
+    def _detect_yolo(self, frame):
+        """Detecção YOLO"""
+        results = self.model(frame, conf=self.confidence, verbose=False)
+        detections = []
         
-        Controles:
-            'q' - Sair
-            's' - Salvar configuração
-            'l' - Carregar configuração
-            '+' - Aumentar confiança
-            '-' - Diminuir confiança
-            'h' - Mostrar ajuda
-        """
-        print("\n" + "="*60)
-        print("DETECTOR DE OBJETOS COM MACHINE LEARNING")
-        print("="*60)
-        print("[INFO] Controles:")
-        print("  'q' - Sair")
-        print("  's' - Salvar configuração")
-        print("  'l' - Carregar configuração")
-        print("  '+' - Aumentar confiança (+0.05)")
-        print("  '-' - Diminuir confiança (-0.05)")
-        print("  'h' - Mostrar ajuda")
-        print("="*60 + "\n")
+        for box in results[0].boxes:
+            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+            conf = float(box.conf[0].cpu().numpy())
+            cls_id = int(box.cls[0].cpu().numpy())
+            
+            width = int(x2 - x1)
+            if self.min_width <= width <= self.max_width:
+                detections.append((int(x1), int(y1), int(x2), int(y2), conf, cls_id))
         
+        return detections
+    
+    def _detect_tflite(self, frame):
+        """Detecção TensorFlow Lite com YOLOv8"""
+        h_orig, w_orig = frame.shape[:2]
+        input_details = self.model.get_input_details()
+        output_details = self.model.get_output_details()
+        
+        # Preparação da imagem
+        input_shape = input_details[0]['shape']
+        input_h, input_w = input_shape[1], input_shape[2]
+        dtype = input_details[0]['dtype']
+        
+        resized = cv2.resize(frame, (input_w, input_h))
+        
+        # Normalização (int8 vs float32)
+        if dtype == np.int8 or dtype == np.uint8:
+            input_data = np.expand_dims(resized, axis=0).astype(dtype)
+        else:
+            input_data = np.expand_dims(resized, axis=0).astype(np.float32) / 255.0
+        
+        # Inferência
+        self.model.set_tensor(input_details[0]['index'], input_data)
+        self.model.invoke()
+        
+        detections = []
+        
+        # Processamento de saída
+        if len(output_details) == 1:
+            output_data = self.model.get_tensor(output_details[0]['index'])[0]
+            output_data = output_data.T  # Shape: (N, 4 + num_classes)
+            
+            boxes_xywh = []
+            confidences = []
+            class_ids = []
+            
+            for row in output_data:
+                classes_scores = row[4:]
+                max_score = np.max(classes_scores)
+                
+                if max_score > self.confidence:
+                    cx, cy, w_box, h_box = row[0:4]
+                    class_id = np.argmax(classes_scores)
+                    
+                    # Conversão para coordenadas do frame original
+                    x1 = int((cx - w_box/2) * (w_orig / input_w))
+                    y1 = int((cy - h_box/2) * (h_orig / input_h))
+                    x2 = int((cx + w_box/2) * (w_orig / input_w))
+                    y2 = int((cy + h_box/2) * (h_orig / input_h))
+                    
+                    # Validação de limites
+                    x1 = max(0, min(x1, w_orig - 1))
+                    y1 = max(0, min(y1, h_orig - 1))
+                    x2 = max(0, min(x2, w_orig))
+                    y2 = max(0, min(y2, h_orig))
+                    
+                    boxes_xywh.append([x1, y1, x2 - x1, y2 - y1])
+                    confidences.append(float(max_score))
+                    class_ids.append(int(class_id))
+            
+            # NMS
+            if len(boxes_xywh) > 0:
+                indices = cv2.dnn.NMSBoxes(boxes_xywh, confidences, self.confidence, 0.45)
+                if len(indices) > 0:
+                    for i in indices.flatten():
+                        x, y, w, h = boxes_xywh[i]
+                        detections.append((x, y, x + w, y + h, confidences[i], class_ids[i]))
+        
+        return detections
+    
+    def run(self, window_name="ML Object Detection"):
+        """Executa detecção em tempo real"""
+        print("\n[*] Iniciando captura. Pressione 'q' para sair.\n")
+        
+        last_detections = []
+        last_command = "AGUARDANDO..."
         prev_time = time.time()
-        fps = 0
         
         while True:
             ret, frame = self.cap.read()
             if not ret:
-                print("[ERRO] Falha ao capturar frame")
+                print("[!] Erro ao capturar frame")
                 break
             
             self.frame_count += 1
             
-            # Executar detecção a cada N frames
+            # Processa frame a cada N frames
             if self.frame_count % (self.frame_skip + 1) == 0:
-                try:
-                    results = self.model(frame, conf=self.confidence, verbose=False)
-                    result = results[0]
-                    
-                    self.last_boxes = []
-                    self.last_detections = []
-                    
-                    for box in result.boxes:
-                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                        
-                        width = x2 - x1
-                        height = y2 - y1
-                        
-                        # Aplicar filtro de tamanho
-                        if (width < self.MIN_WIDTH or width > self.MAX_WIDTH or
-                            height < self.MIN_HEIGHT or height > self.MAX_HEIGHT):
-                            continue
-                        
-                        self.last_boxes.append((x1, y1, x2, y2))
-                        
-                        # Extrair informações
-                        center_x = (x1 + x2) // 2
-                        center_y = (y1 + y2) // 2
-                        confidence = float(box.conf[0].cpu().numpy())
-                        class_id = int(box.cls[0].cpu().numpy())
-                        class_name = self.model.names.get(class_id, "Desconhecido")
-                        
-                        self.last_detections.append({
-                            'bbox': (x1, y1, x2, y2),
-                            'center': (center_x, center_y),
-                            'width': width,
-                            'height': height,
-                            'confidence': confidence,
-                            'class_id': class_id,
-                            'class_name': class_name
-                        })
-                    
-                    self.detection_count += len(self.last_detections)
+                last_detections = self.detect(frame)
                 
-                except Exception as e:
-                    print(f"[ERRO] Falha na detecção: {e}")
+
             
-            # Desenhar detecções em todo frame (para fluidez)
-            for detection in self.last_detections:
-                x1, y1, x2, y2 = detection['bbox']
-                center_x, center_y = detection['center']
-                confidence = detection['confidence']
-                class_name = detection['class_name']
-                
-                # Desenhar caixa
+            # Desenha detecções
+            for x1, y1, x2, y2, conf, cls_id in last_detections:
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                
-                # Desenhar centro
-                cv2.circle(frame, (center_x, center_y), 3, (0, 0, 255), -1)
-                
-                # Etiqueta com classe e confiança
-                label = f"{class_name} {confidence:.2f}"
-                cv2.putText(
-                    frame, label, (x1, y1 - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
-                )
+                cv2.putText(frame, f"{conf:.2f}", (x1, y1 - 10), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             
-            # Desenhar linha central
-            cv2.line(
-                frame,
-                (self.center_screen_x, 0),
-                (self.center_screen_x, self.frame_height),
-                (255, 0, 0), 1
-            )
-            cv2.line(
-                frame,
-                (0, self.center_screen_y),
-                (self.frame_width, self.center_screen_y),
-                (255, 0, 0), 1
-            )
-            
-            # FPS
+            # FPS (corrigido)
             curr_time = time.time()
-            fps = 1 / (curr_time - prev_time) if (curr_time - prev_time) > 0 else 0
+            fps = 1 / (curr_time - prev_time + 1e-6)
             prev_time = curr_time
             
-            cv2.putText(
-                frame, f"FPS: {int(fps)}", (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2
-            )
+            cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, last_command, (10, 70), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
+            cv2.putText(frame, f"Modelo: {self.model_type.upper()} | Conf: {self.confidence}", (10, 110),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
             
-            # Informações de detecção
-            cv2.putText(
-                frame, f"Confianca: {self.confidence:.2f}", (10, 60),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2
-            )
+            cv2.imshow(window_name, frame)
             
-            cv2.putText(
-                frame, f"Objetos: {len(self.last_detections)}", (10, 90),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2
-            )
-            
-            if show_stats:
-                cv2.putText(
-                    frame, f"Frame: {self.frame_count}", (10, 120),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1
-                )
-            
-            cv2.imshow('ML Object Detector - Rover Vision', frame)
-            
-            # Controles
-            key = cv2.waitKey(1) & 0xFF
-            
-            if key == ord('q'):
-                print("\n[INFO] Encerrando...")
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            elif key == ord('s'):
-                timestamp = time.strftime("%Y%m%d_%H%M%S")
-                config_file = f"ml_config_{timestamp}.json"
-                self.save_config(config_file)
-            elif key == ord('l'):
-                config_file = input("Nome do arquivo de configuração: ")
-                self.load_config(config_file)
-            elif key == ord('+'):
-                self.confidence = min(1.0, self.confidence + 0.05)
-                print(f"[INFO] Confiança aumentada para: {self.confidence:.2f}")
-            elif key == ord('-'):
-                self.confidence = max(0.0, self.confidence - 0.05)
-                print(f"[INFO] Confiança diminuída para: {self.confidence:.2f}")
-            elif key == ord('h'):
-                print("\n[INFO] Controles:")
-                print("  'q' - Sair")
-                print("  's' - Salvar configuração")
-                print("  'l' - Carregar configuração")
-                print("  '+' - Aumentar confiança")
-                print("  '-' - Diminuir confiança")
-                print("  'h' - Mostrar ajuda\n")
-        
-        stats = self.get_statistics()
-        print("\n" + "="*60)
-        print("ESTATÍSTICAS:")
-        print(f"  Total de frames: {stats['frames_processados']}")
-        print(f"  Total de detecções: {stats['deteccoes_totais']}")
-        print(f"  FPS final: {int(fps)}")
-        print("="*60)
         
         self.cap.release()
         cv2.destroyAllWindows()
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description='Detector de objetos com Machine Learning para Rover',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Exemplos de uso:
-  # Usar modelo YOLOv8 Nano (baixa automático)
-  python MLModelConfig.py --model yolov8n.pt
-
-  # Usar modelo customizado
-  python MLModelConfig.py --model ./models/best.pt --confidence 0.7
-
-  # Usar modelo TFLite
-  python MLModelConfig.py --model best_int8.tflite --camera 0
-
-  # Configuração completa
-  python MLModelConfig.py --model yolov8s.pt --camera 0 --confidence 0.65 --width 640 --height 480
-        """
-    )
+        print("[+] Captura finalizada.\n")
     
-    parser.add_argument(
-        '--model', '-m',
-        type=str,
-        required=True,
-        help='Caminho do modelo ou nome do modelo YOLO (ex: yolov8n.pt, best.pt)'
-    )
-    
-    parser.add_argument(
-        '--camera', '-c',
-        type=int,
-        default=0,
-        help='ID da câmera a usar (padrão: 0)'
-    )
-    
-    parser.add_argument(
-        '--confidence',
-        type=float,
-        default=0.65,
-        help='Limiar de confiança para detecções (0.0-1.0, padrão: 0.65)'
-    )
-    
-    parser.add_argument(
-        '--width',
-        type=int,
-        default=640,
-        help='Largura do frame (padrão: 640)'
-    )
-    
-    parser.add_argument(
-        '--height',
-        type=int,
-        default=480,
-        help='Altura do frame (padrão: 480)'
-    )
-    
-    parser.add_argument(
-        '--frame-skip',
-        type=int,
-        default=2,
-        help='Número de frames a pular (padrão: 2)'
-    )
-    
-    parser.add_argument(
-        '--no-stats',
-        action='store_true',
-        help='Não mostrar estatísticas em tempo real'
-    )
-    
-    args = parser.parse_args()
-    
-    try:
-        detector = MLObjectDetector(
-            model_path=args.model,
-            camera_id=args.camera,
-            confidence=args.confidence,
-            frame_width=args.width,
-            frame_height=args.height,
-            frame_skip=args.frame_skip
-        )
-        
-        detector.run(show_stats=not args.no_stats)
-        
-    except KeyboardInterrupt:
-        print("\n[INFO] Interrupção do usuário")
-    except Exception as e:
-        print(f"\n[ERRO] Erro fatal: {e}")
-        import traceback
-        traceback.print_exc()
-
-
-if __name__ == "__main__":
-    main()
+    def close(self):
+        """Libera recursos"""
+        if self.cap:
+            self.cap.release()
+        cv2.destroyAllWindows()
