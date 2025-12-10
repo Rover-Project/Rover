@@ -109,8 +109,15 @@ if __name__ == "__main__":
             break
 
         if circleHistory is None:
-            print("Nenhum circulo foi detectado")
-            robot.move(-60, 60)  # Rotaciona procurando um círculo
+            # calcula a quantidade de pixels vermelhos na máscara
+            red_area = openCv.countNonZero(mask)
+            RED_THRESHOLD = 5000  # ajuste conforme o tamanho da bola e distância
+            
+            if red_area >= RED_THRESHOLD:
+                robot.stop()
+            else:
+                print("Nenhum circulo foi detectado")
+                robot.move(-60, 60)  # Rotaciona procurando um círculo
 
         else:
             x, y, r = circleHistory  # Agora circles[0] já contém (x, y, r)
