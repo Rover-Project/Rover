@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     circleHistory = None  # média acumulada
     cont = 0
-    LIMIAR = 20  # tolerância para considerar mesma bola
+    LIMIAR = 40  # tolerância para considerar mesma bola
     NO_DET_LIMIT = 10  # número máximo de frames sem detecção
     noDetCounter = 0
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
         if circleHistory is None:
             print("Nenhum circulo foi detectado")
-            robot.move(-30, 30)  # Rotaciona procurando um círculo
+            robot.move(-60, 60)  # Rotaciona procurando um círculo
 
         else:
             x, y, r = circleHistory  # Agora circles[0] já contém (x, y, r)
@@ -118,10 +118,10 @@ if __name__ == "__main__":
             print(f"Tentando achar o centro: ({x_center['low']},{x_center['high']})")
 
             if x > x_center["high"]:
-                robot.move(15, -15)
+                robot.move(60, -60)
 
             elif x < x_center["low"]:
-                robot.move(15, -15)
+                robot.move(-60, 60)
             else:
                 robot.stop()
 
