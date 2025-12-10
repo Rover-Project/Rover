@@ -127,19 +127,28 @@ if __name__ == "__main__":
         x, y, r = circleHistory
         error_x = x_center - x
         error_r = 50 - r  # raio desejado aproximado
-        rotate_speed = int(max(min(Kp_rotate * error_x, 100), -100))
+
+        # Velocidade de avanço baseada no tamanho da bola
         forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
 
-        # Combina rotação e avanço
-        left_final = -rotate_speed + forward_speed
-        right_final = rotate_speed + forward_speed
+        # Rotação usando apenas o motor esquerdo
+        # Se o erro_x > 0 (bola à esquerda), gira para a esquerda (motor esquerdo para trás)
+        # Se o erro_x < 0 (bola à direita), gira para a direita (motor esquerdo para frente)
+        rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 0))
+        if error_x > 0:
+            left_motor_speed = -rotate_speed + forward_speed  # roda para trás para girar esquerda
+        else:
+            left_motor_speed = rotate_speed + forward_speed   # roda para frente para girar direita
+
+        right_motor_speed = forward_speed  # motor direito só anda para frente
 
         # Limita delta de velocidade
-        left_final = max(min(left_final, prev_left + max_delta), prev_left - max_delta)
-        right_final = max(min(right_final, prev_right + max_delta), prev_right - max_delta)
+        left_motor_speed = max(min(left_motor_speed, prev_left + max_delta), prev_left - max_delta)
+        right_motor_speed = max(min(right_motor_speed, prev_right + max_delta), prev_right - max_delta)
 
-        robot.move(left_final, right_final)
-        prev_left, prev_right = left_final, right_final
+        robot.move(left_motor_speed, right_motor_speed)
+        prev_left, prev_right = left_motor_speed, right_motor_speed
+
 
         time.sleep(0.05)
 
