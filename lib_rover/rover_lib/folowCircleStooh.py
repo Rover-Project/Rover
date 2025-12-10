@@ -5,31 +5,31 @@ from circleDetect import *
 import cv2 as openCv
 from picamera2 import Picamera2
 
-def cameraStart(h=640, w=640, analogic=1.5, exposure = 30000, lighConfig=False):
+def cameraStart(h=640, w=640, analogic=1.5, exposure=30000, lighConfig=False):
     picam = Picamera2()
     config = picam.create_preview_configuration(
         main={
-            "format": "RGB888", 
+            "format": "RGB888",
             "size": (HEIGHT, WIDTH)
-            }
-        )
+        }
+    )
     
     if lighConfig:
         picam.set_controls(
             {
-            "AnalogueGain": analogic,
-            "ExposureTime": exposure,
+                "AnalogueGain": analogic,
+                "ExposureTime": exposure,
             }
         )
     picam.configure(config)
     picam.start()
     
     return picam
-    
+
 if __name__ == "__main__":
     HEIGHT = 640
     WIDTH = 640
-    CENTER_THRES = 50  # tolerância central
+    CENTER_THRES = 50
     RED_THRES_LOW = 200000
     RED_THRES_UPPER = 400000
     CIRCLE_THRES = 40
@@ -39,18 +39,18 @@ if __name__ == "__main__":
     circleHistory = None
     noDetCounter = 0
 
-    # Carrega configuração da gpio
+    # Configuração GPIO
     pins_motors = Config.get("gpio")
     left_pins = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
     right_pins = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
 
-    # Inicia motores
+    # Inicializa robô
     robot = Robot(left=left_pins, right=right_pins)
 
     # Centro do frame
     x_center = WIDTH // 2
 
-    # Ganhos para controle proporcional
+    # Ganhos e filtros
     Kp_rotate = 0.5
     Kp_forward = 0.3
     alpha = 0.2  # filtro exponencial
@@ -77,9 +77,11 @@ if __name__ == "__main__":
             det = None
 
         if det is not None:
+            # Converte para int para evitar overflow
+            det = [int(v) for v in det]
             noDetCounter = 0
             if circleHistory is None or not inInterval(det, circleHistory, CIRCLE_THRES):
-                circleHistory = list(det)
+                circleHistory = det
             else:
                 # filtro exponencial
                 circleHistory[0] = int(alpha * det[0] + (1 - alpha) * circleHistory[0])
@@ -107,40 +109,35 @@ if __name__ == "__main__":
             break
 
         # Área vermelha
-        red_area = openCv.countNonZero(mask)
+        red_area = int(openCv.countNonZero(mask))
 
         if circleHistory is None:
-            if red_area >= RED_THRES_LOW and RED_THRES_UPPER > red_area:
+            if RED_THRES_LOW <= red_area < RED_THRES_UPPER:
                 robot.stop()
             elif last_circle:
                 last_x, last_y, last_r = last_circle
-                if last_x > WIDTH // 2:
-                    robot.move(60, -60)  # gira para direita
-                else:
-                    robot.move(-60, 60)  # gira para esquerda
+                left_motor = 60 if last_x > WIDTH // 2 else -60
+                robot.move(left_motor, -left_motor)
             else:
-                print("Nenhum circulo foi detectado")
-                robot.move(-60, 60)  # rotaciona procurando um círculo
+                robot.move(-60, 60)
             continue
 
         # Controle proporcional
         x, y, r = circleHistory
-        error_x = x_center - x
-        error_r = 50 - r  # raio desejado aproximado
+        error_x = int(x_center - x)
+        error_r = 50 - int(r)  # raio desejado
 
-        # Velocidade de avanço baseada no tamanho da bola
+        # Velocidade de avanço
         forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
 
-        # Rotação usando apenas o motor esquerdo
-        # Se o erro_x > 0 (bola à esquerda), gira para a esquerda (motor esquerdo para trás)
-        # Se o erro_x < 0 (bola à direita), gira para a direita (motor esquerdo para frente)
+        # Rotação usando apenas motor esquerdo
         rotate_speed = int(max(min(Kp_rotate * abs(error_x), 100), 0))
         if error_x > 0:
-            left_motor_speed = -rotate_speed + forward_speed  # roda para trás para girar esquerda
+            left_motor_speed = -rotate_speed + forward_speed
         else:
-            left_motor_speed = rotate_speed + forward_speed   # roda para frente para girar direita
+            left_motor_speed = rotate_speed + forward_speed
 
-        right_motor_speed = forward_speed  # motor direito só anda para frente
+        right_motor_speed = forward_speed
 
         # Limita delta de velocidade
         left_motor_speed = max(min(left_motor_speed, prev_left + max_delta), prev_left - max_delta)
@@ -148,7 +145,6 @@ if __name__ == "__main__":
 
         robot.move(left_motor_speed, right_motor_speed)
         prev_left, prev_right = left_motor_speed, right_motor_speed
-
 
         time.sleep(0.05)
 
