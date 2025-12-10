@@ -48,6 +48,7 @@ if __name__ == "__main__":
     CENTER_LIMIAR = 100
     BUFFER_SIZE = 5  # quantidade de últimas detecções
     circle_buffer = deque(maxlen=BUFFER_SIZE)  # cria o buffer circular
+    RED_THRESHOLD = 5000
 
     while True:
         frame = picam.capture_array()
@@ -102,10 +103,10 @@ if __name__ == "__main__":
         if openCv.waitKey(1) & 0xFF == ord('q'):
             break
 
-        RED_THRESHOLD = 5000
         red_area = openCv.countNonZero(mask)
 
         if circleHistory is None:
+            print(f"Area vermelha: {red_area}")
             if red_area >= RED_THRESHOLD:
                 robot.stop()
             elif circle_buffer:
