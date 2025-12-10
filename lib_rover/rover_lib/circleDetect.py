@@ -164,6 +164,9 @@ def circleVoting(hough, contorno):
 
     x1, y1, r1 = hough
     x2, y2, r2 = contorno
+    
+    x1, y1, r1 = int(x1), int(y1), int(r1)
+    x2, y2, r2 = int(x2), int(y2), int(r2)
 
     # votação:
     if abs(x1 - x2) < 20 and abs(y1 - y2) < 20:
