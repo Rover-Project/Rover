@@ -15,7 +15,8 @@ def forward(robot: Robot, speed=100.0):
 
 def backward(robot: Robot, speed=100.0):
     robot.move(speed_left=(-speed * 0.7), speed_right=-speed)
-
+    
+    
 if __name__ == "__main__":
     HEIGHT = 640
     WIDTH = 480
@@ -27,13 +28,6 @@ if __name__ == "__main__":
     picam.configure(config)
     picam.start()
 
-    # Ajuste de exposição
-    # picam.set_controls({
-    #     "AnalogueGain": 1.5,   # controla amplificação do sensor, <1 = mais escuro
-    #     "ExposureTime": 30000, # em microssegundos, menor = mais escuro
-    # })
-    # picam.start()
-
     circleHistory = None  # média acumulada
     cont = 0
     LIMIAR = 40  # tolerância para considerar mesma bola
@@ -41,23 +35,22 @@ if __name__ == "__main__":
     noDetCounter = 0
 
     pins_motors = Config.get("gpio")
-
     letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
     right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
 
-    robot = Robot(
-        left=letf,
-        right=right
-    )
+    robot = Robot(left=letf, right=right)
 
     x_center = {
         "low": (HEIGHT // 2),
         "high": (HEIGHT // 2)
     }
 
+    CENTER_LIMIAR = 100
+    BUFFER_SIZE = 5  # quantidade de últimas detecções
+    circle_buffer = deque(maxlen=BUFFER_SIZE)  # cria o buffer circular
+
     while True:
         frame = picam.capture_array()
-
         mask, _, _ = colorDualSegmentation(frame)
         hough, _ = houghDetect(mask)
         contorno = circleCannyDetect(mask)
@@ -76,24 +69,25 @@ if __name__ == "__main__":
             noDetCounter = 0  # reset contador de frames sem detecção
 
             if circleHistory is None or not inInterval(det, circleHistory, LIMIAR):
-                circleHistory = list(det)  # converte tupla para lista
+                circleHistory = list(det)
                 cont = 1
             else:
-                # acumula valores
                 circleHistory[0] += det[0]
                 circleHistory[1] += det[1]
                 circleHistory[2] += det[2]
                 cont += 1
+
+            # atualiza buffer com a última detecção
+            circle_buffer.append(det)
+
         else:
             noDetCounter += 1
-            # se muitos frames sem detecção, zera histórico
             if noDetCounter >= NO_DET_LIMIT:
                 circleHistory = None
                 cont = 0
 
         txt = "Nenhum circulo detectado"
         if circleHistory and cont > 0:
-            # calcula média real
             x = circleHistory[0] // cont
             y = circleHistory[1] // cont
             r = circleHistory[2] // cont
@@ -108,26 +102,28 @@ if __name__ == "__main__":
         if openCv.waitKey(1) & 0xFF == ord('q'):
             break
 
+        RED_THRESHOLD = 5000
+        red_area = openCv.countNonZero(mask)
+
         if circleHistory is None:
-            # calcula a quantidade de pixels vermelhos na máscara
-            red_area = openCv.countNonZero(mask)
-            RED_THRESHOLD = 5000  # ajuste conforme o tamanho da bola e distância
-            
             if red_area >= RED_THRESHOLD:
                 robot.stop()
+            elif circle_buffer:
+                # utiliza a última posição do buffer para girar
+                last_x, last_y, last_r = circle_buffer[-1]
+                if last_x > WIDTH // 2:
+                    robot.move(60, -60)  # gira para direita
+                else:
+                    robot.move(-60, 60)  # gira para esquerda
             else:
                 print("Nenhum circulo foi detectado")
-                robot.move(-60, 60)  # Rotaciona procurando um círculo
+                robot.move(-60, 60)  # rotaciona procurando um círculo
 
         else:
-            x, y, r = circleHistory  # Agora circles[0] já contém (x, y, r)
-            print(f"Circulo unico detectado: centro - ({x}, {y}); raio - {r}")
-            print(f"Tentando achar o centro: ({x_center['low']},{x_center['high']})")
-
-            if x > x_center["high"] + r:
+            x, y, r = circleHistory
+            if x > x_center["high"] + CENTER_LIMIAR:
                 robot.move(60, -60)
-
-            elif x < x_center["low"] - r:
+            elif x < x_center["low"] - CENTER_LIMIAR:
                 robot.move(-60, 60)
             else:
                 robot.move(70, 100)
