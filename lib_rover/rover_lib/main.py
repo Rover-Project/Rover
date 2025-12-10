@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
         if circleHistory is None:
             print("Nenhum circulo foi detectado")
-            robot.move(-SPEED, SPEED * 0.5)  # Rotaciona procurando um círculo
+            robot.move(-30, 30)  # Rotaciona procurando um círculo
 
         else:
             x, y, r = circleHistory  # Agora circles[0] já contém (x, y, r)
@@ -118,10 +118,10 @@ if __name__ == "__main__":
             print(f"Tentando achar o centro: ({x_center['low']},{x_center['high']})")
 
             if x > x_center["high"]:
-                robot.move(30, -SPEED)
+                robot.move(15, -15)
 
             elif x < x_center["low"]:
-                robot.move(30, SPEED)
+                robot.move(15, -15)
             else:
                 robot.stop()
 
