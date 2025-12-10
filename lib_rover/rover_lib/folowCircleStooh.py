@@ -124,6 +124,10 @@ if __name__ == "__main__":
 
         # Controle proporcional
         x, y, r = circleHistory
+        x = int(x)
+        y = int(y)
+        r = int(r)
+        
         error_x = int(x_center - x)
         error_r = 50 - int(r)  # raio desejado
 
