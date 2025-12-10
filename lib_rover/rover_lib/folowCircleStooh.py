@@ -114,9 +114,13 @@ if __name__ == "__main__":
                 robot.stop()
             elif last_circle:
                 last_x, last_y, last_r = last_circle
-                robot.move(60 if last_x > WIDTH // 2 else -60, -60 if last_x > WIDTH // 2 else 60)
+                if last_x > WIDTH // 2:
+                    robot.move(60, -60)  # gira para direita
+                else:
+                    robot.move(-60, 60)  # gira para esquerda
             else:
-                robot.move(-60, 60)
+                print("Nenhum circulo foi detectado")
+                robot.move(-60, 60)  # rotaciona procurando um círculo
             continue
 
         # Controle proporcional
@@ -127,8 +131,8 @@ if __name__ == "__main__":
         forward_speed = int(max(min(Kp_forward * error_r, 100), 0))
 
         # Combina rotação e avanço
-        left_final = rotate_speed + forward_speed
-        right_final = -rotate_speed + forward_speed
+        left_final = -rotate_speed + forward_speed
+        right_final = rotate_speed + forward_speed
 
         # Limita delta de velocidade
         left_final = max(min(left_final, prev_left + max_delta), prev_left - max_delta)
