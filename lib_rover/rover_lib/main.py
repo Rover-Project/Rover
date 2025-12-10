@@ -51,8 +51,8 @@ if __name__ == "__main__":
     )
 
     x_center = {
-        "low": (HEIGHT // 2) - THRES,
-        "high": (HEIGHT // 2) + THRES
+        "low": (HEIGHT // 2),
+        "high": (HEIGHT // 2)
     }
 
     while True:
@@ -117,10 +117,10 @@ if __name__ == "__main__":
             print(f"Circulo unico detectado: centro - ({x}, {y}); raio - {r}")
             print(f"Tentando achar o centro: ({x_center['low']},{x_center['high']})")
 
-            if x > x_center["high"]:
+            if x > x_center["high"] + r:
                 robot.move(60, -60)
 
-            elif x < x_center["low"]:
+            elif x < x_center["low"] - r:
                 robot.move(-60, 60)
             else:
                 robot.stop()
