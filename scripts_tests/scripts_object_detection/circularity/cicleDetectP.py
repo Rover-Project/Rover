@@ -3,6 +3,7 @@ import numpy as np
 import math
 from collections import deque
 from picamera2 import Picamera2
+import time
 
 ultimo = None          # último círculo detectado
 consistencia = 0       # contagem de consistência
@@ -311,18 +312,16 @@ def filtro_temporal(circ):
     return None
 
 def folowCircle():
-    """Seguindo circulos detectados"""
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Erro ao acessar webcam!")
-        return
+    picam = Picamera2()
+    config = picam.create_preview_configuration(main={"format": "RGB888", "size": (640, 640)})
+    picam.configure(config)
+    picam.start()
 
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+        time.sleep(0.3)
+        frame = picam.capture_array()
 
-        frame = cv2.resize(frame, (640, 640))
+        #frame = cv2.resize(frame, (640, 640))
 
         # máscara da bola (usar sua função de segmentação)
         mask, _, _ = redSegmentationDuble(frame)
@@ -354,7 +353,7 @@ def folowCircle():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cap.release()
+    picam.stop()
     cv2.destroyAllWindows()
     
 def inInterval(a, b, l):
@@ -380,10 +379,10 @@ def avCircle():
     noDetCounter = 0
 
     while True:
+        time.sleep(0.3)
         frame = picam.capture_array()
-        
 
-        frame = cv2.resize(frame, (640, 640))
+        #frame = cv2.resize(frame, (640, 640))
 
         mask, _, _ = redSegmentationDuble(frame)
         hough, _ = hough_robusto(mask)
@@ -435,7 +434,7 @@ def avCircle():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cap.release()
+    picam.stop()
     cv2.destroyAllWindows()
 
 avCircle()
