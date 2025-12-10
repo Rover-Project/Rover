@@ -377,6 +377,10 @@ def avCircle():
     LIMIAR = 20  # tolerância para considerar mesma bola
     NO_DET_LIMIT = 30  # número máximo de frames sem detecção
     noDetCounter = 0
+    
+    cv2.namedWindow("Deteccao Final (Estável)", cv2.WINDOW_NORMAL)
+    cv2.namedWindow("Mascara", cv2.WINDOW_NORMAL)
+
 
     while True:
         time.sleep(0.3)
@@ -427,7 +431,7 @@ def avCircle():
             cv2.circle(frame, (x, y), 3, (0, 255, 255), -1)
             txt = f"X={x}  Y={y}  R={r}"
 
-        cv2.putText(frame, txt, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        #cv2.putText(frame, txt, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
         cv2.imshow("Deteccao Final (Estável)", frame)
         cv2.imshow("Mascara", mask)
 
