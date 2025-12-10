@@ -48,7 +48,8 @@ if __name__ == "__main__":
     CENTER_LIMIAR = 100
     BUFFER_SIZE = 5  # quantidade de últimas detecções
     last_circle = None  # cria o buffer circular
-    RED_THRESHOLD = 200000
+    RED_THRESHOLD_LOW = 200000
+    RED_THRESHOLD_UPPER = 400000
 
     while True:
         frame = picam.capture_array()
@@ -105,7 +106,7 @@ if __name__ == "__main__":
 
         if circleHistory is None:
             print(f"Area vermelha: {red_area}")
-            if red_area >= RED_THRESHOLD: # Chegou perto o suficiente da bola
+            if red_area >= RED_THRESHOLD_LOW and RED_THRESHOLD_UPPER > red_area: # Chegou perto o suficiente da bola
                 robot.stop()
             elif last_circle:
                 last_x, last_y, last_r = last_circle
