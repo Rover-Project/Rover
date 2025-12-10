@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     CENTER_LIMIAR = 100
     BUFFER_SIZE = 5  # quantidade de últimas detecções
-    circle_buffer = deque(maxlen=BUFFER_SIZE)  # cria o buffer circular
+    last_circle = None  # cria o buffer circular
     RED_THRESHOLD = 200000
 
     while True:
@@ -76,10 +76,8 @@ if __name__ == "__main__":
                 circleHistory[0] += det[0]
                 circleHistory[1] += det[1]
                 circleHistory[2] += det[2]
+                last_circle = circleHistory # captura o ultimo ciculo
                 cont += 1
-
-            # atualiza buffer com a última detecção
-            circle_buffer.append(det)
 
         else:
             noDetCounter += 1
@@ -107,15 +105,14 @@ if __name__ == "__main__":
 
         if circleHistory is None:
             print(f"Area vermelha: {red_area}")
-            if red_area >= RED_THRESHOLD:
+            if red_area >= RED_THRESHOLD: # Chegou perto o suficiente da bola
                 robot.stop()
-            elif circle_buffer:
-                # utiliza a última posição do buffer para girar
-                last_x, last_y, last_r = circle_buffer[-1]
+            elif last_circle:
+                last_x, last_y, last_r = last_circle
                 if last_x > WIDTH // 2:
-                    robot.move(60, -60)  # gira para direita
+                    robot.move(-60, 60)  # gira para direita
                 else:
-                    robot.move(-60, 60)  # gira para esquerda
+                    robot.move(60, -60)  # gira para esquerda
             else:
                 print("Nenhum circulo foi detectado")
                 robot.move(-60, 60)  # rotaciona procurando um círculo
