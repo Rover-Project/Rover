@@ -56,6 +56,8 @@ if __name__ == "__main__":
 
     while True:
         frame = picam.capture_array()
+        
+        openCv.imshow("Imagem", frame)
 
         mask, _, _ = colorDualSegmentation(frame)
         hough, _ = houghDetect(mask)
