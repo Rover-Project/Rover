@@ -429,7 +429,7 @@ def avCircle():
             txt = f"X={x}  Y={y}  R={r}"
 
         #cv2.putText(frame, txt, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        cv2.imshow("Deteccao Final (Estável)", frame)
+        cv2.imshow("Deteccao Final", frame)
         cv2.imshow("Mascara", mask)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
