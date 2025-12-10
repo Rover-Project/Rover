@@ -123,7 +123,7 @@ if __name__ == "__main__":
             elif x < x_center["low"] - r:
                 robot.move(-60, 60)
             else:
-                robot.stop()
+                robot.move(70, 100)
 
         time.sleep(0.1)
 
