@@ -97,13 +97,13 @@ class AppControllerMotor:
 
     def increase_speed(self):
         """ Aumenta a velocidade do motor e atualiza o label. """
-        self.motor_controller.speed += 0.1
+        self.motor_controller.speed += 5
         self.update_speed_label()
         print(f"Velocidade atual: {self.motor_controller.speed:.1f}")
 
     def decrease_speed(self):
         """ Diminui a velocidade do motor e atualiza o label. """
-        self.motor_controller.speed -= 0.1
+        self.motor_controller.speed -= 5
         self.update_speed_label()
         print(f"Velocidade atual: {self.motor_controller.speed:.1f}")
     

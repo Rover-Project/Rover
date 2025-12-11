@@ -4,7 +4,7 @@ class Motor:
     """
     Classe para controlar os motores usando gpiozero.Robot.
     """
-    def __init__(self, left_pins, right_pins, initial_speed=0.5):
+    def __init__(self, left_pins, right_pins, initial_speed=50):
         """
         Inicializa o motor com os pinos e a velocidade inicial.
         """
@@ -20,7 +20,7 @@ class Motor:
     @speed.setter
     def speed(self, new_speed):
         """ Setter para a velocidade, garante que esteja entre 0.0 e 1.0. """
-        self._speed = max(0.0, min(1.0, new_speed))
+        self._speed = max(0.0, min(100, new_speed))
 
     def forward(self):
         """ Move para frente com a velocidade atual. """
