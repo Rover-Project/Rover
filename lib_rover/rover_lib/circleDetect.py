@@ -196,7 +196,7 @@ def smoothDetect():
     #     "AnalogueGain": 1.5,   # controla amplificação do sensor, <1 = mais escuro
     #     "ExposureTime": 30000, # em microssegundos, menor = mais escuro
     # })
-    # picam.start()
+    picam.start()
 
     circleHistory = None  # média acumulada
     cont = 0
