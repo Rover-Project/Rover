@@ -32,11 +32,11 @@ class Motor:
 
     def left(self):
         """ Move para a esquerda (gira no lugar ou curva) com a velocidade atual. """
-        self.motor.left(self._speed) # type: ignore
+        self.motor.turn_left(self._speed) # type: ignore
 
     def right(self):
         """ Move para a direita (gira no lugar ou curva) com a velocidade atual. """
-        self.motor.right(self._speed) # type: ignore
+        self.motor.turn_right(self._speed) # type: ignore
 
     def stop(self):
         """ Para o motor. """
