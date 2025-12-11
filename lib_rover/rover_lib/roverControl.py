@@ -1,6 +1,6 @@
-from srcControl.motor import Motor # Classe que controla os motores
-from srcControl.control import AppControllerMotor # Classe que cria uma interface basica de controle
-from srcControl.constants import LEFT_MOTOR_1, LEFT_MOTOR_2, RIGHT_MOTOR_1, RIGHT_MOTOR_2 # pinos da GPIO dos motores
+from motor import Motor # Classe que controla os motores
+from control import AppControllerMotor # Classe que cria uma interface basica de controle
+from constants import LEFT_MOTOR_1, LEFT_MOTOR_2, RIGHT_MOTOR_1, RIGHT_MOTOR_2 # pinos da GPIO dos motores
 
 if __name__ == "__main__":
     # Cria a instancia para controle dos motores
