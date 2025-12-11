@@ -1,4 +1,4 @@
-from ..modules.movement.robot import Robot
+from modules.movement.robot import Robot
 
 class Motor:
     """

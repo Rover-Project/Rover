@@ -261,4 +261,4 @@ def smoothDetect():
     picam.stop()
     openCv.destroyAllWindows()
 
-#smoothDetect()
+smoothDetect()
