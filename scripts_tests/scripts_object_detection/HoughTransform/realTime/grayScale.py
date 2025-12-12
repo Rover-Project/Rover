@@ -19,7 +19,7 @@ def main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120):
         # Captura o frame da câmera
         frame = picam.capture_array()
 
-        # Converte para escala de cinza
+        # Converte para escala de cinza, tentar depois somente com vermelho
         gray = openCv.cvtColor(frame, openCv.COLOR_RGB2GRAY)
 
         # Reduz o ruído para melhorar a detecção

@@ -1,0 +1,122 @@
+{
+    "default_config": {
+        "confidence": 0.65,
+        "frame_width": 640,
+        "frame_height": 480,
+        "frame_skip": 2,
+        "min_width": 20,
+        "max_width": 590,
+        "min_height": 20,
+        "max_height": 430
+    },
+    "models": {
+        "yolov8n": {
+            "name": "YOLOv8 Nano",
+            "path": "yolov8n.pt",
+            "params": 3200000,
+            "description": "Modelo mais rápido, ideal para tempo real",
+            "recommended_platforms": ["raspberry_pi", "jetson_nano"],
+            "frame_skip": 2,
+            "confidence": 0.65
+        },
+        "yolov8s": {
+            "name": "YOLOv8 Small",
+            "path": "yolov8s.pt",
+            "params": 11200000,
+            "description": "Equilíbrio entre velocidade e precisão",
+            "recommended_platforms": ["raspberry_pi", "jetson_nano", "pc"],
+            "frame_skip": 2,
+            "confidence": 0.65
+        },
+        "yolov8m": {
+            "name": "YOLOv8 Medium",
+            "path": "yolov8m.pt",
+            "params": 25900000,
+            "description": "Mais preciso, adequado para PCs",
+            "recommended_platforms": ["pc", "laptop"],
+            "frame_skip": 1,
+            "confidence": 0.65
+        },
+        "yolov8l": {
+            "name": "YOLOv8 Large",
+            "path": "yolov8l.pt",
+            "params": 43700000,
+            "description": "Alta precisão",
+            "recommended_platforms": ["pc"],
+            "frame_skip": 1,
+            "confidence": 0.65
+        },
+        "yolov8x": {
+            "name": "YOLOv8 XLarge",
+            "path": "yolov8x.pt",
+            "params": 68200000,
+            "description": "Máxima precisão, requer GPU",
+            "recommended_platforms": ["pc_with_gpu"],
+            "frame_skip": 1,
+            "confidence": 0.65
+        }
+    },
+    "presets": {
+        "raspberry_pi": {
+            "model": "yolov8n.pt",
+            "confidence": 0.6,
+            "frame_width": 320,
+            "frame_height": 240,
+            "frame_skip": 3,
+            "min_width": 15,
+            "max_width": 300,
+            "min_height": 15,
+            "max_height": 225
+        },
+        "jetson_nano": {
+            "model": "yolov8s.pt",
+            "confidence": 0.65,
+            "frame_width": 640,
+            "frame_height": 480,
+            "frame_skip": 2,
+            "min_width": 20,
+            "max_width": 600,
+            "min_height": 20,
+            "max_height": 450
+        },
+        "pc": {
+            "model": "yolov8m.pt",
+            "confidence": 0.65,
+            "frame_width": 1280,
+            "frame_height": 720,
+            "frame_skip": 1,
+            "min_width": 30,
+            "max_width": 1200,
+            "min_height": 30,
+            "max_height": 680
+        },
+        "pc_with_gpu": {
+            "model": "yolov8x.pt",
+            "confidence": 0.65,
+            "frame_width": 1920,
+            "frame_height": 1080,
+            "frame_skip": 0,
+            "min_width": 50,
+            "max_width": 1850,
+            "min_height": 50,
+            "max_height": 1020
+        }
+    },
+    "filter_sizes": {
+        "small_objects": {
+            "min_width": 10,
+            "max_width": 50,
+            "description": "Detecta objetos pequenos (ruído)"
+        },
+        "medium_objects": {
+            "min_width": 30,
+            "max_width": 300,
+            "description": "Detecta objetos médios (padrão)"
+        },
+        "large_objects": {
+            "min_width": 200,
+            "max_width": 1000,
+            "description": "Detecta objetos grandes"
+        }
+    }
+}
