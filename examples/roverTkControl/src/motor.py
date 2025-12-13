@@ -19,8 +19,8 @@ class Motor:
 
     @speed.setter
     def speed(self, new_speed):
-        """ Setter para a velocidade, garante que esteja entre 0.0 e 1.0. """
-        self._speed = max(0.0, min(1.0, new_speed))
+        """ Setter para a velocidade, garante que esteja entre 0.0 e 100. """
+        self._speed = max(0.0, min(100, new_speed))
 
     def forward(self):
         """ Move para frente com a velocidade atual. """
@@ -40,4 +40,5 @@ class Motor:
 
     def stop(self):
         """ Para o motor. """
+        self.motor.cleanup()
         self.motor.stop()
