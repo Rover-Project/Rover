@@ -1,8 +1,8 @@
 import time
 import cv2
 from .modules.movement.robot import Robot 
-from .modules.camera.camera import CameraModule
-from .modules.vision.vision import VisionModule
+from .modules.camera.cameraModule import CameraModule
+from .modules.vision.visionModule import VisionModule
 from utils.config_manager import Config
 
 class Rover:

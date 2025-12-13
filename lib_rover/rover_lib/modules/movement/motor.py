@@ -2,7 +2,7 @@
 Driver para controle de motores via GPIO e PWM.
 Responsável pela comunicação direta com o hardware da Raspberry Pi.
 """
-from execeptions.motorExeceptions import (
+from .execeptions.motorExeceptions import (
     UninitializedMotorError, 
     DirectionInvalidMotorError, 
     MotorCreationError

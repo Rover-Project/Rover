@@ -1,4 +1,3 @@
-import time
 import cv2
 import numpy as np
 from ...utils.config_manager import Config
@@ -38,7 +37,7 @@ class CameraModule:
     Módulo para gerenciar a câmera do Rover, capturar e fornecer frames
     para o módulo de visão computacional.
     """
-    def __init__(self):
+    def __init__(self, height, width, analogic=1.5, exposure = 30000, lighConfig=False):
         """Inicializa e configura a câmera."""
         self.picam2 = Picamera2()
         self.is_mock = hasattr(self.picam2, 'is_mock')
@@ -47,19 +46,32 @@ class CameraModule:
             # Configuração real da câmera se não for o mock
             # Usamos o modo 'preview' para processamento em tempo real
             config = self.picam2.create_preview_configuration(
-                main={"size": CAMERA_PREVIEW_RESOLUTION, "format": "RGB888"},
+                main=
+                {
+                    "size": (height, width), "format": "RGB888"
+                },
                 # lores={"size": (320, 240), "format": "YUV420"}, # Stream de baixa resolução opcional
             )
+        
+            #  Configuração de iluminação
+            if lighConfig:
+                self.picam2.set_controls(
+                    {
+                    "AnalogueGain": 1.5,   # controla amplificação do sensor, analogic < 1 = mais escuro
+                    "ExposureTime": 30000, # em microssegundos, menor = mais escuro
+                    }
+                )
             self.picam2.configure(config)
             self.picam2.start()
             print("Câmera real (picamera2) inicializada.")
         else:
-            # Configuração do mock
-            self.picam2.configure(None)
-            self.picam2.start()
-            print("Câmera mock inicializada.")
+            raise ModuleNotFoundError("Não foi possivel importa o modulo Picamera2")
+            # # Configuração do mock
+            # self.picam2.configure(None)
+            # self.picam2.start()
+            # print("Câmera mock inicializada.")
 
-    def capture_frame(self):
+    def get_frame(self):
         """
         Captura um único frame da câmera.
 
@@ -96,7 +108,7 @@ if __name__ == "__main__":
         print(f"Resolução do preview: {camera.get_preview_resolution()}")
         print("Capturando um frame de teste...")
         
-        frame = camera.capture_frame()
+        frame = camera.get_frame()
         
         # condicional que verifica se o frame foi capturado corretamente
         if frame is not None and frame.shape[0] > 0 and frame.shape[1] > 0:
