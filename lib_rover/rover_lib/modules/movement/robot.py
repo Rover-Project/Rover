@@ -2,29 +2,32 @@
 Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
-from .driver import MotorDriver
+from motor import Motor
+from motorCalibration import MotorCalibration
 
-
-class MovementCommands:
+class Robot:
     """
     Comandos básicos de movimento do Rover.
     Fornece métodos intuitivos para controlar o movimento.
     """
     
-    def __init__(self, driver=None, pwm_frequency=100):
+    def __init__(self, left: tuple[int, int], right:tuple[int, int], pwm_frequency=1000):
         """
-        Inicializa os comandos de movimento.
-        
+        Inicia os drivers para os motores.
         Args:
-            driver (MotorDriver, optional): Driver de motores. Se None, cria um novo.
-            pwm_frequency (int): Frequência PWM (usado apenas se driver for None)
+            left (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da esquerda.
+            right (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da direita.
+            pwm_frequency (int, optional): Frequência do sinal PWM em Hz(padrão: 1000Hz). Defaults to 1000.
         """
-        if driver is None:
-            self.driver = MotorDriver(pwm_frequency=pwm_frequency)
-        else:
-            self.driver = driver
         
-        self.driver.initialize()
+        # Crias instâncias para controlas os motores
+        self.left_motor = Motor(left, pwm_frequency)
+        self.right_motor = Motor(right, pwm_frequency)
+        self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
+        
+        # Inicias os motores
+        self.left_motor.initialize()
+        self.right_motor.initialize()
     
     def forward(self, speed=50, duration=None):
         """
@@ -37,8 +40,12 @@ class MovementCommands:
         Returns:
             bool: True se executado com sucesso
         """
-        self.driver.set_motors('forward', speed, 'forward', speed)
         
+        # Movimenta os motores para a frente
+        self.left_motor.set_movement(speed)
+        self.right_motor.set_movement(speed)
+        
+        # Delimita movimento por uma duração
         if duration is not None:
             import time
             time.sleep(duration)
@@ -57,8 +64,12 @@ class MovementCommands:
         Returns:
             bool: True se executado com sucesso
         """
-        self.driver.set_motors('backward', speed, 'backward', speed)
         
+        # Movimenta os motores para a frente
+        self.left_motor.set_movement(speed, "backward")
+        self.right_motor.set_movement(speed, "backward")
+        
+        # Delimita movimento por uma duração
         if duration is not None:
             import time
             time.sleep(duration)
@@ -77,8 +88,11 @@ class MovementCommands:
         Returns:
             bool: True se executado com sucesso
         """
-        self.driver.set_motors('backward', speed, 'forward', speed)
         
+        self.left_motor.set_movement(speed, "backward")
+        self.right_motor.set_movement(speed)
+        
+        # Delimita movimento por um intervalo de tempo
         if duration is not None:
             import time
             time.sleep(duration)
@@ -97,8 +111,11 @@ class MovementCommands:
         Returns:
             bool: True se executado com sucesso
         """
-        self.driver.set_motors('forward', speed, 'backward', speed)
         
+        self.left_motor.set_movement(speed)
+        self.right_motor.set_movement(speed, "backward")
+        
+        # Delimita movimento por um intervalo de tempo
         if duration is not None:
             import time
             time.sleep(duration)
@@ -106,7 +123,7 @@ class MovementCommands:
         
         return True
     
-    def move(self, speed_left, speed_right):
+    def move(self, speed_left, speed_right, calibration=False):
         """
         Controla os motores individualmente.
         
@@ -115,6 +132,7 @@ class MovementCommands:
                                Positivo = frente, Negativo = trás
             speed_right (float): Velocidade do motor direito (-100 a 100)
                                 Positivo = frente, Negativo = trás
+            calibration: Aplicar calibração nos motores
         """
         # determina direção e velocidade para cada motor
         if speed_left > 0:
@@ -136,14 +154,20 @@ class MovementCommands:
         else:
             right_dir = 'stop'
             right_speed = 0
+            
+        if calibration:
+            left_speed, right_speed = self.calibration.getCalibration(left_speed=left_speed, right_speed=right_speed) # Calibra as velocidades
         
-        self.driver.set_motors(left_dir, left_speed, right_dir, right_speed)
+        self.left_motor.set_movement(left_speed, left_dir)
+        self.right_motor.set_movement(right_speed, right_dir)
     
     def stop(self):
         """Para o Rover imediatamente."""
-        self.driver.stop_all()
+        self.left_motor.stop()
+        self.right_motor.stop()
     
     def cleanup(self):
         """Libera recursos do driver."""
-        self.driver.cleanup()
+        self.left_motor.cleanup()
+        self.right_motor.cleanup()
 
