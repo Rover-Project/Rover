@@ -10,8 +10,8 @@ Permite controlar dois motores DC conectados a uma **Raspberry Pi** através de 
 - **Seta ↓**: Motor para trás  
 - **Seta ←**: Giro para a esquerda  
 - **Seta →**: Giro para a direita  
-- **+ Velocidade**: aumenta a velocidade dos motores no intervalo ``[0.1, 1]``  
-- **- Velocidade**: diminui a velocidade dos motores  no intervalo ``[0.1, 1]``
+- **+ Velocidade**: aumenta a velocidade dos motores no intervalo ``[0, 100]``  
+- **- Velocidade**: diminui a velocidade dos motores  no intervalo ``[0, 100]``
 
 ---
 

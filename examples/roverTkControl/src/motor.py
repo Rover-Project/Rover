@@ -1,10 +1,10 @@
-from gpiozero import Robot
+from lib_rover.rover_lib.modules.movement.robot import Robot
 
 class Motor:
     """
     Classe para controlar os motores usando gpiozero.Robot.
     """
-    def __init__(self, left_pins, right_pins, initial_speed=0.5):
+    def __init__(self, left_pins, right_pins, initial_speed=5):
         """
         Inicializa o motor com os pinos e a velocidade inicial.
         """
@@ -32,11 +32,11 @@ class Motor:
 
     def left(self):
         """ Move para a esquerda (gira no lugar ou curva) com a velocidade atual. """
-        self.motor.left(self._speed) # type: ignore
+        self.motor.turn_left(self._speed) # type: ignore
 
     def right(self):
         """ Move para a direita (gira no lugar ou curva) com a velocidade atual. """
-        self.motor.right(self._speed) # type: ignore
+        self.motor.turn_right(self._speed) # type: ignore
 
     def stop(self):
         """ Para o motor. """
