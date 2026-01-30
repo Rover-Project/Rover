@@ -1,0 +1,10 @@
+numpy
+opencv-python
+
+[cli]
+click
+
+[dev]
+pytest
+black
+ruff
