@@ -2,7 +2,7 @@
 
 ## Implementação 
 
-- Tecnica de detecção de linhas: Usar transformada de Hough para detectar as linhas 
+- Tecnica de detecção de linhas: Usa transformada de Hough para detectar as linhas 
 
 - Realizar um pré-processamento básico:
     
