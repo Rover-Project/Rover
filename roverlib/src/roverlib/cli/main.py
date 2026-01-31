@@ -3,7 +3,7 @@ from .new import new
 from .run import run
 from .hello import hello
 from .camera import camera
-from .movement import movement
+from .move import move
 
 @click.group()
 def cli():
@@ -14,4 +14,4 @@ cli.add_command(new)
 cli.add_command(run)
 cli.add_command(hello)
 cli.add_command(camera)
-cli.add_command(movement)
+cli.add_command(move)

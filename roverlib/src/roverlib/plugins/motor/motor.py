@@ -10,6 +10,7 @@ from .exceptions import (
     DirectionInvalidMotorError, 
 )
 
+# Verifica se está na raspbarry 
 try:
     import RPi.GPIO as GPIO # type: ignore
     GPIO_AVAILABLE = True
