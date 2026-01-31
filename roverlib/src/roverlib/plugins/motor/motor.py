@@ -8,7 +8,6 @@ from .motorInterface import MotorInterface
 from .exceptions import (
     UninitializedMotorError, 
     DirectionInvalidMotorError, 
-    MotorCreationError
 )
 
 try:
@@ -18,7 +17,6 @@ try:
 except (RuntimeError, ModuleNotFoundError):
     GPIO_AVAILABLE = False
     print("AVISO: RPi.GPIO não detectado. Este módulo requer Raspberry Pi com RPi.GPIO instalado.")
-    raise ImportError("RPi.GPIO não está disponível. Execute este código na Raspberry Pi.")
 
 class Motor(MotorInterface):
     """
@@ -36,7 +34,7 @@ class Motor(MotorInterface):
         """
         
         if not GPIO_AVAILABLE:
-            raise MotorCreationError("GPIO não disponível. Execute na Raspberry Pi.")
+            raise ImportError("RPi.GPIO não está disponível. Execute este código na Raspberry Pi.")
         
         self.pwm_frequency = pwm_frequency 
         self.in1, self.in2 = pins
