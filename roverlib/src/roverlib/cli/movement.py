@@ -1,6 +1,6 @@
 import click # type: ignore
-from roverlib.core.movement_loader import load_motor
 from roverlib.modules.movement.robot import Robot
+from roverlib.utils.config_manager import Config
 
 @click.group()
 def movement():
@@ -8,22 +8,21 @@ def movement():
     pass
 
 @movement.command()
-@click.option("--backend", default="mock", show_default=True)
 @click.option("--speed", default=50, show_default=True)
 def test(backend, speed):
 
-    MotorClass = load_motor(backend)
+    # lendo pinos da gpio
+    pins_motors = Config.get("gpio")
+    left = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
+    right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
 
-    if backend == "mock":
-        left_motor = MotorClass("left")
-        right_motor = MotorClass("right")
-        
-
+    # instânciado motores
     robot = Robot(
-        left_motor,
-        right_motor,
+        left,
+        right,
     )
 
+    # Testando
     print("\n")
     click.echo("Frente")
     robot.forward(speed, duration=2)
@@ -39,6 +38,3 @@ def test(backend, speed):
     robot.cleanup()
     print("\n")
     click.echo("Teste de movimentação finalizado")
-
-
-
