@@ -1,21 +1,30 @@
-# Repositório de Drivers Rover
+# Rover
+Repositório que reúne referências, exemplos e a biblioteca de modernização do Rover 1.0, um projeto da Universidade Federal do Piauí (UFPI) voltado para visão computacional e robótica.
 
-Este repositório contém os **drivers e scripts necessários para controle de componentes de robótica** do projeto de modernização de um Rover 1.0 utilizando uma **Raspberry Pi 5 B**.  
+O projeto tem como objetivo restaurar o hardware do Rover 1.0 e desenvolver uma biblioteca modular com ferramentas para:
 
-O projeto inclui suporte a:
+- controle de hardware;
+- processamento de imagens;
+- aplicações de visão computacional embarcadas.
 
-- Motores DC com ponte H (L298N)  
-- Câmeras para captura de vídeo e imagem  
-- Outros módulos de robótica e automação  
+## RoverLib
 
-## Estrutura do Repositório
+Biblioteca responsável pelo controle do Rover 1.0, além de fornecer ferramentas de visão computacional que facilitam o desenvolvimento de aplicações robóticas.
 
-- `driver_motors/` - Scripts e drivers para controle dos motores DC via ponte H.  
-- `driver_camera/` - Scripts e drivers para controle de camêras via MSI da raspberry.
+## Examples
 
-## Instalação
+Conjunto de exemplos práticos de aplicações de visão computacional integradas ao Rover 1.0 utilizando a RoverLib.
 
-1. Clone o repositório:
-```bash
-git clone "https://github.com/AbstractGleidson/Rover.git"
-cd Rover
+## Assets
+
+Diretório contendo referências, imagens, diagramas e outros recursos importantes para o desenvolvimento e documentação do projeto.
+
+## Integrantes do Projeto
+#### Orientadores
+ - Kelson T.Aires
+ - Erico Leão 
+#### Alunos 
+- Gleidson Luan
+- Gutemberg Portela
+- Francisco Sarmento
+- Hillan Alves

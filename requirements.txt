@@ -1,7 +1,0 @@
-gpiozero
-Pillow
-rpi.gpio
-picamera2
-opencv-python
-numpy
-PyYAML
