@@ -1,0 +1,102 @@
+import cv2
+import numpy as numpy
+from RoverLib.src.utils.config_manager import Config
+
+try:
+    # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
+    from picamera2 import Picamera2 # type: ignore
+except (ImportError, ModuleNotFoundError):
+    print("Aviso: picamera2 não detectado. Usando mock para desenvolvimento.")
+    
+    # Mock da classe Picamera2 para desenvolvimento em outros sistemas
+    class Picamera2:
+        def __init__(self):
+            self.is_mock = True
+
+        def configure(self, config): pass
+        def start(self): pass
+        def capture_array(self, name="main"):
+            # Retorna uma imagem de teste (um gradiente cinza)
+            # Cria um array 3D (altura, largura, canais)
+            height, width = 480, 640
+            # Cria um gradiente simples para simular uma imagem
+            img = numpy.zeros((height, width, 3), dtype=numpy.uint8)
+            for i in range(height):
+                img[i, :, 0] = int(255 * (i / height)) # Canal Azul (simulação)
+                img[i, :, 1] = int(255 * (1 - (i / height))) # Canal Verde (simulação)
+                img[i, :, 2] = 100 # Canal Vermelho (constante)
+            return img
+        def stop(self): pass
+
+# Carrega configuração da câmera
+CAMERA_RESOLUTION = tuple(Config.get("camera")["resolution"])
+CAMERA_FPS = int(Config.get("camera")["fps"])
+CAMERA_PREVIEW_RESOLUTION = tuple(Config.get("camera")["preview_resolution"])
+
+class CameraModule:
+    """
+    Módulo para gerenciar a câmera do Rover, capturar e fornecer frames
+    para o módulo de visão computacional.
+    """
+    def __init__(self, height, width, analogic=1.5, exposure = 30000, lighConfig=False):
+        """Inicializa e configura a câmera."""
+        self.picam2 = Picamera2()
+        self.is_mock = hasattr(self.picam2, 'is_mock')
+
+        if not self.is_mock:
+            # Configuração real da câmera se não for o mock
+            # Usamos o modo 'preview' para processamento em tempo real
+            config = self.picam2.create_preview_configuration( # type: ignore
+                main=
+                {
+                    "size": (height, width), "format": "RGB888"
+                },
+                # lores={"size": (320, 240), "format": "YUV420"}, # Stream de baixa resolução opcional
+            )
+        
+            #  Configuração de iluminação
+            if lighConfig:
+                self.picam2.set_controls( # type: ignore
+                    {
+                    "AnalogueGain": 1.5,   # controla amplificação do sensor, analogic < 1 = mais escuro
+                    "ExposureTime": 30000, # em microssegundos, menor = mais escuro
+                    }
+                )
+            self.picam2.configure(config)
+            self.picam2.start()
+            print("Câmera real (picamera2) inicializada.")
+        else:
+            raise ModuleNotFoundError("Não foi possivel importa o modulo Picamera2")
+            # # Configuração do mock
+            # self.picam2.configure(None)
+            # self.picam2.start()
+            # print("Câmera mock inicializada.")
+
+    def get_frame(self):
+        """
+        Captura um único frame da câmera.
+
+        Retorna:
+            numpy.array: O frame capturado como um array NumPy no formato BGR.
+        """
+        # A picamera2 captura em formato RGB por padrão
+        frame_rgb = self.picam2.capture_array("main")
+        
+        # Se for o mock, o frame já está em RGB (simulado)
+        if self.is_mock:
+            # O mock retorna um array 3D (H, W, 3) em RGB
+            frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+        else:
+            # A picamera2 retorna em RGB, precisamos converter para BGR para o OpenCV
+            frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+            
+        return frame_bgr
+
+    def get_preview_resolution(self):
+        """Retorna a resolução de preview configurada."""
+        return CAMERA_PREVIEW_RESOLUTION
+
+    def cleanup(self):
+        """Libera os recursos da câmera."""
+        print("Liberando recursos da câmera...")
+        self.picam2.stop()

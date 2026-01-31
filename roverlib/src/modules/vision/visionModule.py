@@ -1,6 +1,6 @@
 import cv2 as openCv
 import numpy 
-from ..processing.processing_image import ProcessingImage
+from RoverLib.src.modules.processing.processing_image import ProcessingImage
 
 class VisionModule:
     """
@@ -178,8 +178,8 @@ class VisionModule:
         mask = mask1 + mask2
 
         # Aplica operações morfológicas para remover ruído
-        mask = openCv.erode(mask, None, iterations=2)
-        mask = openCv.dilate(mask, None, iterations=2)
+        mask = openCv.erode(mask, None, iterations=2) # type: ignore
+        mask = openCv.dilate(mask, None, iterations=2) # type:ignore
 
         # Encontra contornos na máscara
         contours, _ = openCv.findContours(mask.copy(), openCv.RETR_EXTERNAL, openCv.CHAIN_APPROX_SIMPLE)

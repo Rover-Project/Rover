@@ -39,7 +39,7 @@ cli = ["click"]
 dev = ["pytest", "black", "ruff"]
 
 [project.scripts]
-rover = "rover.cli.main:cli"
+rover = "cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/Rover-Project/Rover"
@@ -53,9 +53,9 @@ include-package-data = true
 where = ["src"]
 
 [project.entry-points."rover.camera"]
-webcam = "rover.plugins.camera.webcam:Webcam"
-picamera2 = "rover.plugins.camera.picamera2:PiCamera2"
+webcam = "plugins.camera.webcam:Webcam"
+picamera2 = "plugins.camera.picamera2:PiCamera2"
 
 [project.entry-points."rover.movement"]
-l298n = "rover.plugins.movement.gpio_l298n:L298NMotor"
-mock = "rover.plugins.movement.mock:MockMotor"
+l298n = "plugins.movement.gpio_l298n:L298NMotor"
+mock = "plugins.movement.mock:MockMotor"

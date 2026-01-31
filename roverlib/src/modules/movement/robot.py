@@ -2,7 +2,7 @@
 Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
-from .motor import Motor
+from RoverLib.src.plugins.motor.motor import Motor
 from .motorCalibration import MotorCalibration
 
 class Robot:
@@ -170,4 +170,3 @@ class Robot:
         """Libera recursos do driver."""
         self.left_motor.cleanup()
         self.right_motor.cleanup()
-
