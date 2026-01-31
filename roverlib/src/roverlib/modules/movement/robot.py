@@ -3,7 +3,9 @@ Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
 from roverlib.plugins.motor.motor import Motor
+from roverlib.plugins.motor.vitualMotor import VirtualMotor
 from .motorCalibration import MotorCalibration
+import time
 
 class Robot:
     """
@@ -19,11 +21,17 @@ class Robot:
             right (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da direita.
             pwm_frequency (int, optional): Frequência do sinal PWM em Hz(padrão: 1000Hz). Defaults to 1000.
         """
+        try:
+            # Crias instâncias para controlas os motores
+            self.left_motor = Motor(left, pwm_frequency)
+            self.right_motor = Motor(right, pwm_frequency)
+            self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
         
-        # Crias instâncias para controlas os motores
-        self.left_motor = Motor(left, pwm_frequency)
-        self.right_motor = Motor(right, pwm_frequency)
-        self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
+        except ImportError: # caso a GPIO não esteja disponivel
+            print("Criando motores virtuais.")
+            self.left_motor = VirtualMotor(left, "Left", pwm_frequency)
+            self.right_motor = VirtualMotor(right, "Right", pwm_frequency)
+            self.calibration = MotorCalibration()
         
         # Inicias os motores
         self.left_motor.initialize()
@@ -47,7 +55,6 @@ class Robot:
         
         # Delimita movimento por uma duração
         if duration is not None:
-            import time
             time.sleep(duration)
             self.stop()
         
@@ -71,7 +78,6 @@ class Robot:
         
         # Delimita movimento por uma duração
         if duration is not None:
-            import time
             time.sleep(duration)
             self.stop()
         
@@ -94,7 +100,6 @@ class Robot:
         
         # Delimita movimento por um intervalo de tempo
         if duration is not None:
-            import time
             time.sleep(duration)
             self.stop()
         
@@ -117,7 +122,6 @@ class Robot:
         
         # Delimita movimento por um intervalo de tempo
         if duration is not None:
-            import time
             time.sleep(duration)
             self.stop()
         
@@ -134,6 +138,7 @@ class Robot:
                                 Positivo = frente, Negativo = trás
             calibration: Aplicar calibração nos motores
         """
+        
         # determina direção e velocidade para cada motor
         if speed_left > 0:
             left_dir = 'forward'
