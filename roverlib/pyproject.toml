@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
   "numpy",
   "opencv-python",
+  "click"
 ]
 
 [project.optional-dependencies]
@@ -46,22 +47,10 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]
 
-
 [project.entry-points."rover.camera"]
 webcam = "rover.plugins.camera.webcam:Webcam"
 picamera2 = "rover.plugins.camera.picamera2:PiCamera2"
 
-
 [project.entry-points."rover.movement"]
 l298n = "rover.plugins.movement.gpio_l298n:L298NMotor"
 mock = "rover.plugins.movement.mock:MockMotor"
-
-
-
-
-
-
-
-
-
-

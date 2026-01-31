@@ -33,4 +33,3 @@ src/rover_lib.egg-info/dependency_links.txt
 src/rover_lib.egg-info/entry_points.txt
 src/rover_lib.egg-info/requires.txt
 src/rover_lib.egg-info/top_level.txt
-tests/test_plugins.py

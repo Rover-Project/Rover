@@ -1,0 +1,10 @@
+[console_scripts]
+rover = rover.cli.main:cli
+
+[rover.camera]
+picamera2 = rover.plugins.camera.picamera2:PiCamera2
+webcam = rover.plugins.camera.webcam:Webcam
+
+[rover.movement]
+l298n = rover.plugins.movement.gpio_l298n:L298NMotor
+mock = rover.plugins.movement.mock:MockMotor
