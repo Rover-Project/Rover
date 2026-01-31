@@ -1,5 +1,5 @@
 import cv2
-from roverlib.src.roverlib.utils.config_manager import Config
+from roverlib.utils.config_manager import Config
 from .cameraInterface import CameraInterface
 
 try:
