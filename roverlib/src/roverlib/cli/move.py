@@ -16,8 +16,8 @@ def move(direction: str, speed: int, time: float):
 
     # lendo pinos da gpio
     pins_motors = Config.get("gpio")
-    left = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
-    right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
+    left = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
 
     # instânciando motores
     robot = Robot(

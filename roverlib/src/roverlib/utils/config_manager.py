@@ -2,7 +2,7 @@ import yaml
 from pathlib import Path
 
 class Config:
-    _config_path = Path(__file__).parent.parent / "configs" / "config.yaml"
+    _config_path = Path(__file__).parent.parent.parent.parent / "configs" / "config.yaml"
 
     @classmethod
     def load(cls):
