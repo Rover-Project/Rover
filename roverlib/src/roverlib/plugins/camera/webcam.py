@@ -1,6 +1,7 @@
 import cv2 as openCv
+from .cameraInterface import CameraInterface 
  
-class Webcam:
+class Webcam(CameraInterface):
     """
         Usa o webcam para ler frames
     """
