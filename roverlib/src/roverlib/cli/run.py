@@ -1,5 +1,5 @@
 import click # type: ignore
-from RoverLib.src.core.runner import run_project
+from roverlib.core.runner import run_project
 
 @click.command()
 @click.argument("path", default=".")

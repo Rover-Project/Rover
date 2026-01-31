@@ -1,6 +1,6 @@
 import cv2 as openCv
 import numpy 
-from RoverLib.src.modules.processing.processing_image import ProcessingImage
+from roverlib.modules.processing.processing_image import ProcessingImage
 
 class VisionModule:
     """

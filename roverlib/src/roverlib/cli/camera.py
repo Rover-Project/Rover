@@ -1,6 +1,6 @@
 import click # type: ignore
 import cv2
-from RoverLib.src.core.camera_loader import load_cameras
+from roverlib.core.camera_loader import load_cameras
 
 @click.group()
 def camera():

@@ -1,6 +1,6 @@
 import click # type: ignore
-from core.movement_loader import load_motor
-from modules.movement.robot import Robot
+from roverlib.core.movement_loader import load_motor
+from roverlib.modules.movement.robot import Robot
 
 @click.group()
 def movement():

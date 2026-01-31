@@ -2,7 +2,7 @@
 Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
-from RoverLib.src.plugins.motor.motor import Motor
+from roverlib.plugins.motor.motor import Motor
 from .motorCalibration import MotorCalibration
 
 class Robot:

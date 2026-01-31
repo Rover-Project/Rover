@@ -2,7 +2,7 @@
 Módulo de controle avançado com compensação de motores e calibração.
 Tenta ajustes pontuais para compensar diferenças entre motores.
 """
-from utils.config_manager import Config
+from roverlib.utils.config_manager import Config
 
 
 class MotorCalibration:
