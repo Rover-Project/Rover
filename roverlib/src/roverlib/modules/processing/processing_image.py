@@ -25,7 +25,9 @@ class ProcessingImage:
         ]).astype("uint8")
 
         # Aplica a nova quantização aos pixels do frame
-        corrected = openCv.LUT(img, table)
+        corrected = openCv.LUT(
+            img, table
+        )
         
         return corrected
     

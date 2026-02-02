@@ -203,30 +203,3 @@ class VisionModule:
         openCv.putText(frame_processado, f"Obstaculo: {obstacle_detected}", (10, 60), openCv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         return obstacle_detected, frame_processado
-
-# exemplo de uso (para testes)
-if __name__ == "__main__":
-    
-    test_width, test_height = 640, 480
-    test_frame = numpy.zeros((test_height, test_width, 3), dtype=numpy.uint8)
-    
-    
-    openCv.rectangle(test_frame, (250, 200), (400, 350), (0, 0, 255), -1) # desenha um quadrado vermelho no centro
-    
-    vision = VisionModule((test_width, test_height))
-    
-    # Teste de detecção de linha (apenas para garantir que a função anterior ainda funciona)
-    desvio, processed_line_frame = vision.process_frame_for_line_following(test_frame)
-    print(f"Desvio de linha (com obstáculo): {desvio}")
-    
-    # Teste de detecção de obstáculo
-    obstacle_detected, processed_obstacle_frame = vision.detect_obstacle(test_frame, min_area_threshold=1000)
-    
-    print(f"Obstáculo detectado: {obstacle_detected}")
-    
-    
-    if processed_obstacle_frame is not None:    # salva o frame processado para visualização
-        openCv.imwrite("test_obstacle_frame.jpg", processed_obstacle_frame)
-        print("Frame de teste de obstáculo salvo como 'test_obstacle_frame.jpg'")
-    else:
-        print("Falha no processamento do frame de teste de obstáculo.")

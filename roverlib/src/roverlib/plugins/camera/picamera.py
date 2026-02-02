@@ -14,7 +14,7 @@ CAMERA_RESOLUTION = tuple(Config.get("camera")["resolution"])
 CAMERA_FPS = int(Config.get("camera")["fps"])
 CAMERA_PREVIEW_RESOLUTION = tuple(Config.get("camera")["preview_resolution"])
 
-class Camera(CameraInterface):
+class Picamera(CameraInterface):
     """
     Módulo para gerenciar a câmera do Rover, capturar e fornecer frames
     para o módulo de visão computacional.

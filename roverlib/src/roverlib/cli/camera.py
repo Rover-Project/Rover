@@ -1,6 +1,6 @@
 import click # type: ignore
 import cv2 as openCV
-from roverlib.plugins.camera.camera import  Camera
+from roverlib.plugins.camera.picamera import  Camera
 from roverlib.plugins.camera.webcam import Webcam
 
 @click.command()
