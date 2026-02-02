@@ -1,6 +1,6 @@
 from .src.motor import Motor # Classe que controla os motores
 from .src.appControllerMotor import AppControllerMotor # Classe que cria uma interface basica de controle
-from lib_rover.rover_lib.utils.config_manager import Config
+from roverlib.utils.config_manager import Config
 
 if __name__ == "__main__":
     # Carrega configuração da gpio

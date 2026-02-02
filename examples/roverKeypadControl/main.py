@@ -1,7 +1,7 @@
-from lib_rover.rover_lib.modules.movement.robot import Robot
-from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
-from lib_rover.rover_lib.utils.config_manager import Config
-from lib_rover.rover_lib.modules.camera.webcam import Webcam
+from roverlib.modules.movement.robot import Robot
+from roverlib.plugins.camera.camera import Camera
+from roverlib.utils.config_manager import Config
+from roverlib.plugins.camera.webcam import Webcam
 import cv2 as openCv
 
 if __name__ == "__main__":
@@ -18,49 +18,51 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = CameraModule(HEIGHT, WIDTH)
+        camera = Camera(HEIGHT, WIDTH)
     except:
         camera = Webcam(HEIGHT, WIDTH)
     
     while True:
         frame = camera.get_frame()
         
-        speed = max(0, min(speed, 100))        
+        if frame is not None:
         
-        openCv.imshow("Rover", frame)
-        
-        key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
-        
-        if key == ord("w"):
-            robot.forward(speed)
-            pass
-        
-        elif key == ord("a"):
-            robot.turn_left(speed)
-            pass
-        
-        elif key == ord("d"):
-            robot.turn_right(speed)
-            pass
-        
-        elif key == ord("s"):
-            robot.backward(speed)
-            pass
+            speed = max(0, min(speed, 100))        
             
-        elif key == ord("e"):
-            speed = max(0, min(speed + 10, 100))
+            openCv.imshow("Rover", frame)
+            
+            key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
+            
+            if key == ord("w"):
+                robot.forward(speed)
+                pass
+            
+            elif key == ord("a"):
+                robot.turn_left(speed)
+                pass
+            
+            elif key == ord("d"):
+                robot.turn_right(speed)
+                pass
+            
+            elif key == ord("s"):
+                robot.backward(speed)
+                pass
+                
+            elif key == ord("e"):
+                speed = max(0, min(speed + 10, 100))
+            
+            elif key == ord("r"):
+                speed = max(0, min(speed - 10, 100))
+            
+            elif key == ord("q"):
+                break
         
-        elif key == ord("r"):
-            speed = max(0, min(speed - 10, 100))
-        
-        elif key == ord("q"):
-            break
-    
-        else:
-            pass
-            robot.stop()
-        
-        print(speed)
+            else:
+                pass
+                robot.stop()
+            
+            print(speed)
     
     robot.cleanup()
     camera.cleanup()

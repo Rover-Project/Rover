@@ -1,4 +1,4 @@
-from lib_rover.rover_lib.modules.movement.robot import Robot
+from roverlib.modules.movement.robot import Robot
 
 class Motor:
     """

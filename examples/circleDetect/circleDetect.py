@@ -1,8 +1,8 @@
-from lib_rover.rover_lib.modules.vision.visionModule import VisionModule
-from lib_rover.rover_lib.modules.camera.webcam import Webcam
-from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
+from roverlib.modules.vision.visionModule import VisionModule
+from roverlib.plugins.camera.webcam import Webcam
+from roverlib.plugins.camera.camera import Camera
 import cv2 as openCv
-from lib_rover.rover_lib.modules.processing.processing_image import ProcessingImage
+from roverlib.modules.processing.processing_image import ProcessingImage
 
 def circleVoting(hough, contorno):
     """Relaciona a detecção de dois metodos diferente"""
@@ -43,9 +43,8 @@ def smoothDetect():
     HEIGHT = 640
     WIDTH = 640
     
-    
     try:
-        camera = CameraModule(HEIGHT, WIDTH)
+        camera = Camera(HEIGHT, WIDTH)
     except:
         camera = Webcam(HEIGHT, WIDTH)
 
@@ -57,57 +56,64 @@ def smoothDetect():
     
     while True:
         frame = camera.get_frame()
-        frame = openCv.resize(frame, (HEIGHT, WIDTH))
+        
+        if frame is not None:
+            
+            frame = openCv.resize(
+                frame, 
+                (HEIGHT, WIDTH),
+                interpolation=openCv.INTER_CUBIC
+            )
 
-        mask = ProcessingImage.color_dual_segmentation(frame, gamma=1.9)
-        hough, _ = VisionModule.houghCircleDetect(mask)
-        contorno = VisionModule.circleCannyDetect(mask)
+            mask = ProcessingImage.color_dual_segmentation(frame, gamma=1.9)
+            hough, _ = VisionModule.houghCircleDetect(mask)
+            contorno = VisionModule.circleCannyDetect(mask)
 
-        # escolhe a melhor detecção entre hough e contorno
-        if hough is not None and contorno is not None:
-            det = circleVoting(hough, contorno)
-        elif hough is not None:
-            det = hough
-        elif contorno is not None:
-            det = contorno
-        else:
-            det = None
-
-        if det is not None:
-            noDetCounter = 0  # reset contador de frames sem detecção
-
-            if circleHistory is None or not inInterval(det, circleHistory, LIMIAR):
-                circleHistory = list(det)  # converte tupla para lista
-                cont = 1
+            # escolhe a melhor detecção entre hough e contorno
+            if hough is not None and contorno is not None:
+                det = circleVoting(hough, contorno)
+            elif hough is not None:
+                det = hough
+            elif contorno is not None:
+                det = contorno
             else:
-                # acumula valores
-                circleHistory[0] += det[0]
-                circleHistory[1] += det[1]
-                circleHistory[2] += det[2]
-                cont += 1
-        else:
-            noDetCounter += 1
-            # se muitos frames sem detecção, zera histórico
-            if noDetCounter >= NO_DET_LIMIT:
-                circleHistory = None
-                cont = 0
+                det = None
 
-        txt = "Nenhum circulo detectado"
-        if circleHistory and cont > 0:
-            # calcula média real
-            x = circleHistory[0] // cont
-            y = circleHistory[1] // cont
-            r = circleHistory[2] // cont
-            openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
-            openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
-            txt = f"X={x}  Y={y}  R={r}"
+            if det is not None:
+                noDetCounter = 0  # reset contador de frames sem detecção
 
-        openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        openCv.imshow("Deteccao Final", frame)
-        openCv.imshow("Mascara", mask)
+                if circleHistory is None or not inInterval(det, circleHistory, LIMIAR):
+                    circleHistory = list(det)  # converte tupla para lista
+                    cont = 1
+                else:
+                    # acumula valores
+                    circleHistory[0] += det[0]
+                    circleHistory[1] += det[1]
+                    circleHistory[2] += det[2]
+                    cont += 1
+            else:
+                noDetCounter += 1
+                # se muitos frames sem detecção, zera histórico
+                if noDetCounter >= NO_DET_LIMIT:
+                    circleHistory = None
+                    cont = 0
 
-        if openCv.waitKey(1) & 0xFF == ord('q'):
-            break
+            txt = "Nenhum circulo detectado"
+            if circleHistory and cont > 0:
+                # calcula média real
+                x = circleHistory[0] // cont
+                y = circleHistory[1] // cont
+                r = circleHistory[2] // cont
+                openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
+                openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
+                txt = f"X={x}  Y={y}  R={r}"
+
+            openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            openCv.imshow("Deteccao Final", frame)
+            openCv.imshow("Mascara", mask)
+
+            if openCv.waitKey(1) & 0xFF == ord('q'):
+                break
 
     camera.cleanup()
     openCv.destroyAllWindows()
