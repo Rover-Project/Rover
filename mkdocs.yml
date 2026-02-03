@@ -1,0 +1,38 @@
+site_name: RoverLib Documentation
+site_url: https://rover-project.github.io/Rover/
+repo_url: https://github.com/Rover-Project/Rover
+repo_name: Rover-Project/Rover
+
+theme:
+  name: material
+  language: pt-BR
+  palette: 
+    - scheme: default
+      primary: teal
+      accent: purple 
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs 
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy 
+    - content.tabs.link
+
+markdown_extensions:
+  - pymdownx.highlight: 
+      anchor_linenums: true
+  - pymdownx.superfences 
+  - pymdownx.tabbed: 
+      alternate_style: true 
+  - admonition 
+
+plugins:
+  - search
