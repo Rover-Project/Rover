@@ -1,0 +1,44 @@
+name: Publicar Documentação
+on:
+  push:
+    branches:
+      - main
+    paths:
+      
+      - 'docs/**'       # o orkflow só roda se houver mudança nestes locais:
+      - 'mkdocs.yml'    # configuração do site
+      - 'roverLib/**'   # mudança de código (para atualizar as docstrings)
+      - '.github/workflows/deploy_docs.yml' # o próprio workflow
+
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Instalar Dependências
+        run: |
+          # Instala o gerador de site
+          pip install mkdocs-material mkdocs-glightbox 
+          
+          # IMPORTANTE: Se você estiver usando plugins que leem seu código 
+          # (como mkdocstrings), instale também as dependências do projeto:
+          # pip install -r requirements.txt 
+
+      - name: Configurar Git User
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy para gh-pages
+        run: mkdocs gh-deploy --force
