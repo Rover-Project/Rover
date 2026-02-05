@@ -57,7 +57,7 @@ def lineDetectHough(img, isCut=False):
         edges,
         rho=1,
         theta=numpy.pi / 180,
-        threshold=80,
+        threshold=40,
         minLineLength=60,
         maxLineGap=20
     )
