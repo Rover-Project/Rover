@@ -1,27 +1,40 @@
 #!/usr/bin/env bash
 # Shell Script para a configuração do ambiente rover
-# Instalação de dependências de sistema, python e roverlib
+# Instala dependências do sistema 
+# Instala e configura o pyenv para gerenciar versões do python
+# Instala python 3.11 como global 
 
-set -e
+set -e # Interrompe o script em qualquer erro
 
-echo -e "\033[32mIniciando setup do ambiente Rover\033[0m"
+# Cores para feadback do shell
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+RC="\033[0m" # reseta cor
+
+echo -e "${GREEN}Iniciando setup do ambiente Rover${RC}"
+
+# Verifica se o script foi rodado como root 
+if [ "$EUID" -ne 0 ]; then 
+    echo -e "${RED}Erro${RC}: execute este script como root (sudo)."
+    exit 1
+fi
 
 # Verifica se o sistema operacional é Ubuntu
 if ! grep -qi ubuntu /etc/os-release; then
-  echo -e "\033[31mEste script suporta apenas Ubuntu\033[0m"
+  echo -e "${RED}Erro${RC}: Este script suporta apenas Ubuntu."
   exit 1
 fi
 
 # Dependências de sistema
-echo -e "\033[32mInstalando dependências do sistema\033[0m"
+echo -e "${GREEN}Instalando dependências do sistema${RC}"
 
-sudo apt update
+sudo apt update 
+sudo apt-get install git-all
 sudo apt install -y \
   software-properties-common \
   build-essential \
   curl \
-  git \
-  python3-venv \
   python3-pip \
   libssl-dev \
   zlib1g-dev \
@@ -32,11 +45,13 @@ sudo apt install -y \
   xz-utils \
   tk-dev \
   libffi-dev \
-  liblzma-dev
+  liblzma-dev \ 
+  libcamera-apps \ 
+  libcamera-dev 
 
 # Instala Python 3.11
 if ! command -v python3.11 &>/dev/null; then
-  echo -e "\033[32mInstalando Python 3.11 via pyenv\033[0m"
+  echo -e "${GREEN}Instalando Python 3.11 via pyenv${RC}"
 
   if [ ! -d "$HOME/.pyenv" ]; then
     curl https://pyenv.run | bash
@@ -49,10 +64,12 @@ if ! command -v python3.11 &>/dev/null; then
   pyenv install -s 3.11.8
   pyenv global 3.11.8
 else
-  echo -e "\033[33mPython 3.11 já instalado\033[0m"
+  echo -e "${YELLOW}Python 3.11 já instalado${RC}"
 fi
 
-# Diretório raiz do projeto (blindado)
+echo -e "${GREEN}Iniciando instalação e configuração da roverlib${RC}"
+
+# Diretório raiz do projeto 
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_ROOT"
 
@@ -61,35 +78,35 @@ ROVERLIB_DIR="$PROJECT_ROOT/roverlib"
 
 # Criando ambiente virtual
 if [ ! -d "$VENV_DIR" ]; then
-  echo -e "\033[32mCriando ambiente virtual em $VENV_DIR\033[0m"
+  echo -e "${GREEN}Criando ambiente virtual em $VENV_DIR${RC}"
   python3.11 -m venv "$VENV_DIR"
 else
-  echo -e "\033[33mAmbiente virtual já existe.\033[0m"
+  echo -e "${YELLOW}Ambiente virtual já existe.${RC}"
 fi
 
 # Ativando ambiente virtual
-echo -e "\033[32mAtivando ambiente virtual\033[0m"
+echo "Ativando ambiente virtual"
 source "$VENV_DIR/bin/activate"
 
 # Atualizando ferramentas
-echo -e "\033[32mAtualizando ferramentas Python\033[0m"
+echo "Atualizando ferramentas Python"
 pip install --upgrade pip setuptools wheel build
 
 # Instalando roverlib
 if [ -f "$ROVERLIB_DIR/pyproject.toml" ]; then
-  echo -e "\033[32mInstalando roverlib (modo editável)\033[0m"
+  echo -e "${GREEN}Instalando roverlib${RC}"
   pip install -e "$ROVERLIB_DIR"
 else
-  echo -e "\033[31mpyproject.toml não encontrado em roverlib/\033[0m"
+  echo -e "${RED}pyproject.toml não encontrado em roverlib/${RC}"
   exit 1
 fi
 
 # Validando instalação
-echo -e "\033[32mValidando instalação\033[0m"
+echo "Validando instalação"
 rover --help >/dev/null
 
 echo ""
-echo -e "\033[32mAmbiente Rover configurado com sucesso!\033[0m"
+echo -e "${GREEN}Ambiente Rover configurado com sucesso!${RC}"
 echo ""
 echo "Para começar:"
 echo "   source .venv/bin/activate"

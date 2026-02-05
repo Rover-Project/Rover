@@ -1,6 +1,6 @@
 import click # type: ignore
 import cv2 as openCV
-from roverlib.plugins.camera.picamera import  Camera
+from roverlib.plugins.camera.picamera import  Picamera
 from roverlib.plugins.camera.webcam import Webcam
 
 @click.command()
@@ -11,7 +11,7 @@ def camera(camera: str, width, height):
     """Uso da camera"""
 
     if camera.lower() == 'picamera':
-        cam = Camera(width, height)
+        cam = Picamera(width, height)
 
     elif camera.lower() == 'webcam':
         cam = Webcam(width, height)
