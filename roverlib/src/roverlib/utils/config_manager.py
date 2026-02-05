@@ -2,30 +2,36 @@ import yaml
 from pathlib import Path
 
 class Config:
-    _config_path = Path(__file__).parent.parent.parent.parent / "configs" / "config.yaml"
+    
+    def __init__(self, path=Path(__file__).parent / "config.yaml"):
+        """
+        Carrega dados do arquivo de configuração.
 
-    @classmethod
-    def load(cls):
+        Args:
+            path (path): Caminho para o arquivo de configuração. Defaults to Path(__file__).parent / "config.yaml".
+        """
+        self.config_path = path
+
+    def load(self):
         """Ler o arquivo de configuração"""
-        with open(cls._config_path, "r") as file:
+        with open(self.config_path, "r") as file:
             config = yaml.safe_load(file)
+            
         return config
 
-    @classmethod
-    def get(cls, key: str):
+    def get(self, key: str):
         """Acessa um campo do arquivo de configuração"""
-        config = cls.load()
+        config = self.load()
         return config.get(key)
-
-    @classmethod 
-    def setConfig(cls, config_write: dict):
+ 
+    def setConfig(self, config_write: dict):
         """
         Adicona novas configuracoes no arquivo de config
         Args:
             config_write (dict): nova configuração que deve ser escrita.
         """
         
-        config = dict(cls.load())
+        config = dict(self.load())
         
         #print(config)
         
@@ -36,5 +42,5 @@ class Config:
             config[key] = value
         
         # Escreve as novas configurações no arquivo
-        with open(cls._config_path, "w") as file:
+        with open(self.config_path, "w") as file:
             yaml.safe_dump(config, file, default_flow_style=False)

@@ -7,7 +7,6 @@ from roverlib.plugins.camera.webcam import Webcam
 import time
 import cv2 as openCv
 
-
 def circleVoting(hough, contorno):
     """Relaciona a detecção de dois metodos diferente"""
     
