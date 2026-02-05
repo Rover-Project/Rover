@@ -1,10 +1,13 @@
-# Adicionar log de direcao, inclinacao e angulo da curva(ou reta)
+# Valores das variaveiz ajustados para o video5 
 # Adicionar binarizacao como pre-processamento
-
+# Adicionar mascara de cor como pre-processamento
+import lineMemory 
+import lineDecision
 import cv2 as openCV
 import sys 
 from pathlib import Path
 import numpy
+import time
 
 try:
     file = sys.argv[1]
@@ -26,15 +29,19 @@ def binaryOtsu(img):
         otsu
     )
 
+# Funcao que limita a area utilizada para desenho das linhas
 def aplicar_roi(img):
     height, width = img.shape[:2]
 
+    # Valor para retirar o capo dos carros 
+    capo_offset = int(height * 0.9)
+
     # Definição do ROI(Region of Interest) (Ajustavel de acordo com a camera e ambiente)
     # Topo = Quanto maior o valor, mais baixo o Poligono
-    bottom_left  = [width * 0, height]      # Canto inferior esquerdo 
+    bottom_left  = [width * 0, capo_offset]      # Canto inferior esquerdo 
     top_left     = [width * 0.2, height * 0.6] # Topo esquerdo 
     top_right    = [width * 0.65, height * 0.6] # Topo direito
-    bottom_right = [width * 0.9, height]      # Canto inferior direito
+    bottom_right = [width * 0.9, capo_offset]      # Canto inferior direito
 
     poligono = numpy.array([[bottom_left, top_left, top_right, bottom_right]], dtype=numpy.int32)
 
@@ -49,6 +56,7 @@ def aplicar_roi(img):
     
     return mask_img
 
+# Extrai as coordenadas a partir das linhas para desenho do poligono
 def extrair_coordenadas_plano(lines, image_shape):
     left_pts = []
     right_pts = []
@@ -63,15 +71,21 @@ def extrair_coordenadas_plano(lines, image_shape):
         else:
             continue
 
-        if x2 - x1 == 0:
+        # Cálculo da inclinação (m)
+        # Se x2 - x1 for zero, a linha é vertical
+        if abs(x2 - x1) < 0.005: 
+            slope = 999 # Valor alto para representar verticalidade
+        else:
+            slope = (y2 - y1) / (x2 - x1)
+ 
+        # linhas quase/ou horizontais (ruído, sombras, rachaduras).
+        if abs(slope) < 0.7:
+            print("Descartei") 
             continue
 
         parameters = numpy.polyfit((x1, x2), (y1, y2), 1)
-        slope = parameters[0]
-        intercept = parameters[1]
-        
-        # ignora linhas quase horizontais (ruído)
-        if abs(slope) < 0.5: continue 
+        slope = parameters[0] # inclinacao da reta
+        intercept = parameters[1] 
         
         if slope < 0:
             left_pts.append((slope, intercept))
@@ -86,7 +100,7 @@ def extrair_coordenadas_plano(lines, image_shape):
 
 def obter_pontos_linha(y_min, y_max, line_parameters):
     if line_parameters is None: return None
-    # slope = inclinacao
+
     slope, intercept = line_parameters
     # x = (y - b) / m
     x_start = int((y_min - intercept) / slope)
@@ -141,9 +155,17 @@ def lineDetectHough(img, isCut=False):
 
 if __name__ == "__main__":
     if file is not None:
-        
+        # incializando    
+        memoria = lineMemory.memory(frames_number=10)
+        decisao = lineDecision.decision()
+
         video = openCV.VideoCapture(path)
 
+        # log das tomadas de decisao do rover
+        log_file = open("rover_decision_log.csv", "w")
+        log_file.write("timestamp, decisao, erro\n")
+
+        # *** LOOP ***
         while True:
             ret, frame = video.read()
             # Pra manter videos em loop
@@ -170,6 +192,8 @@ if __name__ == "__main__":
                 print("deu errado")
                 
             try:
+                left_avg = memoria.suavizar(left_avg, "left")
+                right_avg = memoria.suavizar(right_avg, "right")
                 ponto_esq = obter_pontos_linha(y_min, y_max, left_avg)
                 ponto_dir = obter_pontos_linha(y_min, y_max, right_avg)
             except Exception as e:
@@ -177,23 +201,54 @@ if __name__ == "__main__":
                 ponto_dir = []
                 print(e)
 
+            result = frame.copy() 
+
             if ponto_esq and ponto_dir:
-            # Organiza os pontos para o fillPoly (sentido horário)
-            # [Top_Left, Top_Right, Bottom_Right, Bottom_Left]
+                # Desenho do plano verde
                 pts = numpy.array([ponto_esq[0], ponto_dir[0], ponto_dir[1], ponto_esq[1]], numpy.int32)
-    
                 mask = numpy.zeros_like(frame)
                 openCV.fillPoly(mask, [pts], (0, 255, 0))
+                # Aplica o plano sobre o frame
                 result = openCV.addWeighted(frame, 1, mask, 0.4, 0)
-                openCV.imshow("Plano", result)
             else:
-                #openCV.imshow("Plano Final", frame)
-                print("Nao deu")
+                print("Nao deu para detectar as faixas")
 
+            # Sistema de Decisão
+            direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
 
-            #openCV.imshow("Linhas", frame_linhas)
-            openCV.imshow("Roi", roi)
-            
+            # Desenho do Painel de Log 
+            overlay = result.copy()
+            openCV.rectangle(overlay, (10, 10), (350, 130), (0, 0, 0), -1)
+            result = openCV.addWeighted(overlay, 0.6, result, 0.4, 0) # Aplica transparência no painel
+
+            # Inserção do texto do log
+            openCV.putText(result, f"Status: {direcao}", (20, 40), 
+                        openCV.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    
+            distancia = erro
+            openCV.putText(result, f"{distancia:.1f} de erro", (20, 80), 
+                        openCV.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1)
+
+            cor_status = (0, 255, 0) if abs(erro) < 20 else (0, 0, 255)
+            label_status = "LANE KEEPING: OK" if abs(erro) < 15 else "ALERTA: DESVIO"
+            openCV.putText(result, label_status, (20, 110), 
+                        openCV.FONT_HERSHEY_SIMPLEX, 0.5, cor_status, 2)
+
+            # Desenho de um circulo para debug do centro da tela
+            if ponto_esq and ponto_dir:
+                # O centro do frame(video5) esta levemente desalinhado com o do carro
+                calibragem_offset = 47
+                centro_cam = (frame.shape[1] / 2) 
+                centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
+                centro_real_cam = int(centro_cam) - calibragem_offset # centro cam
+
+                openCV.circle(result, (centro_real_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
+                openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
+
+            # Exibicao das telas
+            openCV.imshow("Navegacao Rover", result)
+            openCV.imshow("ROI", roi)
+            log_file.write(f"{time.time()},{direcao},{erro}\n")
 
             key = openCV.waitKey(25)
             
