@@ -1,10 +1,14 @@
 from .src.motor import Motor # Classe que controla os motores
 from .src.appControllerMotor import AppControllerMotor # Classe que cria uma interface basica de controle
 from roverlib.utils.config_manager import Config
+from pathlib import Path
 
 if __name__ == "__main__":
+    
     # Carrega configuração da gpio
-    pins_motors = Config.get("gpio")
+    config = Config(Path(__file__).parent / "config.yaml")
+    
+    pins_motors = config.get("gpio")
     letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
     right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
     

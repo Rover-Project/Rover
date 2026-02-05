@@ -2,6 +2,7 @@ from roverlib.modules.movement.robot import Robot
 from roverlib.plugins.camera.picamera import Picamera
 from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.webcam import Webcam
+from pathlib import Path
 import cv2 as openCv
 
 if __name__ == "__main__":
@@ -9,10 +10,12 @@ if __name__ == "__main__":
     WIDTH = 640
     
     # Carrega configuração da gpio
-    pins_motors = Config.get("gpio")
+    config = Config(Path(__file__).parent / "config.yaml")
+    
+    pins_motors = config.get("gpio")
     letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
     right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
-
+    
     # Inicia motores
     robot = Robot(left=letf, right=right)
     speed = 50 # Velocidade inicial

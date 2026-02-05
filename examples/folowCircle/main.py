@@ -4,6 +4,7 @@ from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.picamera import Picamera
 from roverlib.plugins.camera.webcam import Webcam
+from pathlib import Path
 import time
 import cv2 as openCv
 
@@ -69,7 +70,10 @@ if __name__ == "__main__":
     noDetCounter = 0 # contador para quantidade de frames sem detecção
 
     # Carrega configuração da gpio
-    pins_motors = Config.get("gpio")
+    
+    config = Config(Path(__file__).parent / "config.yaml")
+    
+    pins_motors = config.get("gpio")
     letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
     right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
 

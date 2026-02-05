@@ -1,5 +1,4 @@
 import cv2
-from roverlib.utils.config_manager import Config
 from .cameraInterface import CameraInterface
 
 try:
@@ -8,11 +7,6 @@ try:
     availablePicamera = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera = False
-
-# Carrega configuração da câmera
-CAMERA_RESOLUTION = tuple(Config.get("camera")["resolution"])
-CAMERA_FPS = int(Config.get("camera")["fps"])
-CAMERA_PREVIEW_RESOLUTION = tuple(Config.get("camera")["preview_resolution"])
 
 class Picamera(CameraInterface):
     """
@@ -62,7 +56,7 @@ class Picamera(CameraInterface):
 
     def get_preview_resolution(self):
         """Retorna a resolução de preview configurada."""
-        return CAMERA_PREVIEW_RESOLUTION
+        pass
 
     def cleanup(self):
         """Libera os recursos da câmera."""

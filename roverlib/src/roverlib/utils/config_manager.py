@@ -3,12 +3,12 @@ from pathlib import Path
 
 class Config:
     
-    def __init__(self, path=Path(__file__).parent / "config.yaml"):
+    def __init__(self, path):
         """
         Carrega dados do arquivo de configuração.
 
         Args:
-            path (path): Caminho para o arquivo de configuração. Defaults to Path(__file__).parent / "config.yaml".
+            path (path): Caminho para o arquivo de configuração.
         """
         self.config_path = path
 
