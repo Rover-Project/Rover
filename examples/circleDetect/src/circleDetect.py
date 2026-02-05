@@ -1,6 +1,6 @@
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.webcam import Webcam
-from roverlib.plugins.camera.fixedFocus import Picamera
+from roverlib.plugins.camera.fixedFocus import FixedCamera
 import cv2 as openCv
 from roverlib.modules.processing.processing_image import ProcessingImage
 
@@ -44,7 +44,7 @@ def smoothDetect():
     WIDTH = 640
     
     try:
-        camera = Picamera(HEIGHT, WIDTH)
+        camera = FixedCamera(HEIGHT, WIDTH)
     except:
         camera = Webcam(HEIGHT, WIDTH)
 
