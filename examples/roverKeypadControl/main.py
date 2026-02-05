@@ -1,5 +1,5 @@
 from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.picamera import Picamera
+from roverlib.plugins.camera.fixedFocus import FixedCamera
 from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = Picamera(HEIGHT, WIDTH)
+        camera = FixedCamera(HEIGHT, WIDTH)
     except:
         camera = Webcam(HEIGHT, WIDTH)
     

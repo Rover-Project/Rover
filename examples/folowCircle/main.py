@@ -2,7 +2,7 @@ from roverlib.modules.movement.robot import Robot
 from roverlib.utils.config_manager import Config
 from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
-from roverlib.plugins.camera.picamera import Picamera
+from roverlib.plugins.camera.fixedFocus import FixedCamera
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
 import time
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     last_circle = None  # guarda o ultimo circulo detectado
 
     try:
-        picam = Picamera(HEIGHT, WIDTH) # Inicia a camera 
+        picam = FixedCamera(HEIGHT, WIDTH) # Inicia a camera 
     except:
         picam = Webcam(HEIGHT, WIDTH)
 

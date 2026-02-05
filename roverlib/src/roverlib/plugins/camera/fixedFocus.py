@@ -8,7 +8,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     availablePicamera = False
 
-class Picamera(CameraInterface):
+class FixedCamera(CameraInterface):
     """
     Módulo para gerenciar a câmera do Rover, capturar e fornecer frames
     para o módulo de visão computacional.
