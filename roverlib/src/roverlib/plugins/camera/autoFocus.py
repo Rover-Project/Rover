@@ -1,5 +1,6 @@
 from .camera import Camera
 from time import sleep
+from .exceptions import CameraNotStart
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
@@ -29,9 +30,22 @@ class AfCamera(Camera):
         # Configuração de foco automático
         self.afMode = afMode.lower() # mode de foco
         self.afSpeed = afSpeed.lower() # velocidade de foco
+    
+    def start(self):
+        super().start()
+        self._configure_autofocus() # método que configura o foco automático
         
-        # método que configura o foco automático
-        self._configure_autofocus()
+    def _valid(self):
+        """
+        Valida se a câmera está ativa
+
+        Raises:
+            CameraNotStart: Dispara se a câmera não estiver ativa.
+        """
+        
+        # Verifica se a camera esta ativa antes de mudar o foco
+        if not super().runing:
+            raise CameraNotStart("Você não iniciou a câmera")
     
     def _parse_af_mode(self) -> AfModeEnum:
         """
@@ -95,6 +109,7 @@ class AfCamera(Camera):
             Dispara um ciclo de autofocus manual.
         """
         
+        self._valid()
         if self.afMode != "auto":
             self.set_afMode("auto") # Configura o tipo de foco nescessario para a funcao
         
@@ -115,6 +130,7 @@ class AfCamera(Camera):
             ValueError: Dispara a exceção caso o valor esteja fora do intervalo
         """
         
+        self._valid()
         if not 0.0 <= position <= 1.0:
             raise ValueError("LensPosition deve estar entre 0.0 e 1.0")
 
@@ -133,6 +149,7 @@ class AfCamera(Camera):
             mode (str): novo modo de autofoco
         """
         
+        self._valid()
         self.afMode = mode.lower()
         
         self.picam2.set_controls(
@@ -149,6 +166,7 @@ class AfCamera(Camera):
             speed (str): nova velociade de autofoco
         """
         
+        self._valid()
         self.afSpeed = speed.lower()
         
         self.picam2.set_controls(
@@ -162,13 +180,14 @@ class AfCamera(Camera):
         Trava a posição atual de foco.
         """
         
+        self._valid()
         self.set_afMode("manual") # muda o foco para foco manual, travando posição atual
         
     def unlock_focus(self):
         """
         Destrava foco colocando no modo de foco contiuo
         """
-        
+        self._valid()
         self.set_afMode("continuous") # moda o foco para o foco continuo
         
     
@@ -179,6 +198,7 @@ class AfCamera(Camera):
             duration (float, optional): Tempo de foco continuo. Valor padrão 5 segundos.
         """
         
+        self._valid()
         self.set_afMode("continuous") # modo foco continuo
         sleep(duration) # tempo de ajuste
         self.lock_focus() # trava a posição final de foco
