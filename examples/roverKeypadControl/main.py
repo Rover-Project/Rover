@@ -1,5 +1,5 @@
 from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.fixedFocus import FixedCamera
+from roverlib.plugins.camera.camera import FixedCamera
 from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path

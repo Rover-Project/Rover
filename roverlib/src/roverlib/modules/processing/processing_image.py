@@ -7,6 +7,22 @@ class ProcessingImage:
         entre outras ferramentas de pre-processamento
     """
     
+    @classmethod
+    def cutImage(cls, frame, region_interest: tuple[int, int, int, int]):
+        """
+        Corta um frame em uma dada região de interesse.
+        Args:
+            frame (numpy array): numpy array da imagem.
+            region_interest (tuple[int, int, int, int]): coordenadas de corte 0 = x_start, 1 = y_start, 2 = x_end, 3 = y_end
+
+        Returns:
+            numpy array: frame cortado na região de interesse
+        """
+    
+        x_start, y_start, x_end, y_end = region_interest
+        
+        return frame[y_start:y_start + y_end, x_start: x_start + x_end]
+    
     @classmethod 
     def ligh_adjustment(cls, img, gamma=1.9):
         """

@@ -2,7 +2,7 @@ from roverlib.modules.movement.robot import Robot
 from roverlib.utils.config_manager import Config
 from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
-from roverlib.plugins.camera.fixedFocus import FixedCamera
+from roverlib.plugins.camera.camera import FixedCamera
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
 import time
