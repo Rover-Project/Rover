@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import threading
 
-from roverlib.modules.camera.camera import Camera
+from roverlib.plugins.camera.camera import Camera
 
 
 class CameraGUI:
