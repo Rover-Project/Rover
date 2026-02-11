@@ -24,6 +24,7 @@ if __name__ == "__main__":
     ).parse_args() 
     
     camera = Camera(args.h, args.w)
+    camera.start()
     
     while(True):
         
