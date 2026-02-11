@@ -34,7 +34,7 @@ if __name__ == "__main__":
             
             openCV.imshow(f"Frame: {args.h} x {args.w}", frame)
             
-            key = openCV.waitKey(1) & 0xFF
+            key = openCV.waitKey(10) & 0xFF
             
             if key == ord("q"):
                 break
