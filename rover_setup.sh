@@ -60,28 +60,28 @@ for pkg in "${APT_PACKAGES[@]}"; do
   install_if_missing "$pkg"
 done
 
-# Verifica pyenv
-if [ ! -d "$HOME/.pyenv" ]; then
-  echo -e "${GREEN}Instalando pyenv.${RC}"
-  curl https://pyenv.run | bash
-else
-  echo -e "${YELLOW}pyenv já instalado.${RC}"
-fi
+# # Verifica pyenv
+# if [ ! -d "$HOME/.pyenv" ]; then
+#   echo -e "${GREEN}Instalando pyenv.${RC}"
+#   curl https://pyenv.run | bash
+# else
+#   echo -e "${YELLOW}pyenv já instalado.${RC}"
+# fi
 
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
 
-# Verifica Python 3.11
-if pyenv versions --bare | grep -q "3.11.8"; then
-  echo -e "${YELLOW}Python 3.11.8 já instalado.${RC}"
-else
-  echo -e "${GREEN}Instalando Python 3.11.8...${RC}"
-  pyenv install 3.11.8
-fi
+# # Verifica Python 3.11
+# if pyenv versions --bare | grep -q "3.11.8"; then
+#   echo -e "${YELLOW}Python 3.11.8 já instalado.${RC}"
+# else
+#   echo -e "${GREEN}Instalando Python 3.11.8...${RC}"
+#   pyenv install 3.11.8
+# fi
 
-pyenv global 3.11.8
-pyenv rehash
+# pyenv global 3.11.8
+# pyenv rehash
 
 # Configuração do Projeto
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -91,8 +91,8 @@ VENV_DIR="$PROJECT_ROOT/.venv"
 ROVERLIB_DIR="$PROJECT_ROOT/roverlib"
 
 if [ ! -d "$VENV_DIR" ]; then
-  echo -e "${GREEN}Criando ambiente virtual...${RC}"
-  python -m venv "$VENV_DIR --system-site-packages venv"
+  echo -e "${GREEN}Criando ambiente virtual com Python do sistema...${RC}"
+  /usr/bin/python3 -m venv --system-site-packages "$VENV_DIR"
 else
   echo -e "${YELLOW}Ambiente virtual já existe.${RC}"
 fi
