@@ -4,12 +4,12 @@ from .exceptions import CameraNotStart
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time
 
-try: 
-    # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
-    from libcamera import Transform # type: ignore
-    availableLibcamera = True
-except (ImportError, ModuleNotFoundError):
-    availableLibcamera = False
+# try: 
+#     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
+#     from libcamera import Transform # type: ignore
+#     availableLibcamera = True
+# except (ImportError, ModuleNotFoundError):
+#     availableLibcamera = False
     
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
@@ -54,8 +54,8 @@ class Camera(CameraInterface):
         if not availablePicamera2:
             raise ModuleNotFoundError("Não foi possivel importa o modulo picamera2")
         
-        if not availableLibcamera:
-            raise ModuleNotFoundError("Não foi possivel importar o modulo libcamera")
+        # if not availableLibcamera:
+        #     raise ModuleNotFoundError("Não foi possivel importar o modulo libcamera")
         
         self.size = (width, height) # tamanho da imagem
         self.fps = fps # taxa de frames
@@ -71,10 +71,10 @@ class Camera(CameraInterface):
                     "size": self.size, # tamanho da imagem
                     "format": "RGB888" # formato de captura 
                 },   
-            transform=Transform(
-                hflip=horizontalFlip, # Espelha de forma horizontal
-                vflip=verticalFilp # Espelha de forma vertical
-            )
+            # transform=Transform(
+            #     hflip=horizontalFlip, # Espelha de forma horizontal
+            #     vflip=verticalFilp # Espelha de forma vertical
+            # )
         )
         
         self.picam2.configure(self.config) # Configura câmera
