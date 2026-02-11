@@ -3,20 +3,22 @@ from .cameraInterface import CameraInterface
 from .exceptions import CameraNotStart
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time
+from libcamera import Transform
+from picamera2 import picamera2
 
-try: 
-    # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
-    from libcamera import Transform # type: ignore
-    availableLibcamera = True
-except (ImportError, ModuleNotFoundError):
-    availableLibcamera = False
+# try: 
+#     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
+#     from libcamera import Transform # type: ignore
+#     availableLibcamera = True
+# except (ImportError, ModuleNotFoundError):
+#     availableLibcamera = False
     
-try:
-    # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
-    from picamera2 import Picamera2 # type: ignore
-    availablePicamera2 = True
-except (ImportError, ModuleNotFoundError):
-    availablePicamera2 = False
+# try:
+#     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
+#     from picamera2 import Picamera2 # type: ignore
+#     availablePicamera2 = True
+# except (ImportError, ModuleNotFoundError):
+#     availablePicamera2 = False
 
 class Camera(CameraInterface):
     """
@@ -51,11 +53,11 @@ class Camera(CameraInterface):
             ModuleNotFoundError: Erro disparado caso não seja possível importar o módulo libcamera
         """
         
-        if not availablePicamera2:
-            raise ModuleNotFoundError("Não foi possivel importa o modulo picamera2")
+        # if not availablePicamera2:
+        #     raise ModuleNotFoundError("Não foi possivel importa o modulo picamera2")
         
-        if not availableLibcamera:
-            raise ModuleNotFoundError("Não foi possivel importar o modulo libcamera")
+        # if not availableLibcamera:
+        #     raise ModuleNotFoundError("Não foi possivel importar o modulo libcamera")
         
         self.size = (width, height) # tamanho da imagem
         self.fps = fps # taxa de frames

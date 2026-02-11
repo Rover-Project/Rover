@@ -10,12 +10,6 @@ if __name__ == "__main__":
     args = setArguments(
         [
             {
-                "name":"path",
-                "type": str,
-                "help": "Local para salvar as imagens"
-            },
-            
-            {
                 "name": "h",
                 "type": int,
                 "help": "Altura da imagem"
