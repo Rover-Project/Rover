@@ -92,7 +92,7 @@ ROVERLIB_DIR="$PROJECT_ROOT/roverlib"
 
 if [ ! -d "$VENV_DIR" ]; then
   echo -e "${GREEN}Criando ambiente virtual...${RC}"
-  python -m venv "$VENV_DIR"
+  python -m venv "$VENV_DIR --system-site-packages venv"
 else
   echo -e "${YELLOW}Ambiente virtual já existe.${RC}"
 fi
