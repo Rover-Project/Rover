@@ -24,5 +24,3 @@ class decision:
             direcao = "Em frente"
 
         return direcao, erro
-
-        

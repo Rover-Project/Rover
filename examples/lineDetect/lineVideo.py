@@ -1,21 +1,15 @@
 # Valores das variaveiz ajustados para o video5 
 # Adicionar binarizacao como pre-processamento
 # Adicionar mascara de cor como pre-processamento
-import sys
-import os
 
 # Adiciona a pasta 'Rover' principal ao caminho de busca
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
-from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
-from lib_rover.rover_lib.modules.camera.webcam import Webcam
-import lineMemory 
-import lineDecision
+from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.webcam import Webcam
+from .lineMemory import memory
+from .lineDecision import decision
 import cv2 as openCV
-import sys 
 from pathlib import Path
 import numpy
-import time
 
 HEIGHT = 640
 WIDTH = 640
@@ -29,9 +23,11 @@ WIDTH = 640
 #path = Path(__file__).parent / "assets" / file # type: ignore
 
 try:
-    picam = CameraModule(HEIGHT, WIDTH) # Inicia a camera 
+    picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
+    picam.start()
 except:
-    picam = Webcam(HEIGHT, WIDTH)
+    #picam = Webcam(HEIGHT, WIDTH)
+    pass
 
 # Tecnica de binarizacao adptativa 
 def binaryOtsu(img):
@@ -171,8 +167,8 @@ def lineDetectHough(img, isCut=False):
 
 if __name__ == "__main__":
         # incializando    
-        memoria = lineMemory.memory(frames_number=10)
-        decisao = lineDecision.decision()
+        memoria = memory(frames_number=10)
+        decisao = decision()
         # video = openCV.VideoCapture(path)
 
         # log das tomadas de decisao do rover
@@ -186,7 +182,7 @@ if __name__ == "__main__":
             # if not ret:
                 # video = openCV.VideoCapture(path)
                 # ontinue
-            frame = picam.get_frame() # carrega frame
+            frame = picam.getFrame() # carrega frame
 
             frame = openCV.resize(
                 frame, 
@@ -203,69 +199,72 @@ if __name__ == "__main__":
 
             try:
                 left_avg, right_avg = extrair_coordenadas_plano(hough_data, frame_shape)
+                error = False 
             except Exception as e:
+                error = True
                 print("deu errado")
                 
-            try:
-                left_avg = memoria.suavizar(left_avg, "left")
-                right_avg = memoria.suavizar(right_avg, "right")
-                ponto_esq = obter_pontos_linha(y_min, y_max, left_avg)
-                ponto_dir = obter_pontos_linha(y_min, y_max, right_avg)
-            except Exception as e:
-                left_avg = memoria.suavizar(left_avg, "left")
-                right_avg = memoria.suavizar(right_avg, "right")
-                ponto_esq = []
-                ponto_dir = []
-                print(e)
+            if not error:
+                try:
+                    left_avg = memoria.suavizar(left_avg, "left")
+                    right_avg = memoria.suavizar(right_avg, "right")
+                    ponto_esq = obter_pontos_linha(y_min, y_max, left_avg)
+                    ponto_dir = obter_pontos_linha(y_min, y_max, right_avg)
+                except Exception as e:
+                    left_avg = memoria.suavizar(left_avg, "left")
+                    right_avg = memoria.suavizar(right_avg, "right")
+                    ponto_esq = []
+                    ponto_dir = []
+                    print(e)
 
-            result = frame.copy() 
+                result = frame.copy() 
 
-            if ponto_esq and ponto_dir:
-                # Desenho do plano verde
-                pts = numpy.array([ponto_esq[0], ponto_dir[0], ponto_dir[1], ponto_esq[1]], numpy.int32)
-                mask = numpy.zeros_like(frame)
-                openCV.fillPoly(mask, [pts], (0, 255, 0))
-                # Aplica o plano sobre o frame
-                result = openCV.addWeighted(frame, 1, mask, 0.4, 0)
-            else:
-                print("Nao deu para detectar as faixas")
+                if ponto_esq and ponto_dir:
+                    # Desenho do plano verde
+                    pts = numpy.array([ponto_esq[0], ponto_dir[0], ponto_dir[1], ponto_esq[1]], numpy.int32)
+                    mask = numpy.zeros_like(frame)
+                    openCV.fillPoly(mask, [pts], (0, 255, 0))
+                    # Aplica o plano sobre o frame
+                    result = openCV.addWeighted(frame, 1, mask, 0.4, 0)
+                else:
+                    print("Nao deu para detectar as faixas")
 
-            # Sistema de Decisão
-            direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
+                # Sistema de Decisão
+                direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
 
-            # Desenho do Painel de Log 
-            overlay = result.copy()
-            openCV.rectangle(overlay, (10, 10), (350, 130), (0, 0, 0), -1)
-            result = openCV.addWeighted(overlay, 0.6, result, 0.4, 0) # Aplica transparência no painel
+                # Desenho do Painel de Log 
+                overlay = result.copy()
+                openCV.rectangle(overlay, (10, 10), (350, 130), (0, 0, 0), -1)
+                result = openCV.addWeighted(overlay, 0.6, result, 0.4, 0) # Aplica transparência no painel
 
-            # Inserção do texto do log
-            openCV.putText(result, f"Status: {direcao}", (20, 40), 
-                        openCV.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
-    
-            distancia = erro
-            openCV.putText(result, f"{distancia:.1f} de erro", (20, 80), 
-                        openCV.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1)
+                # Inserção do texto do log
+                openCV.putText(result, f"Status: {direcao}", (20, 40), 
+                            openCV.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        
+                distancia = erro
+                openCV.putText(result, f"{distancia:.1f} de erro", (20, 80), 
+                            openCV.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1)
 
-            cor_status = (0, 255, 0) if abs(erro) < 20 else (0, 0, 255)
-            label_status = "LANE KEEPING: OK" if abs(erro) < 15 else "ALERTA: DESVIO"
-            openCV.putText(result, label_status, (20, 110), 
-                        openCV.FONT_HERSHEY_SIMPLEX, 0.5, cor_status, 2)
+                cor_status = (0, 255, 0) if abs(erro) < 20 else (0, 0, 255)
+                label_status = "LANE KEEPING: OK" if abs(erro) < 15 else "ALERTA: DESVIO"
+                openCV.putText(result, label_status, (20, 110), 
+                            openCV.FONT_HERSHEY_SIMPLEX, 0.5, cor_status, 2)
 
-            # Desenho de um circulo para debug do centro da tela
-            if ponto_esq and ponto_dir:
-                # O centro do frame(video5) esta levemente desalinhado com o do carro
-                calibragem_offset = 47
-                centro_cam = (frame.shape[1] / 2) 
-                centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
-                centro_real_cam = int(centro_cam) - calibragem_offset # centro cam
+                # Desenho de um circulo para debug do centro da tela
+                if ponto_esq and ponto_dir:
+                    # O centro do frame(video5) esta levemente desalinhado com o do carro
+                    calibragem_offset = 47
+                    centro_cam = (frame.shape[1] / 2) 
+                    centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
+                    centro_real_cam = int(centro_cam) - calibragem_offset # centro cam
 
-                openCV.circle(result, (centro_real_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
-                openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
+                    openCV.circle(result, (centro_real_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
+                    openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
 
-            # Exibicao das telas
-            openCV.imshow("Navegacao Rover", result)
+                # Exibicao das telas
+                openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
-            # log_file.write(f"{time.time()},{direcao},{erro}\n")
+                # log_file.write(f"{time.time()},{direcao},{erro}\n")
 
             key = openCV.waitKey(25)
             

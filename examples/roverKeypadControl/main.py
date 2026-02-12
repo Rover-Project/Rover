@@ -1,5 +1,5 @@
 from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.camera import FixedCamera
+from roverlib.plugins.camera.camera import Camera
 from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
@@ -13,20 +13,22 @@ if __name__ == "__main__":
     config = Config(Path(__file__).parent / "config.yaml")
     
     pins_motors = config.get("gpio")
-    letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
-    right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
+    letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
     
     # Inicia motores
     robot = Robot(left=letf, right=right)
     speed = 50 # Velocidade inicial
     
     try:
-        camera = FixedCamera(HEIGHT, WIDTH)
+        camera = Camera(HEIGHT, WIDTH)
+        camera.start()
     except:
-        camera = Webcam(HEIGHT, WIDTH)
+        #camera = Webcam(HEIGHT, WIDTH)
+        pass
     
     while True:
-        frame = camera.get_frame()
+        frame = camera.getFrame()
         
         if frame is not None:
         
