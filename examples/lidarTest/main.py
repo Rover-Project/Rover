@@ -2,43 +2,50 @@ import serial
 import time 
 
 try:
-    # Configura a conexão com o Lidar
-    uart1 = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=1)
-    
-    # Se você realmente precisar replicar os dados para outra porta:
-    # uart0 = serial.Serial("/dev/ttyS0", baudrate=115200, timeout=1) 
+    uart_lidar = serial.Serial(
+        port='/dev/ttyAMA0',
+        baudrate=115200,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=1
+    )
 except Exception as e:
-    print(f"Erro ao abrir a porta serial: {e}")
+    print(f"Erro ao acessar os pinos TX/RX: {e}")
     exit()
 
 def getLidarData(serial_in):
-
-    if serial_in.in_waiting >= 9:
-        # Le exatamente 9 bytes (pacote completo do TF-luna data)
-        # TF-LUNA data: [HEADER1][HEADER2][DIST_LOW][DIST_HIGH][STRENGTH_LOW][STRENGTH_HIGH][TEMP_LOW][TEMP_HIGH]
-        header += serial_in.read(2)
-
-        if header == b'\x59\x59':
-            data = 'ser_in.read(7)'
-
-            distance = data[0] + data[1] * 256
-
-            strenght = data[2] + data[3] * 256
-
-            temperature = (data[4] + data[5] * 256) / 8 - 256
-
-            print(f"Distância: {distance}cm | Força: {strenght} | Temp: {temperature:.2f}°C")
-
-        else:
-            # Se desalinhou, limpa o buffer para tentar sincronizar no próximo loop
-            serial_in.read(1)
+    # O pacote do TF-Luna tem 9 bytes
+    if uart_lidar.in_waiting >= 9:
+        # Sincronização: Lemos até achar o primeiro 0x59
+        byte1 = uart_lidar.read(1)
+        if byte1 == b'\x59':
+            byte2 = uart_lidar.read(1)
+            if byte2 == b'\x59':
+                # Se achou 0x59 0x59, lê os próximos 7 bytes
+                payload = uart_lidar.read(7)
+                
+                # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
+                distance = payload[0] + payload[1] * 256
+                
+                # Força do sinal: Byte 4 e 5 (índices 2 e 3 do payload)
+                strength = payload[2] + payload[3] * 256
+                
+                # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
+                temp_raw = payload[4] + payload[5] * 256
+                temperature = temp_raw / 8 - 256
+                
+                print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
+                return distance, strength, temperature
+    return None
+    
             
 if __name__ == "__main__":
     try:
         while True:
-            getLidarData(uart1)
+            getLidarData(uart_lidar)
             time.sleep(0.01)
     except KeyboardInterrupt:
         print("\nEncerrando...")
-        uart1.close()
+        uart_lidar.close()
 
