@@ -110,7 +110,8 @@ class FolowCircle:
         cls._last_error = 0
         cls._dt = time.time() # Inicializa a varial de tempo
         
-        BASE_SPEED = 80
+        BASE_SPEED = 70
+        SEARCH_SPEED = 100
         
         # Loop principal de movimento
         while True:
@@ -201,7 +202,7 @@ class FolowCircle:
                         
                     else:
                         print("Nenhum circulo foi detectado")
-                        robot.move(speed_left=BASE_SPEED, speed_right=-BASE_SPEED)  # rotaciona procurando um círculo
+                        robot.move(speed_left=SEARCH_SPEED, speed_right=SEARCH_SPEED)  # rotaciona procurando um círculo
             else:
                 robot.stop()
 
