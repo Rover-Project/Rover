@@ -86,6 +86,7 @@ class FolowCircle:
 
         try:
             picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
+            picam.start()
         except:
             #picam = Webcam(HEIGHT, WIDTH)
             pass 
@@ -113,7 +114,7 @@ class FolowCircle:
         cls._integral = 0
         cls._last_error = 0
         cls._dt = time.time() # Inicializa a varial de tempo
-
+        
         # Loop principal de movimento
         while True:
             frame = picam.getFrame() # carrega frame
