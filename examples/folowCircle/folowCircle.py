@@ -199,7 +199,7 @@ class FolowCircle:
                         
                     else:
                         print("Nenhum circulo foi detectado")
-                        robot.move(speed_left=-BASE_SPEED * BALANCING_ROTACION_ANTH, speed_right=BASE_SPEED * BALANCING_ROTACION_ANTH)  # rotaciona procurando um círculo
+                        robot.move(speed_left=BASE_SPEED * BALANCING_ROTACION_ANTH, speed_right=-BASE_SPEED * BALANCING_ROTACION_ANTH)  # rotaciona procurando um círculo
             else:
                 robot.stop()
 
