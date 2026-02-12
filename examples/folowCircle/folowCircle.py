@@ -1,12 +1,48 @@
-from lib_rover.rover_lib.modules.movement.robot import Robot
-from lib_rover.rover_lib.utils.config_manager import Config
-from lib_rover.rover_lib.modules.processing.processing_image import ProcessingImage
-from lib_rover.rover_lib.modules.vision.visionModule import VisionModule
-from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
-from lib_rover.rover_lib.modules.camera.webcam import Webcam
-from ..circleDetect.circleDetect import circleVoting, inInterval
+from roverlib.modules.movement.robot import Robot
+from roverlib.utils.config_manager import Config
+from roverlib.modules.processing.processing_image import ProcessingImage
+from roverlib.modules.vision.visionModule import VisionModule
+from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.webcam import Webcam
 import cv2 as openCv
 import time 
+from pathlib import Path
+
+def circleVoting(hough, contorno):
+    """Relaciona a detecção de dois metodos diferente"""
+    
+    if hough is None and contorno is None: # nada detectado
+        return None
+
+    if hough is None: # Somente um metodo detectou
+        return contorno
+
+    if contorno is None: # Somente um metodo detectou
+        return hough
+
+    x1, y1, r1 = hough
+    x2, y2, r2 = contorno
+    
+    x1, y1, r1 = int(x1), int(y1), int(r1)
+    x2, y2, r2 = int(x2), int(y2), int(r2)
+
+    # votação:
+    if abs(x1 - x2) < 20 and abs(y1 - y2) < 20:
+        if abs(r1 - r2) < (r1 * 0.30):
+            return ((x1 + x2)//2, (y1 + y2)//2, int((r1 + r2) / 2))
+
+    # Se a discordancia for alta, retorna o metodo mais seguro
+    return contorno
+    
+def inInterval(last, current, LIMIAR):
+    # a e b são tuplas/listas (x, y, r)
+    if current is None:
+        return False
+    for i in range(3):
+        if abs(last[i] - current[i]) > LIMIAR:
+            return False
+    return True
+
 
 class FolowCircle:
     
@@ -49,20 +85,24 @@ class FolowCircle:
         last_circle = None  # guarda o ulthimo circulo detectado
 
         try:
-            picam = CameraModule(HEIGHT, WIDTH) # Inicia a camera 
+            picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
         except:
-            picam = Webcam(HEIGHT, WIDTH)
-
+            #picam = Webcam(HEIGHT, WIDTH)
+            pass 
+        
         circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
         counterHistory = 0 # Quantidade de frames acumulados
         
         noDetCounter = 0 # contador para quantidade de frames sem detecção
 
         # Carrega configuração da gpio
-        pins_motors = Config.get("gpio")
-        letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
-        right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
-
+        # Carrega configuração da gpio
+        config = Config(Path(__file__).parent / "config.yaml")
+    
+        pins_motors = config.get("gpio")
+        letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+        right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
+    
         # Inicia motores
         robot = Robot(left=letf, right=right)
 
@@ -76,7 +116,7 @@ class FolowCircle:
 
         # Loop principal de movimento
         while True:
-            frame = picam.get_frame() # carrega frame
+            frame = picam.getFrame() # carrega frame
             
             cls.updateTime() # atualiza o tempo de captura
             
