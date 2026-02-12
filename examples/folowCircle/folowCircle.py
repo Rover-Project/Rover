@@ -110,7 +110,7 @@ class FolowCircle:
         cls._last_error = 0
         cls._dt = time.time() # Inicializa a varial de tempo
         
-        BASE_SPEED = 60
+        BASE_SPEED = 80
         
         # Loop principal de movimento
         while True:
