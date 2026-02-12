@@ -1,6 +1,14 @@
 # Valores das variaveiz ajustados para o video5 
 # Adicionar binarizacao como pre-processamento
 # Adicionar mascara de cor como pre-processamento
+import sys
+import os
+
+# Adiciona a pasta 'Rover' principal ao caminho de busca
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
+from lib_rover.rover_lib.modules.camera.webcam import Webcam
 import lineMemory 
 import lineDecision
 import cv2 as openCV
@@ -9,13 +17,21 @@ from pathlib import Path
 import numpy
 import time
 
-try:
-    file = sys.argv[1]
-except IndexError:
-    print("vode nao passou o arquivo que deseja abrir")
-    file = None
+HEIGHT = 640
+WIDTH = 640
+
+# try:
+    #file = sys.argv[1]
+# except IndexError:
+    #print("vode nao passou o arquivo que deseja abrir")
+    #file = None
     
-path = Path(__file__).parent / "assets" / file # type: ignore
+#path = Path(__file__).parent / "assets" / file # type: ignore
+
+try:
+    picam = CameraModule(HEIGHT, WIDTH) # Inicia a camera 
+except:
+    picam = Webcam(HEIGHT, WIDTH)
 
 # Tecnica de binarizacao adptativa 
 def binaryOtsu(img):
@@ -154,25 +170,24 @@ def lineDetectHough(img, isCut=False):
     return roi, img, numpy.array(ajustadas) if ajustadas else None
 
 if __name__ == "__main__":
-    if file is not None:
         # incializando    
         memoria = lineMemory.memory(frames_number=10)
         decisao = lineDecision.decision()
-
-        video = openCV.VideoCapture(path)
+        # video = openCV.VideoCapture(path)
 
         # log das tomadas de decisao do rover
-        log_file = open("rover_decision_log.csv", "w")
-        log_file.write("timestamp, decisao, erro\n")
+        # log_file = open("rover_decision_log.csv", "w")
+        # log_file.write("timestamp, decisao, erro\n")
 
         # *** LOOP ***
         while True:
-            ret, frame = video.read()
+            # ret, frame = video.read()
             # Pra manter videos em loop
-            if not ret:
-                video = openCV.VideoCapture(path)
-                continue
-            
+            # if not ret:
+                # video = openCV.VideoCapture(path)
+                # ontinue
+            frame = picam.get_frame() # carrega frame
+
             frame = openCV.resize(
                 frame, 
                 (640, 640),
@@ -197,6 +212,8 @@ if __name__ == "__main__":
                 ponto_esq = obter_pontos_linha(y_min, y_max, left_avg)
                 ponto_dir = obter_pontos_linha(y_min, y_max, right_avg)
             except Exception as e:
+                left_avg = memoria.suavizar(left_avg, "left")
+                right_avg = memoria.suavizar(right_avg, "right")
                 ponto_esq = []
                 ponto_dir = []
                 print(e)
@@ -248,11 +265,10 @@ if __name__ == "__main__":
             # Exibicao das telas
             openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
-            log_file.write(f"{time.time()},{direcao},{erro}\n")
+            # log_file.write(f"{time.time()},{direcao},{erro}\n")
 
             key = openCV.waitKey(25)
             
             if key == ord('q'):
                 break
-        video.release()
         openCV.destroyAllWindows()
