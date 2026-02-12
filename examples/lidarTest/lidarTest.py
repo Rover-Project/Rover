@@ -3,7 +3,7 @@ import time
 
 # tx == transmit sensor
 # rx == receive from sensor
-uart1 = UART(1, baudrate=115200, tx=Pin(8), rx=Pin(1))
+uart1 = UART(1, baudrate=115200, tx=Pin(14), rx=Pin(15))
 
 # pin 0 == tx
 # pin 1 == rx
@@ -20,7 +20,7 @@ def getLidarData(UART1, UART0):
         if temp[0] == 0x59 and temp[1] == 0x59:
             # calculate distance in centimeters 
             # combine low byte (temp[2] + high byte(temp[3]* 256)to form 16-bitdistance value)
-            distance -= temp[2] + temp[3] * 256
+            distance = temp[2] + temp[3] * 256
 
             strenght = temp[4] + temp[5] * 256
 
@@ -28,7 +28,12 @@ def getLidarData(UART1, UART0):
 
             UART0.write(temp)
 
-            print(f"Distance =%5dcm, Signal Strenght =%5d, Chip Temperature =%5cºC" % (distance, strenght, temperature))
+            print(f"Distance =%5dcm, Signal Strenght =%5d, Chip Temperature =%.2fºC" % (distance, strenght, temperature))
+
+        else:
+            # Se desalinhou, limpa o buffer para tentar sincronizar no próximo loop
+            UART1.read(UART1.any())
+            
 # pra estabilizar o sensor
 time.sleep(1)
 
