@@ -1,5 +1,5 @@
 from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.camera import FixedCamera
+from roverlib.plugins.camera.camera import Camera
 from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
@@ -21,12 +21,13 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = FixedCamera(HEIGHT, WIDTH)
+        camera = Camera(HEIGHT, WIDTH)
     except:
-        camera = Webcam(HEIGHT, WIDTH)
+        #camera = Webcam(HEIGHT, WIDTH)
+        pass
     
     while True:
-        frame = camera.get_frame()
+        frame = camera.getFrame()
         
         if frame is not None:
         
