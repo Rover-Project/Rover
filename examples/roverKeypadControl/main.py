@@ -22,6 +22,7 @@ if __name__ == "__main__":
     
     try:
         camera = Camera(HEIGHT, WIDTH)
+        camera.start()
     except:
         #camera = Webcam(HEIGHT, WIDTH)
         pass
