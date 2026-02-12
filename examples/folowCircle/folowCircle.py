@@ -72,12 +72,7 @@ class FolowCircle:
     def folowCircle(cls):
         HEIGHT = 640 # Altura da imagem 
         WIDTH = 640 # Largura da imagem
-        SPEED = 100  # Velocidade de rotação
-        BALANCING_ROTACION_H = 5 / 10 # Balanceamento para rotação no sentido horário
         BALANCING_ROTACION_ANTH = 6 / 10 # Balanceamento para rotação no sentido ant-horário
-        BALANCING_MOTOR_RIGHT = 1 # Balanceamento para o motor direito 
-        BALANCING_MOTOR_LEFT = 7 / 10 # Balanceamento para o motor esquerdo
-        CENTER_THRES = 250 # Limiar de tolerencia para o centro
         RED_THRES_LOW = 200000 # Limite inferior para a detecção de vermelho
         RED_THRES_UPPER = 400000 # Limite superior para a detecção de vermelho
         CIRCLE_THRES = 40  # tolerância para considerar mesma circuferencia
@@ -114,6 +109,8 @@ class FolowCircle:
         cls._integral = 0
         cls._last_error = 0
         cls._dt = time.time() # Inicializa a varial de tempo
+        
+        BASE_SPEED = 60
         
         # Loop principal de movimento
         while True:
@@ -194,20 +191,15 @@ class FolowCircle:
                         last_x, _, _ = last_circle
                         
                         left, right = FolowCircle.controllerPID(x_center - last_x)
+                        
+                        left = (left + BASE_SPEED if left > 0 else left - BASE_SPEED)
+                        right = (right + BASE_SPEED if right > 0 else right - BASE_SPEED)
+                        
                         robot.move(speed_left=left, speed_right=right)
                         
                     else:
                         print("Nenhum circulo foi detectado")
-                        robot.move(speed_left=-SPEED * BALANCING_ROTACION_ANTH, speed_right=SPEED * BALANCING_ROTACION_ANTH)  # rotaciona procurando um círculo
-
-                else:
-                    x, y, r = circleHistory
-                    if x > x_center + CENTER_THRES:
-                        robot.move(speed_left=SPEED * BALANCING_ROTACION_H, speed_right=-SPEED * BALANCING_ROTACION_H)
-                    elif x < x_center - CENTER_THRES:
-                        robot.move(speed_left=-SPEED * BALANCING_ROTACION_ANTH, speed_right=SPEED * BALANCING_ROTACION_ANTH)
-                    else:
-                        robot.move(speed_left=SPEED * BALANCING_MOTOR_LEFT,speed_right=SPEED * BALANCING_MOTOR_RIGHT)
+                        robot.move(speed_left=-BASE_SPEED * BALANCING_ROTACION_ANTH, speed_right=BASE_SPEED * BALANCING_ROTACION_ANTH)  # rotaciona procurando um círculo
             else:
                 robot.stop()
 
