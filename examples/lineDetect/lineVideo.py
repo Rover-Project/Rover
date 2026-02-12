@@ -5,8 +5,8 @@
 # Adiciona a pasta 'Rover' principal ao caminho de busca
 from roverlib.plugins.camera.camera import Camera
 from roverlib.plugins.camera.webcam import Webcam
-import lineMemory 
-import lineDecision
+from .lineMemory import memory
+from .lineDecision import decision
 import cv2 as openCV
 from pathlib import Path
 import numpy
@@ -167,8 +167,8 @@ def lineDetectHough(img, isCut=False):
 
 if __name__ == "__main__":
         # incializando    
-        memoria = lineMemory.memory(frames_number=10)
-        decisao = lineDecision.decision()
+        memoria = memory(frames_number=10)
+        decisao = decision()
         # video = openCV.VideoCapture(path)
 
         # log das tomadas de decisao do rover
