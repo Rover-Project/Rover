@@ -72,7 +72,7 @@ class FolowCircle:
     def folowCircle(cls):
         HEIGHT = 640 # Altura da imagem 
         WIDTH = 640 # Largura da imagem
-        BALANCING_ROTACION_ANTH = 6 / 10 # Balanceamento para rotação no sentido ant-horário
+        #BALANCING_ROTACION_ANTH = 6 / 10 # Balanceamento para rotação no sentido ant-horário
         RED_THRES_LOW = 200000 # Limite inferior para a detecção de vermelho
         RED_THRES_UPPER = 400000 # Limite superior para a detecção de vermelho
         CIRCLE_THRES = 40  # tolerância para considerar mesma circuferencia
@@ -195,11 +195,13 @@ class FolowCircle:
                         left = (left + BASE_SPEED if left > 0 else left - BASE_SPEED)
                         right = (right + BASE_SPEED if right > 0 else right - BASE_SPEED)
                         
+                        
+                        print(f"Velocidade:\nL - {left}\nR - {right}")
                         robot.move(speed_left=left, speed_right=right)
                         
                     else:
                         print("Nenhum circulo foi detectado")
-                        robot.move(speed_left=BASE_SPEED * BALANCING_ROTACION_ANTH, speed_right=-BASE_SPEED * BALANCING_ROTACION_ANTH)  # rotaciona procurando um círculo
+                        robot.move(speed_left=BASE_SPEED, speed_right=-BASE_SPEED)  # rotaciona procurando um círculo
             else:
                 robot.stop()
 
