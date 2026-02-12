@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
                 # Exibicao das telas
                 openCV.imshow("Navegacao Rover", result)
-                openCV.imshow("ROI", roi)
+            openCV.imshow("ROI", roi)
                 # log_file.write(f"{time.time()},{direcao},{erro}\n")
 
             key = openCV.waitKey(25)
