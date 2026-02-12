@@ -1,21 +1,15 @@
 # Valores das variaveiz ajustados para o video5 
 # Adicionar binarizacao como pre-processamento
 # Adicionar mascara de cor como pre-processamento
-import sys
-import os
 
 # Adiciona a pasta 'Rover' principal ao caminho de busca
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
-from lib_rover.rover_lib.modules.camera.cameraModule import CameraModule
-from lib_rover.rover_lib.modules.camera.webcam import Webcam
+from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.webcam import Webcam
 import lineMemory 
 import lineDecision
 import cv2 as openCV
-import sys 
 from pathlib import Path
 import numpy
-import time
 
 HEIGHT = 640
 WIDTH = 640
@@ -29,9 +23,11 @@ WIDTH = 640
 #path = Path(__file__).parent / "assets" / file # type: ignore
 
 try:
-    picam = CameraModule(HEIGHT, WIDTH) # Inicia a camera 
+    picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
+    picam.start()
 except:
-    picam = Webcam(HEIGHT, WIDTH)
+    #picam = Webcam(HEIGHT, WIDTH)
+    pass
 
 # Tecnica de binarizacao adptativa 
 def binaryOtsu(img):
@@ -186,7 +182,7 @@ if __name__ == "__main__":
             # if not ret:
                 # video = openCV.VideoCapture(path)
                 # ontinue
-            frame = picam.get_frame() # carrega frame
+            frame = picam.getFrame() # carrega frame
 
             frame = openCV.resize(
                 frame, 
