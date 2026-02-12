@@ -4,7 +4,7 @@ Fornece interface simplificada para operações comuns.
 """
 from roverlib.plugins.motor.motor import Motor
 from roverlib.plugins.motor.vitualMotor import VirtualMotor
-from .motorCalibration import MotorCalibration
+#from .motorCalibration import MotorCalibration
 import time
 
 class Robot:
@@ -25,13 +25,13 @@ class Robot:
             # Crias instâncias para controlas os motores
             self.left_motor = Motor(left, pwm_frequency)
             self.right_motor = Motor(right, pwm_frequency)
-            self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
+            #self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
         
         except ImportError: # caso a GPIO não esteja disponivel
             print("Criando motores virtuais.")
             self.left_motor = VirtualMotor(left, "Left", pwm_frequency)
             self.right_motor = VirtualMotor(right, "Right", pwm_frequency)
-            self.calibration = MotorCalibration()
+            #self.calibration = MotorCalibration()
         
         # Inicias os motores
         self.left_motor.initialize()
@@ -160,8 +160,8 @@ class Robot:
             right_dir = 'stop'
             right_speed = 0
             
-        if calibration:
-            left_speed, right_speed = self.calibration.getCalibration(left_speed=left_speed, right_speed=right_speed) # Calibra as velocidades
+        # if calibration:
+        #     left_speed, right_speed = self.calibration.getCalibration(left_speed=left_speed, right_speed=right_speed) # Calibra as velocidades
         
         self.left_motor.set_movement(left_speed, left_dir)
         self.right_motor.set_movement(right_speed, right_dir)
