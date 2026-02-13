@@ -47,7 +47,7 @@ class AfCamera(Camera):
         if not super().runing:
             raise CameraNotStart("Você não iniciou a câmera")
     
-    def _parse_af_mode(self) -> AfModeEnum:
+    def _parse_af_mode(self):
         """
         Coverte a string de foco para o valor real da libcamera.
 
@@ -69,7 +69,7 @@ class AfCamera(Camera):
 
         return modes[self.afMode]
 
-    def _parse_af_speed(self) -> AfSpeedEnum:
+    def _parse_af_speed(self):
         """
         Coverte a string de speed para o valor real da libcamera
 
