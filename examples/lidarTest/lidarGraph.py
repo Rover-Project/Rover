@@ -46,7 +46,8 @@ def getLidarData():
                 # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
                 temp_raw = payload[4] + payload[5] * 256
                 temperature = temp_raw / 8 - 256
-            
+
+                print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
                 return distance, strength, temperature
     return None
 
@@ -80,8 +81,8 @@ def updateGraph(data):
 
     return dist_line, strengh_line, temp_line
     
-if __name__ == "__main__":
-
+# PARTE EXECUTAVEL
+try:
     # Graph config
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
     plt.subplots_adjust(hspace=0.4)
@@ -109,4 +110,7 @@ if __name__ == "__main__":
 
         plt.show()
         uart_lidar.close()
+
+except KeyboardInterrupt or Exception as e:
+    print("Deu errado ou foi interrompido")
 
