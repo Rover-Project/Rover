@@ -72,13 +72,6 @@ def updateGraph(data):
         strengh_line.set_data(range(len(strength_data)), strength_data)
         temp_line.set_data(range(len(temp_data)), temp_data)
 
-        ax1.relim()
-        ax1.autoscale_view()
-        ax2.relim()
-        ax2.autoscale_view()
-        ax2_temp.relim()
-        ax2_temp.autoscale_view()
-
     return dist_line, strengh_line, temp_line
     
 # PARTE EXECUTAVEL
@@ -91,6 +84,7 @@ try:
 
         # Distance graph
         dist_line, = ax1.plot([], [], '-r', label='Distância (cm)')
+        ax1.set_ylim(0, 800) # 8 metros = 800 cm
         ax1.set_ylabel('cm')
         ax1.set_title('Leitura em Tempo Real - TF LUNA')
         ax1.legend(loc='upper right')
@@ -100,8 +94,13 @@ try:
         strengh_line, = ax2.plot([], [], '-b', label='Strenght')
         ax2_temp = ax2.twinx() # Segundo eixo y para a temperatura
         temp_line, = ax2_temp.plot([], [], '-g', label="Temp (ºC)")
+
+        ax2.set_ylim(0, 4000)    
         ax2.set_ylabel("Forca")
+        
+        ax2_temp.set_ylim(-10, 50)
         ax2_temp.set_ylabel("Temp (ºC)")
+
         ax2.legend(loc="upper left")
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
