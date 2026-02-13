@@ -44,8 +44,10 @@ def getLidarData():
     
 if __name__ == "__main__":
 
-    try:
-        getLidarData()
-        time.sleep(0.01)
-    except KeyboardInterrupt as e:
-        print('Não deu certo ou foi interrompido')
+    while True:
+        try:
+            getLidarData()
+            time.sleep(0.01)
+        except KeyboardInterrupt as e:
+            print('Não deu certo ou foi interrompido')
+            break
