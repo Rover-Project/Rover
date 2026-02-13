@@ -93,7 +93,6 @@ class AfCamera(Camera):
         """
         
         speeds = {
-            "slow": controls.AfSpeedEnum.Slow,
             "normal": controls.AfSpeedEnum.Normal,
             "fast": controls.AfSpeedEnum.Fast,
         }
