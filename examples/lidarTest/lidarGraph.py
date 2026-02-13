@@ -25,9 +25,8 @@ temp_data = [] # dados da temperatura
 MAX_POINTS_GRAPH = 50 # numero maximo de pontos no grafico
 
 def getLidarData():
-    # O pacote do TF-Luna tem 9 bytes
     # .in_waiting verifica quantos bytes estam no buffer vindo do lidar
-    if uart_lidar.in_waiting > MAX_POINTS_GRAPH:
+    if uart_lidar.in_waiting > 570:
         uart_lidar.reset_input_buffer()
         return None
 
