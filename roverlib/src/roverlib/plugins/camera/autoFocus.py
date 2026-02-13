@@ -4,7 +4,7 @@ from .exceptions import CameraNotStart
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
-    from libcamera import AfModeEnum, AfSpeedEnum, AfTriggerEnum # type: ignore
+    from libcamera import controls # type: ignore
     availableLibcamera = True
 except (ImportError, ModuleNotFoundError):
     availableLibcamera = False
@@ -57,12 +57,11 @@ class AfCamera(Camera):
         Returns:
             mode (int): Valor da libcamera.
         """
-      
         modes = {
-            "auto": AfModeEnum.Auto,
-            "continuous": AfModeEnum.Continuous,
-            "manual": AfModeEnum.Manual,
-        } # Constantes da libcamera para tipos de foco
+            "auto": controls.AfModeEnum.Auto,
+            "continuous": controls.AfModeEnum.Continuous,
+            "manual": controls.AfModeEnum.Manual,
+        }
 
         if self.afMode not in modes:
             raise ValueError(f"Modo AF inválido: {self.afMode}")
@@ -81,10 +80,10 @@ class AfCamera(Camera):
         """
         
         speeds = {
-            "slow": AfSpeedEnum.Slow,
-            "normal": AfSpeedEnum.Normal,
-            "fast": AfSpeedEnum.Fast,
-        } # Constantes da libcamera para velocidades
+            "slow": controls.AfSpeedEnum.Slow,
+            "normal": controls.AfSpeedEnum.Normal,
+            "fast": controls.AfSpeedEnum.Fast,
+        }
 
         if self.afSpeed not in speeds:
             raise ValueError(f"Velocidade AF inválida: {self.afSpeed}")
@@ -115,7 +114,7 @@ class AfCamera(Camera):
         
         self.picam2.set_controls(
             {
-                "AfTrigger": AfTriggerEnum.Start
+                "AfTrigger": controls.AfTriggerEnum.Start
             }
         )
     
@@ -136,7 +135,7 @@ class AfCamera(Camera):
 
         self.picam2.set_controls(
             {
-                "AfMode": AfModeEnum.Manual,
+                "AfMode": controls.AfModeEnum.Manual,
                 "LensPosition": position
             }
         )
