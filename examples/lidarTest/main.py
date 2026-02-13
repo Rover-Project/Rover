@@ -96,6 +96,7 @@ if __name__ == "__main__":
         ax1.legend(loc='upper right')
         ax1.grid(True)
 
+        # Grafico para forca e temperatura
         strengh_line, = ax2.plot([], [], '-b', label='Strenght')
         ax2_temp = ax2.twinx() # Segundo eixo y para a temperatura
         temp_line, = ax2_temp.plot([], [], '-g', label="Temp (ºC)")
