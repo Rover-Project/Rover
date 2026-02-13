@@ -108,7 +108,6 @@ class AfCamera(Camera):
         """
 
         controls = {
-            "AfEnable": True,
             "AfMode": self._parse_af_mode(),
             "AfSpeed": self._parse_af_speed()
         } # Cria o controller para o libcamera
