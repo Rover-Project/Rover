@@ -32,7 +32,7 @@ class Camera(CameraInterface):
         index: int = 0,
         format: str = "rgb",
         horizontalFlip: bool = False,
-        verticalFilp: bool = False 
+        verticalFlip: bool = False 
     ):
         """
         Realiza a configuração inicial da câmera.
@@ -73,7 +73,7 @@ class Camera(CameraInterface):
                 },   
             transform=Transform(
                 hflip=horizontalFlip, # Espelha de forma horizontal
-                vflip=verticalFilp # Espelha de forma vertical
+                vflip=verticalFlip # Espelha de forma vertical
             )
         )
         

@@ -15,17 +15,30 @@ class AfCamera(Camera):
     """
     
     def __init__(
-        self, 
-        *args, # Argumentos posicionais
+        self,
+        height:int, 
+        width:int,
+        fps: int = 30, 
+        index: int = 0,
+        format: str = "rgb",
+        horizontalFlip: bool = False,
+        verticalFlip: bool = False,
         afMode: str = "continuous", 
         afSpeed: str = "normal",
-        **kwargs, # Argumentos nomeados
     ):
         
         if not availableLibcamera:
             raise ModuleNotFoundError("libcamera não disponível")
         
-        super().__init__(*args, **kwargs) # passa os parâmetros para a classe pai
+        super().__init__(
+            height, 
+            width,
+            fps, 
+            index,
+            format,
+            horizontalFlip,
+            verticalFlip, 
+        ) # passa os parâmetros para a classe pai
         
         # Configuração de foco automático
         self.afMode = afMode.lower() # mode de foco
