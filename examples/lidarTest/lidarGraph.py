@@ -27,28 +27,28 @@ MAX_POINTS_GRAPH = 50 # numero maximo de pontos no grafico
 def getLidarData():
     # O pacote do TF-Luna tem 9 bytes
     # .in_waiting verifica quantos bytes estam no buffer vindo do lidar
+    if uart_lidar.in_waiting > MAX_POINTS_GRAPH:
+        uart_lidar.reset_input_buffer()
+        return None
+
     if uart_lidar.in_waiting >= 9:
+        header = uart_lidar.read(2)
+        if header == b'\x59\x59':
+            # Se achou 0x59 0x59, lê os próximos 7 bytes
+            payload = uart_lidar.read(7)
+            
+            # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
+            distance = payload[0] + payload[1] * 256
+            
+            # Força do sinal: Byte 4 e 5 (índices 2 e 3 do payload)
+            strength = payload[2] + payload[3] * 256
+            
+            # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
+            temp_raw = payload[4] + payload[5] * 256
+            temperature = temp_raw / 8 - 256
 
-        # Le byte por byte ate encontrar o inicio do pacote
-        byte1 = uart_lidar.read(1)
-        if byte1 == b'\x59': # primeiro Header
-            byte2 = uart_lidar.read(1)
-            if byte2 == b'\x59': # segundo Header
-                # Se achou 0x59 0x59, lê os próximos 7 bytes
-                payload = uart_lidar.read(7)
-                
-                # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
-                distance = payload[0] + payload[1] * 256
-                
-                # Força do sinal: Byte 4 e 5 (índices 2 e 3 do payload)
-                strength = payload[2] + payload[3] * 256
-                
-                # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
-                temp_raw = payload[4] + payload[5] * 256
-                temperature = temp_raw / 8 - 256
-
-                print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
-                return distance, strength, temperature
+            print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
+            return distance, strength, temperature
     return None
 
 def updateGraph(data):
@@ -71,6 +71,9 @@ def updateGraph(data):
         dist_line.set_data(range(len(dist_data)), dist_data)
         strengh_line.set_data(range(len(strength_data)), strength_data)
         temp_line.set_data(range(len(temp_data)), temp_data)
+
+        ax1.set_xlim(0, MAX_POINTS_GRAPH)
+        ax2.set_xlim(0, MAX_POINTS_GRAPH)
 
     return dist_line, strengh_line, temp_line
     
@@ -105,7 +108,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
-        ani = FuncAnimation(fig, updateGraph, interval=10, cache_frame_data=False)
+        ani = FuncAnimation(fig, updateGraph, interval=17, cache_frame_data=False)
 
         plt.show()
         uart_lidar.close()
