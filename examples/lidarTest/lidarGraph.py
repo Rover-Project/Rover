@@ -27,23 +27,26 @@ MAX_POINTS_GRAPH = 50 # numero maximo de pontos no grafico
 def getLidarData():
     # .in_waiting verifica quantos bytes estam no buffer vindo do lidar
     if uart_lidar.in_waiting > 570:
-        uart_lidar.reset_input_buffer()
+        uart_lidar.reset_input_buffer() # apaga todas as informações no buffer para não sobrecarregar o gráfico
         return None
 
+    # Se houver ao menos 9 bytes, tentamos fazer a leitura
     if uart_lidar.in_waiting >= 9:
-        header = uart_lidar.read(2)
+        # read(2) pega o Header 1 e 2
+        header = uart_lidar.read(2) 
         if header == b'\x59\x59':
+            # 0x59 0x59 é o header de uma informação completa do Lidar
             # Se achou 0x59 0x59, lê os próximos 7 bytes
-            payload = uart_lidar.read(7)
+            data_load = uart_lidar.read(7)
             
-            # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
-            distance = payload[0] + payload[1] * 256
+            # Distância: Byte 2 e 3 (índices 0 e 1 dodata_load)
+            distance = data_load[0] +data_load[1] * 256
             
-            # Força do sinal: Byte 4 e 5 (índices 2 e 3 do payload)
-            strength = payload[2] + payload[3] * 256
+            # Força do sinal: Byte 4 e 5 (índices 2 e 3 dodata_load)
+            strength = data_load[2] +data_load[3] * 256
             
-            # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
-            temp_raw = payload[4] + payload[5] * 256
+            # Temperatura: Byte 6 e 7 (índices 4 e 5 dodata_load)
+            temp_raw = data_load[4] +data_load[5] * 256
             temperature = temp_raw / 8 - 256
 
             print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
