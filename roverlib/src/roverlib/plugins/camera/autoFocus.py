@@ -57,7 +57,7 @@ class AfCamera(Camera):
         """
         
         # Verifica se a camera esta ativa antes de mudar o foco
-        if not super().runing:
+        if not self.runing:
             raise CameraNotStart("Você não iniciou a câmera")
     
     def _parse_af_mode(self):
