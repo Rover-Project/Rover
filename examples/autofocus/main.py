@@ -21,11 +21,11 @@ if __name__ == "__main__":
         
         elif key == ord("w"):
             position += 1
-            position = max(position, 10)
+            position = min(position, 10)
             camera.set_focus_position(position)
         elif key == ord("s"):
             position -= 1
-            position = min(position, 0)
+            position = max(position, 0)
             camera.set_focus_position(position)
          
 
