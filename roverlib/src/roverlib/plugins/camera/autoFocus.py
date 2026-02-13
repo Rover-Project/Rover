@@ -141,7 +141,7 @@ class AfCamera(Camera):
         """
         
         self._valid()
-        if not 0.0 <= position <= 1.0:
+        if not 0.0 <= position <= 10:
             raise ValueError("LensPosition deve estar entre 0.0 e 1.0")
 
         self.picam2.set_controls(
