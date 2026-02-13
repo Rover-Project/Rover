@@ -3,9 +3,9 @@ import time
 
 try:
     uart_lidar = serial.Serial(
-        port='/dev/ttyAMA0',
-        baudrate=115200,
-        parity=serial.PARITY_NONE,
+        port='/dev/ttyAMA0', # Valor para os pinos fisicos 14 (TX) e 15 (RX)
+        baudrate=115200, # Velocidade de transmissao padrao do TF-LUNA
+        parity=serial.PARITY_NONE, # Sem bit de paridade (Sem verificacao de erro simples)
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         timeout=1
