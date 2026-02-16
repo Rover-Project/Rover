@@ -40,5 +40,5 @@ class Motor:
 
     def stop(self):
         """ Para o motor. """
-        self.motor.cleanup()
+        #self.motor.cleanup()
         self.motor.stop()
