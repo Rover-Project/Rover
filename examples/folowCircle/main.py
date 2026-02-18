@@ -3,7 +3,6 @@ from roverlib.utils.config_manager import Config
 from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
-from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
 import time
 import cv2 as openCv
@@ -59,9 +58,10 @@ if __name__ == "__main__":
     last_circle = None  # guarda o ultimo circulo detectado
 
     try:
-        picam = FixedCamera(HEIGHT, WIDTH) # Inicia a camera 
+        picam = Camera(HEIGHT, WIDTH) # Inicia a camera
+        picam.start() 
     except:
-        picam = Webcam(HEIGHT, WIDTH)
+        raise RuntimeError("Erro ao abrir câmera")
 
     circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
     counterHistory = 0 # Quantidade de frames acumulados
@@ -70,12 +70,11 @@ if __name__ == "__main__":
     noDetCounter = 0 # contador para quantidade de frames sem detecção
 
     # Carrega configuração da gpio
-    
     config = Config(Path(__file__).parent / "config.yaml")
     
     pins_motors = config.get("gpio")
-    letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
-    right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
+    letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
 
     # Inicia motores
     robot = Robot(left=letf, right=right)

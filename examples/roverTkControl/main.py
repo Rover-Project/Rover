@@ -9,8 +9,8 @@ if __name__ == "__main__":
     config = Config(Path(__file__).parent / "config.yaml")
     
     pins_motors = config.get("gpio")
-    letf = (int(pins_motors["motor_esquerdo"]["in3"]), int(pins_motors["motor_esquerdo"]["in4"]))
-    right = (int(pins_motors["motor_direito"]["in1"]), int(pins_motors["motor_direito"]["in2"]))
+    letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
     
     # Cria a instancia para controle dos motores
     motor_controller = Motor(
@@ -27,7 +27,8 @@ if __name__ == "__main__":
         app.run()
     except Exception as e:
         print(f"Um erro ocorreu: {e}")
+        motor_controller.cleanup()
     finally:
         # Garante que o motor pare ao fechar o aplicativo
-        motor_controller.stop()
+        motor_controller.cleanup()
         print("Aplicação encerrada. Motor parado.")
