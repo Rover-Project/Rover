@@ -21,5 +21,11 @@ class Webcam(CameraInterface):
         
         return None
     
+    def start(self):
+        pass
+    
+    def stop(self):
+        pass
+    
     def cleanup(self):
         self.camera.release() # libera o objeto camera
