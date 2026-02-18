@@ -45,6 +45,7 @@ def smoothDetect():
     
     try:
         camera = Camera(HEIGHT, WIDTH)
+        camera.start()
     except:
         camera = Webcam(HEIGHT, WIDTH)
 
