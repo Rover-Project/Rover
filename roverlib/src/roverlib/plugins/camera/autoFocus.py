@@ -1,13 +1,29 @@
 from .camera import Camera
 from time import sleep
-from .exceptions import CameraNotStart
+from .exceptions import CameraNotStart, AutofocusModeInvalid
+from enum import Enum 
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
-    from libcamera import AfModeEnum, AfSpeedEnum, AfTriggerEnum # type: ignore
+    from libcamera import controls # type: ignore
     availableLibcamera = True
 except (ImportError, ModuleNotFoundError):
     availableLibcamera = False
+    
+class AfModeEnum(Enum):
+    """
+    Enum para guarda os valores possiveis para o modo do autofoco
+    """
+    Continuous = controls.AfModeEnum.Continuous
+    Manual = controls.AfModeEnum.Manual 
+    Auto = controls.AfModeEnum.Auto
+    
+class AfSpeedEnum(Enum):
+    """
+    Enum para guarda os valores possiveis para a velocidade do autofoco
+    """
+    Fast = controls.AfSpeedEnum.Fast
+    Normal = controls.AfSpeedEnum.Normal
     
 class AfCamera(Camera):
     """
@@ -16,20 +32,33 @@ class AfCamera(Camera):
     
     def __init__(
         self, 
-        *args, # Argumentos posicionais
-        afMode: str = "continuous", 
-        afSpeed: str = "normal",
-        **kwargs, # Argumentos nomeados
+        height:int, 
+        width:int,
+        fps: int = 30, 
+        index: int = 0,
+        format: str = "rgb",
+        horizontalFlip: bool = False,
+        verticalFlip: bool = False,
+        afMode: AfModeEnum = AfModeEnum.Continuous, 
+        afSpeed: AfSpeedEnum = AfSpeedEnum.Normal,
     ):
         
         if not availableLibcamera:
             raise ModuleNotFoundError("libcamera não disponível")
         
-        super().__init__(*args, **kwargs) # passa os parâmetros para a classe pai
+        super().__init__(
+            height, 
+            width,
+            fps, 
+            index,
+            format,
+            horizontalFlip,
+            verticalFlip
+        ) # passa os parâmetros para a classe pai
         
         # Configuração de foco automático
-        self.afMode = afMode.lower() # mode de foco
-        self.afSpeed = afSpeed.lower() # velocidade de foco
+        self.afMode = afMode # modo do foco
+        self.afSpeed = afSpeed # velocidade de foco
     
     def start(self):
         super().start()
@@ -44,52 +73,8 @@ class AfCamera(Camera):
         """
         
         # Verifica se a camera esta ativa antes de mudar o foco
-        if not super().runing:
+        if not self.isRunning():
             raise CameraNotStart("Você não iniciou a câmera")
-    
-    def _parse_af_mode(self) -> AfModeEnum:
-        """
-        Coverte a string de foco para o valor real da libcamera.
-
-        Raises:
-            ValueError: Dispara a exceção caso o tipo de foco não exista
-
-        Returns:
-            mode (int): Valor da libcamera.
-        """
-      
-        modes = {
-            "auto": AfModeEnum.Auto,
-            "continuous": AfModeEnum.Continuous,
-            "manual": AfModeEnum.Manual,
-        } # Constantes da libcamera para tipos de foco
-
-        if self.afMode not in modes:
-            raise ValueError(f"Modo AF inválido: {self.afMode}")
-
-        return modes[self.afMode]
-
-    def _parse_af_speed(self) -> AfSpeedEnum:
-        """
-        Coverte a string de speed para o valor real da libcamera
-
-        Raises:
-            ValueError: Dispara a exceção caso a velocidade não exista
-
-        Returns:
-            speed (int): Valor da libcamera
-        """
-        
-        speeds = {
-            "slow": AfSpeedEnum.Slow,
-            "normal": AfSpeedEnum.Normal,
-            "fast": AfSpeedEnum.Fast,
-        } # Constantes da libcamera para velocidades
-
-        if self.afSpeed not in speeds:
-            raise ValueError(f"Velocidade AF inválida: {self.afSpeed}")
-
-        return speeds[self.afSpeed]
     
     def _configure_autofocus(self):
         """
@@ -97,25 +82,40 @@ class AfCamera(Camera):
         """
 
         controls = {
-            "AfEnable": True,
-            "AfMode": self._parse_af_mode(),
-            "AfSpeed": self._parse_af_speed()
+            "AfMode": self.afMode,
+            "AfSpeed": self.afSpeed
         } # Cria o controller para o libcamera
 
         self.picam2.set_controls(controls) # Aplica configuração de foco
 
-    def run_autofocus(self):
+    def autofocus_cycle(self):
         """
             Dispara um ciclo de autofocus manual.
         """
         
         self._valid()
-        if self.afMode != "auto":
-            self.set_afMode("auto") # Configura o tipo de foco nescessario para a funcao
+        if self.afMode != AfModeEnum.Auto:
+            self.set_afMode(AfModeEnum.Auto) # Configura o tipo de foco nescessario para a funcao
         
         self.picam2.set_controls(
             {
-                "AfTrigger": AfTriggerEnum.Start
+                "AfTrigger": controls.AfTriggerEnum.Start
+            }
+        )
+    
+    def stop_autofocus_cycle(self):
+        """
+        Finaliza a ação iniciada pela run_autofocus. Colocando no modo de foco continuo
+        """
+        
+        self._valid()
+        
+        if self.afMode != AfModeEnum.Auto:
+            raise AutofocusModeInvalid("O método stop_autofocus exige que a câmera esteja no modo de autofocus: Auto")
+        
+        self.picam2.set_controls(
+            {
+                "AfTrigger":controls.AfTriggerEnum.Cancel
             }
         )
     
@@ -130,10 +130,13 @@ class AfCamera(Camera):
             ValueError: Dispara a exceção caso o valor esteja fora do intervalo
         """
         
-        self._valid()
-        if not 0.0 <= position <= 1.0:
-            raise ValueError("LensPosition deve estar entre 0.0 e 1.0")
+        self._valid() # Valida se a camera esta ativa
+        
+        # Não permite valores negativos
+        if position < 0:
+            raise ValueError("A posição para o foco deve ser positiva")
 
+        # Configura a posição do foco
         self.picam2.set_controls(
             {
                 "AfMode": AfModeEnum.Manual,
@@ -141,7 +144,7 @@ class AfCamera(Camera):
             }
         )
 
-    def set_afMode(self, mode: str):
+    def set_afMode(self, mode: AfModeEnum):
         """
         Troca o modo de autofoco
 
@@ -150,15 +153,15 @@ class AfCamera(Camera):
         """
         
         self._valid()
-        self.afMode = mode.lower()
+        self.afMode = mode # Atualiza o modo de foco
         
         self.picam2.set_controls(
             {
-                "AfMode": self._parse_af_mode() # novo modo de autofocus
+                "AfMode": self.afMode # novo modo de autofocus
             }
         )
         
-    def set_afSpeed(self, speed: str):
+    def set_afSpeed(self, speed: AfSpeedEnum):
         """
         Troca a velocidade de autofoco
 
@@ -167,11 +170,11 @@ class AfCamera(Camera):
         """
         
         self._valid()
-        self.afSpeed = speed.lower()
+        self.afSpeed = speed
         
         self.picam2.set_controls(
             {
-                "AfSpeed": self._parse_af_speed() # nova velocidade de autofocus
+                "AfSpeed": self.afSpeed # nova velocidade de autofocus
             }
         )
         
@@ -181,15 +184,14 @@ class AfCamera(Camera):
         """
         
         self._valid()
-        self.set_afMode("manual") # muda o foco para foco manual, travando posição atual
+        self.set_afMode(AfModeEnum.Manual) # muda o foco para foco manual, travando posição atual
         
     def unlock_focus(self):
         """
         Destrava foco colocando no modo de foco contiuo
         """
         self._valid()
-        self.set_afMode("continuous") # moda o foco para o foco continuo
-        
+        self.set_afMode(AfModeEnum.Continuous) # moda o foco para o foco continuo
     
     def focus_time(self, duration: float = 5):
         """
@@ -199,6 +201,6 @@ class AfCamera(Camera):
         """
         
         self._valid()
-        self.set_afMode("continuous") # modo foco continuo
+        self.set_afMode(AfModeEnum.Continuous) # modo foco continuo
         sleep(duration) # tempo de ajuste
         self.lock_focus() # trava a posição final de foco
