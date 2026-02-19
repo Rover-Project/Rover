@@ -285,7 +285,7 @@ class Camera(CameraInterface):
         except:
             print("Erro ao capturar imagem.")
         
-    def get_video(self, file:str, duration:int):
+    def get_video(self, file:str, t:float):
         """
         Captura video mp4 e salva.
         Args:
@@ -297,8 +297,7 @@ class Camera(CameraInterface):
         
         self.picam2.start_and_record_video(
             file,
-            duration,
-            audio=False
+            duration=t
         )
             
     def metadata(self):
