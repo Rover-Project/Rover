@@ -19,7 +19,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False
     
-class CameraFormat(Enum):
+class CameraFormat:
     """
     Enum para conversão de formato de rgb para bgr, gray ou hsv
     """
