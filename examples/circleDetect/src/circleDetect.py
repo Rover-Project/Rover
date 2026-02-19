@@ -43,19 +43,17 @@ def smoothDetect():
     HEIGHT = 640
     WIDTH = 640
     
-    try:
-        camera = Camera(
-            HEIGHT, 
-            WIDTH, 
-            fps=30,
-        )
-        camera.start()
-        
-        # camera.set_brightness(0.5)
-        # camera.set_contrast(10)
-        # camera.set_saturation(10)
-    except:
-        camera = Webcam(HEIGHT, WIDTH)
+    
+    camera = Camera(
+        HEIGHT, 
+        WIDTH, 
+        fps=30,
+    )
+    camera.start()
+    
+    camera.set_brightness(0.5)
+    camera.set_contrast(10)
+    camera.set_saturation(10)
 
     circleHistory = None  # média acumulada
     cont = 0
