@@ -1,4 +1,4 @@
-from .camera import Camera
+from .camera import Camera, CameraFormat
 from time import sleep
 from .exceptions import CameraNotStart, AutofocusModeInvalid
 
@@ -35,7 +35,7 @@ class AfCamera(Camera):
         width:int,
         fps: int = 30, 
         index: int = 0,
-        format: str = "rgb",
+        format=None,
         horizontalFlip: bool = False,
         verticalFlip: bool = False,
         afMode: AfModeEnum = AfModeEnum.Continuous, 

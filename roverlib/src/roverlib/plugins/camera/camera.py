@@ -3,7 +3,6 @@ from .cameraInterface import CameraInterface
 from .exceptions import CameraNotStart
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time
-from enum import Enum
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
