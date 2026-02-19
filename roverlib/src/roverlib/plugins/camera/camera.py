@@ -15,6 +15,9 @@ except (ImportError, ModuleNotFoundError):
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
     from picamera2 import Picamera2 # type: ignore
+    from picamera2.outputs import FfmpegOutput
+    from picamera2.encoders import H264Encoder, Quality
+     
     availablePicamera2 = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False
@@ -284,20 +287,18 @@ class Camera(CameraInterface):
         
     def get_video(self, file:str, duration:int):
         """
-        Captura video e salva.
+        Captura video mp4 e salva.
         Args:
             file (str): caminho para salvar video.
             duration (int): duração do video.
         """
-        
         if not self.runing:
             raise CameraNotStart("Câmera não iniciada") 
         
-        try:
-            self.picam2.start_and_record_Video(file, duration)
-            print("Video gravado com sucesso!")
-        except:
-            print("Erro ao capturar Video.")
+        self.picam2.start_and_record_video(
+            file,
+            duration
+        )
             
     def metadata(self):
         """
