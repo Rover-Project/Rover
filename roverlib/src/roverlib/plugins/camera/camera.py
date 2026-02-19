@@ -297,7 +297,8 @@ class Camera(CameraInterface):
         
         self.picam2.start_and_record_video(
             file,
-            duration
+            duration,
+            audio=False
         )
             
     def metadata(self):
