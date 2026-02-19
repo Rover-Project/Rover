@@ -27,7 +27,8 @@ if __name__ == "__main__":
         app.run()
     except Exception as e:
         print(f"Um erro ocorreu: {e}")
+        motor_controller.cleanup()
     finally:
         # Garante que o motor pare ao fechar o aplicativo
-        motor_controller.stop()
+        motor_controller.cleanup()
         print("Aplicação encerrada. Motor parado.")

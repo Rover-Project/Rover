@@ -1,7 +1,6 @@
 from roverlib.modules.movement.robot import Robot
 from roverlib.plugins.camera.camera import Camera
 from roverlib.utils.config_manager import Config
-from roverlib.plugins.camera.webcam import Webcam
 from pathlib import Path
 import cv2 as openCv
 
@@ -24,8 +23,12 @@ if __name__ == "__main__":
         camera = Camera(HEIGHT, WIDTH)
         camera.start()
     except:
+<<<<<<< HEAD
         #camera = Webcam(HEIGHT, WIDTH)
         pass
+=======
+        raise RuntimeError("Erro ao abrir câmera")
+>>>>>>> main
     
     while True:
         frame = camera.getFrame()

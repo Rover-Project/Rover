@@ -3,7 +3,6 @@ from roverlib.utils.config_manager import Config
 from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
-from roverlib.plugins.camera.webcam import Webcam
 import cv2 as openCv
 import time 
 from pathlib import Path
@@ -115,7 +114,7 @@ class FolowCircle:
         
         # Loop principal de movimento
         while True:
-            frame = picam.getFrame() # carrega frame
+            frame = picam.get_frame() # carrega frame
             
             cls.updateTime() # atualiza o tempo de captura
             

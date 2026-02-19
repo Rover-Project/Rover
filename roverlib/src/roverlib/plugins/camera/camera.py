@@ -3,6 +3,7 @@ from .cameraInterface import CameraInterface
 from .exceptions import CameraNotStart
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time
+from enum import Enum
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
@@ -17,6 +18,14 @@ try:
     availablePicamera2 = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False
+    
+class CameraFormat(Enum):
+    """
+    Enum para conversão de formato de rgb para bgr, gray ou hsv
+    """
+    BGR = openCV.COLOR_RGB2BGR
+    Gray = openCV.COLOR_RGB2GRAY
+    HSV = openCV.COLOR_RGB2HSV
 
 class Camera(CameraInterface):
     """
@@ -30,7 +39,7 @@ class Camera(CameraInterface):
         width:int,
         fps: int = 30, 
         index: int = 0,
-        format: str = "rgb",
+        format=None,
         horizontalFlip: bool = False,
         verticalFlip: bool = False 
     ):
@@ -59,7 +68,7 @@ class Camera(CameraInterface):
         
         self.size = (width, height) # tamanho da imagem
         self.fps = fps # taxa de frames
-        self.format = format.lower() # formato das imagens capturadas
+        self.format = format # formato das imagens capturadas
         self.index = index # index da câmera que deseja usar 
         self.region_interest = None # Região de interesse na captura 
         self.runing = False # Controla se a câmera estar em funcionamento
@@ -106,8 +115,7 @@ class Camera(CameraInterface):
             self.picam2.stop() # Para câmera
             self.runing = False
             
-            
-    def setExposure(self, expousure_us: int, gain: float):
+    def set_exposure(self, expousure_us: int, gain: float):
         """
         Muda configuração de tempo de exposição à luz na aquisição de frames. Por padrão é automática.
         Args:
@@ -123,7 +131,7 @@ class Camera(CameraInterface):
             }
         )
     
-    def enableExposure(self):
+    def enable_exposure(self):
         """
             Desativa configuração de tempo de exposição manual na aquisição de frames. 
         """
@@ -141,10 +149,65 @@ class Camera(CameraInterface):
         """
         
         self.fps = fps
+        self.picam2.controls.FrameRate = self.fps
         
+    def set_brightness(self, brightness: float = 0.0):
+        """
+        Define um valor para o brilho das imagens da câmera
+        Args:
+            brightness (float, optional): Valor do brilho. Valor padrão 0.0.
+
+        Raises:
+            ValueError: Exceção lançada caso o brightness estiver fora do intervalo [-1.0, 1.0]
+        """
+        
+        if -1.0 > brightness or brightness > 1.0:
+            raise ValueError("O valor para o brilho deve ser um float no intervalo [-1.0, 1.0]")
+        
+        # Configura o brilho
         self.picam2.set_controls(
             {
-                "FrameRate": fps
+                "Brightness": brightness
+            }
+        )
+    
+    def set_contrast(self, contrast: float = 1):
+        """
+        Define o contraste das imagens da câmera
+        Args:
+            contrast (float, optional): Valor para o contrast. Valor padrão 1.
+
+        Raises:
+            ValueError: Exceção lançada caso o contraste estiver fora do intervalo [0, 32]
+        """
+        
+        if 0 > contrast or contrast > 32.0:
+            raise ValueError("O valor do contrast deve ser um float no intervalo [0, 32]")
+        
+        # Configura o contrast
+        self.picam2.set_controls(
+            {
+                "Constrast": contrast
+            }
+        )
+    
+    def set_saturation(self, saturation):
+        """
+        Define a saturação das imagens da câmera
+        Args:
+            contrast (float, optional): Valor para a saturação. Valor padrão 1.
+
+        Raises:
+            ValueError: Exceção lançada caso a saturação estiver fora do intervalo [0, 32]
+        """
+        
+        if 0 > saturation or saturation > 32.0:
+            raise ValueError("O valor da saturação deve ser um float no intervalo [0, 32]")
+        
+        # Configura o contrast
+        self.picam2.set_controls(
+            {
+                "Saturation": saturation
             }
         )
     
@@ -162,7 +225,7 @@ class Camera(CameraInterface):
         """
         self.region_interest = None
         
-    def setFormat(self, format:str):
+    def set_format(self, format: CameraFormat):
         """
         Define o formato do frame na aquisição
         Args:
@@ -171,40 +234,9 @@ class Camera(CameraInterface):
         Raises:
             ValueError: Dispara exceção se o formato não estiver dentre ["rgb", "bgr", "hsv", "gray"]
         """
-        
-        if format.lower() not in ["rgb", "bgr", "hsv", "gray"]:
-            raise ValueError("Formato inválido")
-        
         self.format = format
-    
-    def applyFormat(self, frame):
-        """
-        Aplica o formato definido a inicialização.
-        Args:
-            frame (numpy array): Frame capturado.
-
-        Returns:
-            numpy array: Frame com o formato aplicado.
-        """
-        
-        if self.format == "rgb":
-            return frame
-        
-        if self.format == "bgr":
-            cvt = openCV.COLOR_RGB2BGR
             
-        elif self.format == "gray":
-            cvt = openCV.COLOR_RGB2GRAY
-        
-        elif self.format == "hsv":
-            cvt = openCV.COLOR_RGB2HSV 
-        
-        return openCV.cvtColor(
-            frame,
-            cvt
-        ) # Converte formato do frame
-            
-    def getFrame(self):
+    def get_frame(self):
         """
         Captura um único frame da câmera.
 
@@ -220,18 +252,21 @@ class Camera(CameraInterface):
         if self.region_interest is not None:
             frame = ProcessingImage.cutImage(frame, self.region_interest) # Corta frame na região de interesse
         
-        return self.applyFormat(frame)
+        if self.format is not None:
+            openCV.cvtColor(frame, self.format) # type: ignore
+        
+        return frame
     
-    def getFrameTime(self):
+    def get_frame_time(self):
         """
         Captura um frame e retorna o momento em que ele foi capturado
         Returns:
             (numpy array, time): tupla com o frame e o momento de captura.
         """
         
-        return self.getFrame(), time()
+        return self.get_frame(), time()
         
-    def getPicture(self, file:str):
+    def get_picture(self, file:str):
         """
         Captura imagem e salva.
         Args:
@@ -247,7 +282,7 @@ class Camera(CameraInterface):
         except:
             print("Erro ao capturar imagem.")
         
-    def getVideo(self, file:str, duration:int):
+    def get_video(self, file:str, duration:int):
         """
         Captura video e salva.
         Args:

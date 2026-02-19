@@ -60,29 +60,6 @@ for pkg in "${APT_PACKAGES[@]}"; do
   install_if_missing "$pkg"
 done
 
-# # Verifica pyenv
-# if [ ! -d "$HOME/.pyenv" ]; then
-#   echo -e "${GREEN}Instalando pyenv.${RC}"
-#   curl https://pyenv.run | bash
-# else
-#   echo -e "${YELLOW}pyenv já instalado.${RC}"
-# fi
-
-# export PYENV_ROOT="$HOME/.pyenv"
-# export PATH="$PYENV_ROOT/bin:$PATH"
-# eval "$(pyenv init -)"
-
-# # Verifica Python 3.11
-# if pyenv versions --bare | grep -q "3.11.8"; then
-#   echo -e "${YELLOW}Python 3.11.8 já instalado.${RC}"
-# else
-#   echo -e "${GREEN}Instalando Python 3.11.8...${RC}"
-#   pyenv install 3.11.8
-# fi
-
-# pyenv global 3.11.8
-# pyenv rehash
-
 # Configuração do Projeto
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_ROOT"

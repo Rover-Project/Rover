@@ -31,7 +31,6 @@ dependencies = [
   "opencv-python",
   "click",
   "PyYAML"
-  # picamera2
 ]
 
 [project.optional-dependencies]
