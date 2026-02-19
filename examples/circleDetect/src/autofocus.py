@@ -47,6 +47,8 @@ def smoothDetect():
         HEIGHT, 
         WIDTH, 
         fps=30,
+        horizontalFlip=True,
+        verticalFlip=True,
         afMode=AfModeEnum.Continuous
     )
     camera.start()
