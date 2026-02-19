@@ -51,8 +51,8 @@ def smoothDetect():
     )
     camera.start()
     
-    camera.set_brightness(0.5) # 0.5 de brilho fica muito bom
-    camera.set_contrast(2)
+    camera.set_brightness(0.25) # 0.5 de brilho fica muito bom
+    camera.set_contrast(1.5)
     camera.set_saturation(1)
 
     circleHistory = None  # média acumulada
