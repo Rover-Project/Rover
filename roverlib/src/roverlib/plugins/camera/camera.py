@@ -14,10 +14,7 @@ except (ImportError, ModuleNotFoundError):
     
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
-    from picamera2 import Picamera2 # type: ignore
-    from picamera2.outputs import FfmpegOutput
-    from picamera2.encoders import H264Encoder, Quality
-     
+    from picamera2 import Picamera2 # type: ignore     
     availablePicamera2 = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False

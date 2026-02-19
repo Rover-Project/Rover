@@ -26,4 +26,4 @@ if __name__ == "__main__":
     camera.set_contrast(1)
     camera.set_saturation(5)
     
-    camera.get_video(file=path, duration=duration)
+    camera.get_video(file=path, t=duration)
