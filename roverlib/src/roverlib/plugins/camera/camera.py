@@ -187,7 +187,7 @@ class Camera(CameraInterface):
         # Configura o contrast
         self.picam2.set_controls(
             {
-                "Constrast": contrast
+                "Contrast": contrast
             }
         )
     
