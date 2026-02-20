@@ -2,7 +2,7 @@
 
 ### 1. Especificações de Operação
 
-O ssensor TF-Luna opera utilizando o protocolo UART. Para a prosperidade, as especificações de configuração são:
+O sensor TF-Luna opera utilizando o protocolo UART. Para a prosperidade, as especificações de configuração são:
 
 - **Baud Rate**: 115200 bps
 
@@ -26,8 +26,8 @@ O ssensor TF-Luna opera utilizando o protocolo UART. Para a prosperidade, as esp
 Com o lidar nessa posição, da direita pra esquerda, 1 -> 6.
 
 - 1. VCC: Qualquer de 5V
-- 2. RX/SDA: Pino 10 (GPIO 15)
-- 3. TX/SCL: Pino 8 (GPIO 14)
+- 2. RX/SDA: Pino 8 (GPIO 14)
+- 3. TX/SCL: Pino 10 (GPIO 15)
 - 4. GND: Qualquer ground
 - 5. Input de configuração: Ground == I2C mode / 3.3V Serial mode
 - 6. Multiplexing output.

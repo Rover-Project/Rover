@@ -16,7 +16,7 @@ try:
 except Exception as e:
     print(f"Erro ao acessar os pinos TX/RX: {e}")
     exit()
-
+    
 x_axisData = [] # informacoes para o eixo x (frames)
 dist_data = [] # dados da distancia
 strength_data = [] # dados da forca do sinal

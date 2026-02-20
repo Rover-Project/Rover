@@ -31,7 +31,7 @@ class Camera(CameraInterface):
     Plugin de câmera. Realiza o controle dos hardwares de câmera. 
     Versão génerica para câmeras simples usa como API o módulo Picamera2 que usa os drivers da libcamera na raspberry pi 5. 
     """
-    
+    set_output_flow_control
     def __init__(
         self, 
         height:int, 
