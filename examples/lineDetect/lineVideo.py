@@ -159,8 +159,20 @@ def lineDetectHough(img, isCut=False):
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
-            openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+            declive = (x2 - x1)
+
+            # Evita divisão por 0
+            if declive < 0.1: 
+                slope = 777
+                # Vertical
+            
+            else: 
+                slope = (y2 - y1) / declive
+
+                if abs(slope) > 0.6:
+                    ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
+                    openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
     
     return roi, img, numpy.array(ajustadas) if ajustadas else None
 

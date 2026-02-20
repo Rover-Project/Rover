@@ -22,7 +22,7 @@ if __name__ == "__main__":
     try:
         camera = Camera(HEIGHT, WIDTH)
         camera.start()
-        
+
     except:
         raise RuntimeError("Erro ao abrir câmera")
     
