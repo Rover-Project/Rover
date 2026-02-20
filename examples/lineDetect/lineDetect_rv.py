@@ -2,24 +2,17 @@
 # Adicionar binarizacao como pre-processamento
 # Adicionar mascara de cor como pre-processamento
 
-# Adiciona a pasta 'Rover' principal ao caminho de busc
+from roverlib.modules.movement.robot import Robot
+from roverlib.utils.config_manager import Config
 from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.webcam import Webcam
 from .lineMemory import memory
 from .lineDecision import decision
 import cv2 as openCV
-from pathlib import Path
 import numpy
-
+from pathlib import Path
 HEIGHT = 640
 WIDTH = 640
-
-# try:
-    #file = sys.argv[1]
-# except IndexError:
-    #print("vode nao passou o arquivo que deseja abrir")
-    #file = None
-    
-#path = Path(__file__).parent / "assets" / file # type: ignore
 
 try:
     picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
@@ -166,21 +159,25 @@ def lineDetectHough(img, isCut=False):
 
 if __name__ == "__main__":
         # incializando    
-        memoria = memory(frames_number=10)
-        decisao = decision()
-        # video = openCV.VideoCapture(path)
 
-        # log das tomadas de decisao do rover
-        # log_file = open("rover_decision_log.csv", "w")
-        # log_file.write("timestamp, decisao, erro\n")
+        # Carrega configuração da gpio
+        config = Config(Path(__file__).parent / "config.yaml")
+    
+        pins_motors = config.get("gpio")
+        letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
+        right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
+        
+        # Inicia motores
+        robot = Robot(left=letf, right=right)
+
+        BASE_SPEED = 70
+        KP = 0.4
+
+        memoria = memory(frames_number=10)
+        decisao = decision(BASE_SPEED)
 
         # *** LOOP ***
         while True:
-            # ret, frame = video.read()
-            # Pra manter videos em loop
-            # if not ret:
-                # video = openCV.VideoCapture(path)
-                # ontinue
             frame = picam.getFrame() # carrega frame
 
             frame = openCV.resize(
@@ -198,12 +195,12 @@ if __name__ == "__main__":
 
             try:
                 left_avg, right_avg = extrair_coordenadas_plano(hough_data, frame_shape)
-                error = False 
+                failure = False 
             except Exception as e:
-                error = True
+                failure = True
                 print("deu errado")
                 
-            if not error:
+            if not failure:
                 try:
                     left_avg = memoria.suavizar(left_avg, "left")
                     right_avg = memoria.suavizar(right_avg, "right")
@@ -230,6 +227,22 @@ if __name__ == "__main__":
 
                 # Sistema de Decisão
                 direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
+                correcao = int(abs(erro) * KP)
+
+                if direcao is "para":
+                    robot.stop()
+                    # implementar uma lógica que ele tenta identificar se é o final da pista ou
+                    # Se ele saiu da pista
+            
+                else:
+                    if erro > 0: 
+                        left = min(100, BASE_SPEED - correcao)
+                        right = max(0, BASE_SPEED + correcao)
+                    elif erro < 0: 
+                        left = max(0, BASE_SPEED + correcao)
+                        right = min(100, BASE_SPEED - correcao)
+
+                    robot.move(speed_left=left, speed_right=right)
 
                 # Desenho do Painel de Log 
                 overlay = result.copy()
@@ -255,15 +268,13 @@ if __name__ == "__main__":
                     calibragem_offset = 47
                     centro_cam = (frame.shape[1] / 2) 
                     centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
-                    centro_real_cam = int(centro_cam) - calibragem_offset # centro cam
 
-                    openCV.circle(result, (centro_real_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
+                    openCV.circle(result, (centro_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
                     openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
 
                 # Exibicao das telas
                 openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
-                # log_file.write(f"{time.time()},{direcao},{erro}\n")
 
             key = openCV.waitKey(25)
             
