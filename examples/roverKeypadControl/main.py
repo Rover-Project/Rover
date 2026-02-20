@@ -27,7 +27,7 @@ if __name__ == "__main__":
         raise RuntimeError("Erro ao abrir câmera")
     
     while True:
-        frame = camera.getFrame()
+        frame = camera.get_frame()
         
         if frame is not None:
         
