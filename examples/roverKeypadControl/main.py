@@ -22,13 +22,9 @@ if __name__ == "__main__":
     try:
         camera = Camera(HEIGHT, WIDTH)
         camera.start()
+        
     except:
-<<<<<<< HEAD
-        #camera = Webcam(HEIGHT, WIDTH)
-        pass
-=======
         raise RuntimeError("Erro ao abrir câmera")
->>>>>>> main
     
     while True:
         frame = camera.getFrame()
