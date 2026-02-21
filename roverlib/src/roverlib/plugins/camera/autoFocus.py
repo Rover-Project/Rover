@@ -1,6 +1,7 @@
-from .camera import Camera, CameraFormat
+from .camera import Camera
 from time import sleep
 from .exceptions import CameraNotStart, AutofocusModeInvalid
+from enum import IntEnum 
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
@@ -9,7 +10,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     availableLibcamera = False
     
-class AfModeEnum:
+class AfModeEnum(IntEnum):
     """
     Enum para guarda os valores possiveis para o modo do autofoco
     """
@@ -17,7 +18,7 @@ class AfModeEnum:
     Manual = controls.AfModeEnum.Manual 
     Auto = controls.AfModeEnum.Auto
     
-class AfSpeedEnum:
+class AfSpeedEnum(IntEnum):
     """
     Enum para guarda os valores possiveis para a velocidade do autofoco
     """
