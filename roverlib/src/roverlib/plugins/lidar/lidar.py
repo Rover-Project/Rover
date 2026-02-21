@@ -1,11 +1,10 @@
-import serial
-from .exceptions import LidarNotStart
-from .exceptions import LidarDoNotRespond
+from .exceptions import LidarNotStart, LidarDoNotRespond
+
 try:
-    from serial import Timeout
-    availableLidar = True
+    import serial
+    availableSerial = True
 except (ImportError, ModuleNotFoundError):
-    availableLidar = False
+    availableSerial = False
 
 class Lidar():
     """
@@ -14,8 +13,8 @@ class Lidar():
 
     def __init__(
         self, 
-        port = '/dev/ttyAMA0', # '/dev/ttyAMA0 => padrao para componentes atuais'
-        baudrate :int = 115200,
+        port: str = '/dev/ttyAMA0',
+        baudrate: int = 115200,
         parity = serial.PARITY_NONE,
         stopbits = serial.STOPBITS_ONE,
         bytesize = serial.EIGHTBITS,
@@ -33,8 +32,8 @@ class Lidar():
             timeout = Tempo máximo de espera pelo próximo pacote (segundos)
         """
 
-        if not availableLidar:
-            raise ModuleNotFoundError("Não foi possível importar o modulo Serial")
+        if not availableSerial:
+            raise ModuleNotFoundError("Não foi possível importar o modulo serial")
         
         self.port = port
         self.baudrate = baudrate
@@ -50,52 +49,50 @@ class Lidar():
         """
         try:
             lidar = serial.Serial(
-                self.port, self.baudrate,
-                self.parity, self.stopbits,
-                self.bytesize, self.timeout
+                self.port, 
+                self.baudrate,
+                self.parity, 
+                self.stopbits,
+                self.bytesize, 
+                self.timeout
             )
 
-            state = lidar.is_open()
-
-            if not state:
-                raise LidarNotStart("Nao foi possivel iniciar o Lidar. Verifique as conexoes")
+            if not lidar.is_open():
+                raise LidarNotStart("Não foi possivel iniciar o Lidar. Verifique as conexões")
             
             else:
                 self.lidar = lidar
-                return self.lidar
             
         except serial.SerialException as e:
             raise LidarNotStart(f"Houve algum tipo de falha física {e}")
-
-    def kill(self):
+    
+    def is_open(self):
+        """
+        Verifica o estado do Lidar
+        
+        Retorna:
+            Valor Bool: (True se ativo, false se nao)
+        """
+        return self.lidar.is_open()
+    
+    def stop(self):
         """
         Encerra a operação do Lidar
         """
-        state = self.lidar.is_open()
-
-        if state:
+        if self.is_open():
             self.lidar.reset_input_buffer()
             self.lidar.reset_output_buffer()
             self.lidar.close()
         
-        else: 
-            print("A porta já está fechada")
-    
     def change_config(self):
         """
         Permite mudança nas configurações do Lidar e retorna um dict com essas
         """
         try:
-            state = self.lidar.is_open()
-
-            if not state:
-                raise LidarNotStart("O Lidar nao foi iniciado")
-            
-            else:
+            if self.is_open():
                 config = self.lidar.get_settings()
-                print(config)
-
                 self.lidar.apply_settings(config)
+                
                 return config
             
         except serial.SerialException as e:
@@ -106,14 +103,9 @@ class Lidar():
         Limpa os buffers de entrada e saída do Lidar
 
         Raise:
-            LidarNotStart: Para evitar comportamento inesperado, caso tente limpar o que nao existe
+            LidarNotStart: Para evitar comportamento inesperado, caso tente limpar o que não existe
         """
-
-        state = self.lidar.is_open()
-
-        if not state:
-            raise LidarNotStart("O lidar nao foi iniciado")
-        else:
+        if self.is_open():
             self.lidar.reset_input_buffer()
             self.lidar.reset_output_buffer()
 
@@ -125,20 +117,11 @@ class Lidar():
         Retorna:
             (in_buffer, out_buffer) Tupla com valores int da quantidade de bytes nos dois buffers
         """
-        in_buffer = self.lidar.in_waiting()
-        out_buffer = self.lidar.out_waiting()
 
-        return in_buffer, out_buffer
-
-    def is_open(self):
-        """
-        Verifica o estado do Lidar
-        
-        Retorna:
-            Valor Bool: (True se ativo, false se nao)
-        """
-        state = self.lidar.is_open()
-        return state
+        if self.is_open():
+            in_buffer = self.lidar.in_waiting()
+            out_buffer = self.lidar.out_waiting()
+            return in_buffer, out_buffer
 
     def get_read(self):
         """
@@ -153,18 +136,13 @@ class Lidar():
             LidarNotStart: RunTimeError pois o Lidar não foi iniciado corretamente
             LidarNotRespond: O Lidar foi iniciado, mas não envia nenhum dado
         """
-        state = self.lidar.is_open()
-        
-        if not state:
-            raise LidarNotStart("O lidar nao foi iniciado")
             
-        else:
+        if self.is_open():
             answer = self.lidar.read(5)
+            
             if not answer:
                 raise LidarDoNotRespond("O lidar não está retornando nada")
-            
             else:
-
                 if self.lidar.in_waiting() >= 9:
 
                     # Le byte por byte ate encontrar o inicio do pacote
@@ -203,12 +181,8 @@ class Lidar():
             LidarNotStart: RunTimeError pois o Lidar não foi iniciado corretamente
             LidarNotRespond: O Lidar foi iniciado, mas não envia nenhum dado
         """
-        state = self.lidar.is_open()
-        
-        if not state:
-            raise LidarNotStart("O lidar nao foi iniciado")
             
-        else:
+        if self.is_open():
             answer = self.lidar.read(5)
             if not answer:
                 raise LidarDoNotRespond("O lidar não está retornando nada")
