@@ -1,59 +1,46 @@
-# """
-# Módulo de controle avançado com compensação de motores e calibração.
-# Tenta ajustes pontuais para compensar diferenças entre motores.
-# """
-# from roverlib.utils.config_manager import Config
+"""
+Módulo de controle avançado com compensação de motores e calibração.
+Tenta ajustes pontuais para compensar diferenças entre motores.
+"""
+class Calibration:
+    """
+    Gerencia calibração de motores para compensar diferenças de comportamento.
+    """
+    
+    def __init__(self, right:float, left:float):
+        """
+        Inicializa a classe de calibração
+        Args:
+            right (float): coeficiente de calibração para o motor direito.
+            left (float): coeficiente de calibração para o motor esquerdo.
+        """
 
-
-# class MotorCalibration:
-#     """
-#     Gerencia calibração de motores para compensar diferenças de comportamento.
-#     """
+        self.left = left 
+        self.right = right
     
-#     def __init__(self):
-#         """
-#         Inicializa o sistema de calibração.
-#         """
-#         self.loadCalibration() # Carrega os coeficientes de calibracao do arquivo config.yaml
+    def get_calibration(self, left_speed:float, right_speed:float) -> tuple[float, float]:
+        """
+        Aplica os coeficientes de calibração para a velocidade velocidades.
         
-#     def loadCalibration(self):
-#         corrections_motors = Config.get("motor_calibration")
+        Args:
+            left_speed (float): Velocidade desejada motor esquerdo
+            right_speed (float): Velocidade desejada motor direito
         
-#         # coeficientes de correção para os dois motores
-#         self.left_speed_correction =  corrections_motors["limiar_motor_esquerdo"]
-#         self.right_speed_correction =  corrections_motors["limiar_motor_direito"]
+        Returns:
+            tuple: (left_speed_calibrated, right_speed_calibrated)
+        """
+        left_calibrated = left_speed * self.left
+        right_calibrated = right_speed * self.right
+        
+        return right_calibrated, left_calibrated
     
-#     def getCalibration(self, left_speed, right_speed):
-#         """
-#         Aplica fatores de calibração às velocidades.
+    def set_calibration(self, right: float, left: float):
+        """
+        Define novos coeficiente de calibracao de acordo com os valores passados como parametro
+        Args:
+            left (float): coeficiente para o motor direito
+            right (float): coeficiente para o motor esquerdo
+        """
         
-#         Args:
-#             left_speed (float): Velocidade desejada motor esquerdo
-#             right_speed (float): Velocidade desejada motor direito
-        
-#         Returns:
-#             tuple: (left_speed_calibrated, right_speed_calibrated)
-#         """
-#         left_calibrated = left_speed * self.left_speed_correction
-#         right_calibrated = right_speed * self.right_speed_correction
-        
-#         return left_calibrated, right_calibrated
-    
-#     def setCalibration(self, left_calibration, right_calibration):
-#         """
-#         Define novos coeficiente de calibracao de acordo com os valores passados como parametro
-#         Args:
-#             left_calibration (_type_): coeficiente para o motor direito
-#             right_calibration (_type_): coeficiente para o motor esquerdo
-#         """
-        
-#         calibration = {
-#             "motor_calibration": {
-#                 "limiar_motor_direito": right_calibration, 
-#                 "limiar_motor_esquerdo": left_calibration
-#             }
-#         }
-        
-#         Config.setConfig(calibration)
-        
-#         self.loadCalibration()
+        self.right = right
+        self.left = left

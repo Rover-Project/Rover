@@ -1,5 +1,4 @@
 from roverlib.modules.vision.visionModule import VisionModule
-from roverlib.plugins.camera.webcam import Webcam
 from roverlib.plugins.camera.camera import Camera
 import cv2 as openCv
 from roverlib.modules.processing.processing_image import ProcessingImage

@@ -40,10 +40,6 @@ class Motor:
 
     def stop(self):
         """ Para o motor. """
-<<<<<<< HEAD
-        #self.motor.cleanup()
-        self.motor.stop()
-=======
         self.motor.stop()
         
     def cleanup(self):
@@ -51,4 +47,3 @@ class Motor:
         Libera os recursos de hardware
         """
         self.motor.cleanup()
->>>>>>> main

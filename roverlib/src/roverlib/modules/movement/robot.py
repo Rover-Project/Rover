@@ -3,8 +3,7 @@ Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
 from roverlib.plugins.motor.motor import Motor
-from roverlib.plugins.motor.vitualMotor import VirtualMotor
-#from .motorCalibration import MotorCalibration
+from .motorCalibration import Calibration
 import time
 
 class Robot:
@@ -13,25 +12,20 @@ class Robot:
     Fornece métodos intuitivos para controlar o movimento.
     """
     
-    def __init__(self, left: tuple[int, int], right:tuple[int, int], pwm_frequency=1000):
+    def __init__(self, right:tuple[int, int], left: tuple[int, int], calibration: Calibration=Calibration(1, 1), pwm_frequency=1000):
         """
         Inicia os drivers para os motores.
         Args:
             left (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da esquerda.
             right (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da direita.
-            pwm_frequency (int, optional): Frequência do sinal PWM em Hz(padrão: 1000Hz). Defaults to 1000.
+            calibration (Calibration): Calibração para os motores. Por padrão Calibration(1, 1)
+            pwm_frequency (int, optional): Frequência do sinal PWM em Hz(padrão: 1000Hz). Por padrão 1000.
         """
-        try:
-            # Crias instâncias para controlas os motores
-            self.left_motor = Motor(left, pwm_frequency)
-            self.right_motor = Motor(right, pwm_frequency)
-            #self.calibration = MotorCalibration() # Carrega os valores de calibracao do motores
         
-        except ImportError: # caso a GPIO não esteja disponivel
-            print("Criando motores virtuais.")
-            self.left_motor = VirtualMotor(left, "Left", pwm_frequency)
-            self.right_motor = VirtualMotor(right, "Right", pwm_frequency)
-            #self.calibration = MotorCalibration()
+        # Crias instâncias para controlas os motores
+        self.left_motor = Motor(left, pwm_frequency)
+        self.right_motor = Motor(right, pwm_frequency)
+        self.calibration = calibration 
         
         # Inicias os motores
         self.left_motor.initialize()
@@ -44,21 +38,19 @@ class Robot:
         Args:
             speed (float): Velocidade de 0 a 100
             duration (float, optional): Duração em segundos. Se None, move indefinidamente.
-        
-        Returns:
-            bool: True se executado com sucesso
         """
         
+        # calibra as velocidades
+        right_speed, left_speed = self.calibration.get_calibration(speed, speed)  
+        
         # Movimenta os motores para a frente
-        self.left_motor.set_movement(speed)
-        self.right_motor.set_movement(speed)
+        self.left_motor.set_movement(left_speed)
+        self.right_motor.set_movement(right_speed)
         
         # Delimita movimento por uma duração
         if duration is not None:
             time.sleep(duration)
             self.stop()
-        
-        return True
     
     def backward(self, speed=50, duration=None):
         """
@@ -67,21 +59,19 @@ class Robot:
         Args:
             speed (float): Velocidade de 0 a 100
             duration (float, optional): Duração em segundos. Se None, move indefinidamente.
-        
-        Returns:
-            bool: True se executado com sucesso
         """
         
+        # calibra as velocidades
+        right_speed, left_speed = self.calibration.get_calibration(speed, speed)  
+        
         # Movimenta os motores para a frente
-        self.left_motor.set_movement(speed, "backward")
-        self.right_motor.set_movement(speed, "backward")
+        self.left_motor.set_movement(left_speed, "backward")
+        self.right_motor.set_movement(right_speed, "backward")
         
         # Delimita movimento por uma duração
         if duration is not None:
             time.sleep(duration)
             self.stop()
-        
-        return True
     
     def turn_left(self, speed=50, duration=None):
         """
@@ -90,9 +80,6 @@ class Robot:
         Args:
             speed (float): Velocidade de 0 a 100
             duration (float, optional): Duração em segundos. Se None, gira indefinidamente.
-        
-        Returns:
-            bool: True se executado com sucesso
         """
         
         self.left_motor.set_movement(speed, "backward")
@@ -102,8 +89,6 @@ class Robot:
         if duration is not None:
             time.sleep(duration)
             self.stop()
-        
-        return True
     
     def turn_right(self, speed=50, duration=None):
         """
@@ -112,9 +97,6 @@ class Robot:
         Args:
             speed (float): Velocidade de 0 a 100
             duration (float, optional): Duração em segundos. Se None, gira indefinidamente.
-        
-        Returns:
-            bool: True se executado com sucesso
         """
         
         self.left_motor.set_movement(speed)
@@ -124,19 +106,17 @@ class Robot:
         if duration is not None:
             time.sleep(duration)
             self.stop()
-        
-        return True
     
-    def move(self, speed_left, speed_right, calibration=False):
+    def move(self, speed_right:float, speed_left:float, duration=None):
         """
-        Controla os motores individualmente.
+        Move os motores individualmente de acordo com a velocidade. 
+        Velociade positiva indica rotação para frente.
+        Velocidade negativa indica rotação para trás.
         
         Args:
-            speed_left (float): Velocidade do motor esquerdo (-100 a 100)
-                               Positivo = frente, Negativo = trás
-            speed_right (float): Velocidade do motor direito (-100 a 100)
-                                Positivo = frente, Negativo = trás
-            calibration: Aplicar calibração nos motores
+            speed_right (float): Velocidade do motor direito.
+            speed_left (float): _description_
+            duration (_type_, optional): Duração do movimento. Se for None o movimento é por tempo indefinido.
         """
         
         # determina direção e velocidade para cada motor
@@ -153,18 +133,25 @@ class Robot:
         if speed_right > 0:
             right_dir = 'forward'
             right_speed = abs(speed_right)
+            
         elif speed_right < 0:
             right_dir = 'backward'
             right_speed = abs(speed_right)
+            
         else:
             right_dir = 'stop'
             right_speed = 0
-            
-        # if calibration:
-        #     left_speed, right_speed = self.calibration.getCalibration(left_speed=left_speed, right_speed=right_speed) # Calibra as velocidades
+        
+        left_speed, right_speed = self.calibration.get_calibration(
+            left_speed=left_speed, right_speed=right_speed
+        ) # Calibra as velocidades
         
         self.left_motor.set_movement(left_speed, left_dir)
         self.right_motor.set_movement(right_speed, right_dir)
+        
+        if duration is not None:
+            time.sleep(duration)
+            self.stop()
     
     def stop(self):
         """Para o Rover imediatamente."""

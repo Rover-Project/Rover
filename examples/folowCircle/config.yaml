@@ -1,5 +1,8 @@
 camera:
   fps: 30
+  brigh: 0.5
+  saturation: 1
+  contrast: 1
   preview_resolution:
   - 640
   - 480

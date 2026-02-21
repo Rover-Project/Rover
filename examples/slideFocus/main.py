@@ -1,15 +1,15 @@
-from roverlib.plugins.camera.autoFocus import AfCamera
+from roverlib.plugins.camera.autoFocus import AfCamera, AfModeEnum
 import cv2 as openCV
 
 if __name__ == "__main__":
     
-    camera = AfCamera(height=1080, width=1080, verticalFlip=True, afMode="auto")
+    camera = AfCamera(height=1080, width=1080, verticalFlip=True, afMode=AfModeEnum.Auto)
     camera.start()
     position = 0
     
     while True:
         
-        frame = camera.getFrame()
+        frame = camera.get_frame()
         
         if frame is not None:
             openCV.imshow("Frame", frame)
