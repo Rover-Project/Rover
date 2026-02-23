@@ -1,7 +1,7 @@
 # Configuração para o script folowCircle
 camera:
   fps: 30
-  brigh: 0.5
+  brigh: 0.25
   saturation: 1
   contrast: 1
 
