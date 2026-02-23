@@ -184,9 +184,8 @@ def folowCircle():
             if circleHistory is None:
                 print(f"Area vermelha: {red_area}")                  
                 print("Procurando -----------------------------")
-                if last_circle is not None:
+                if last_circle is None:
                     robot.turn_right(SEARCH_SPEED)
-
                 else:
                     if error_x > 0:
                         robot.turn_left(SEARCH_SPEED) # Procura virando para a direita
