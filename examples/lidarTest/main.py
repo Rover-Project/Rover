@@ -1,5 +1,6 @@
 from roverlib.plugins.lidar.exceptions import LidarDoNotRespond
 from roverlib.plugins.lidar.lidar import Lidar
+import serial
 import time 
 
 def run_test():

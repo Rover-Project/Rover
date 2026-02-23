@@ -1,3 +1,4 @@
+from roverlib.plugins.lidar.exceptions import LidarNotStart
 from roverlib.plugins.lidar.lidar import Lidar
 import serial
 import time 
@@ -12,12 +13,14 @@ temp_data = [] # dados da temperatura
 MAX_POINTS_GRAPH = 50 # numero maximo de pontos no grafico
 
 lidar = Lidar()
-lidar.start()
+try:
+    lidar.start()
+except Exception as e:
+    print(f"Falha ao iniciar: {e}")
+    raise LidarNotStart("O Lidar não iniciou")
 
 def updateGraph(data):
-    data = lidar.get_read()
-
-    dist, stren, temp = data
+    dist, stren, temp =  lidar.get_read()
 
     x_axisData.append(len(x_axisData))
     dist_data.append(dist)
