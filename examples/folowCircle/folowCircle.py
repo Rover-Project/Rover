@@ -56,7 +56,7 @@ def folowCircle():
     RED_THRES_UPPER = 400000 # Limite superior para a detecção de vermelho
     CIRCLE_THRES = 40  # tolerância para considerar mesma circuferencia
     NO_DET_LIMIT = 10  # número máximo de frames sem detecção
-    BASE_SPEED = 40 # Velocidade base para controle
+    BASE_SPEED = 50 # Velocidade base para controle
     SEARCH_SPEED = 70
     last_circle = None  # guarda o ulthimo circulo detectado
     circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
@@ -183,7 +183,6 @@ def folowCircle():
             # Sem detectar circulos
             if circleHistory is None:
                 print(f"Area vermelha: {red_area}")                  
-                print("Procurando -----------------------------")
                 if last_circle is None:
                     robot.turn_right(SEARCH_SPEED)
                 else:
