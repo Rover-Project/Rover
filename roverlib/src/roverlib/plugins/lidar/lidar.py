@@ -166,8 +166,8 @@ class Lidar():
                             temp_raw = payload[4] + payload[5] * 256
                             temperature = temp_raw / 8 - 256
                             
-                            print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
-                            return distance, strength, temperature
+                            # print(f"Distância: {distance}cm | Força: {strength} | Temp: {temperature:.2f}°C")
+                            return (distance, strength, temperature)
     
     def get_reads_until(self, quant:int):
         """
