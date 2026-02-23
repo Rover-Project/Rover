@@ -195,7 +195,7 @@ def folowCircle():
                         
             else: # Segue circulo                    
                     print(f"Velocidade:\nL - {left}\nR - {right}")
-                    robot.move(speed_left=right, speed_right=left)
+                    robot.move(speed_left=left, speed_right=right)
         
         else:
             robot.stop()
