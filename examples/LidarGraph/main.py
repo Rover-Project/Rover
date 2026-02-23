@@ -22,18 +22,19 @@ except Exception as e:
 def updateGraph(frame):
     latest_data = None
 
+    quant_out_buffer = lidar.get_out_buffer()
+    print(f"DEBUG: {quant_out_buffer}")
     try:
-        if lidar.get_out_buffer() > 17:
+        if quant_out_buffer > 17:
             lidar.clean_out_buffer()
-            print(f"QUANT: {lidar.get_out_buffer}")
+            print(f"QUANT: {lidar.get_out_buffer()}")
 
         latest_data = lidar.get_read()
-        time.sleep(0.2)
+        time.sleep(0.01)
 
         # Só processamos dist, stren e temp se latest_data existir
         if latest_data is not None:
             dist, stren, temp = latest_data
-            print(f"DISTANCIA: {dist}")
 
             x_axisData.append(len(x_axisData))
             dist_data.append(dist)
