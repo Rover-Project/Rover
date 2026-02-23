@@ -19,30 +19,29 @@ except Exception as e:
     raise LidarNotStart("O Lidar não iniciou")
 
 def updateGraph(frame):
-    dist = None
-    stren = None
-    temp = None
-    
-    while lidar.get_out_buffer() >= 9:
-        latest_data = lidar.get_read()
+    latest_data = None
 
-        if latest_data:
+    try:
+        # Tenta pegar o dado mais atual
+        while lidar.get_out_buffer() >= 9:
+            latest_data = lidar.get_read()
+
+        # Só processamos dist, stren e temp se latest_data existir
+        if latest_data is not None:
             dist, stren, temp = latest_data
-            
-        # Ignora se os dados forem inválidos (nossos retornos de erro -1)
-        if dist is None:
-            return dist_line, strengh_line, temp_line
-        
-    x_axisData.append(len(x_axisData))
-    dist_data.append(dist)
-    strength_data.append(stren)
-    temp_data.append(temp)
+            x_axisData.append(len(x_axisData))
+            dist_data.append(dist)
+            strength_data.append(stren)
+            temp_data.append(temp)
 
-    if len(x_axisData) > MAX_POINTS_GRAPH:
-        x_axisData.pop(0)
-        dist_data.pop(0)
-        strength_data.pop(0)
-        temp_data.pop(0)
+            if len(x_axisData) > MAX_POINTS_GRAPH:
+                x_axisData.pop(0)
+                dist_data.pop(0)
+                strength_data.pop(0)
+                temp_data.pop(0)
+        
+    except Exception as e:
+        print(f"Erro: {e}")
 
     dist_line.set_data(range(len(dist_data)), dist_data)
     strengh_line.set_data(range(len(strength_data)), strength_data)
