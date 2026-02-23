@@ -23,7 +23,7 @@ def updateGraph(frame):
     latest_data = None
 
     try:
-        if lidar.get_in_buffer() > 17:
+        if lidar.get_in_buffer() > 570:
             lidar.clean_in_buffer()
             quant_out_buffer = lidar.get_in_buffer()
             print(f"DEBUG: {quant_out_buffer}")
