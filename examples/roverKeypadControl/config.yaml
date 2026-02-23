@@ -11,8 +11,8 @@ gpio:
     in3: 16
     in4: 15
   motor_esquerdo:
-    in1: 11
-    in2: 12
+    in1: 12
+    in2: 11
 motor_calibration:
   limiar_motor_direito: 1
   limiar_motor_esquerdo: 1
