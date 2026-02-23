@@ -101,30 +101,50 @@ class Lidar():
         except serial.SerialException as e:
             raise LidarNotStart(f"Houve algum tipo de falha física {e}")
 
-    def clean_buffer(self):
+    def clean_in_buffer(self):
         """
-        Limpa os buffers de entrada e saída do Lidar
+        Limpa o buffer de entrada do lidar
 
         Raise:
             LidarNotStart: Para evitar comportamento inesperado, caso tente limpar o que não existe
         """
         if self.is_open():
-            self.lidar.reset_input_buffer()
             self.lidar.reset_output_buffer()
 
-    def get_buffers(self):
+    def clean_out_buffer(self):
         """
-        Adquire a quantidade de bytes no buffer de entrada
-        e de saida do Lidar
+        Limpa o buffer de entrada do lidar
+
+        Raise:
+            LidarNotStart: Para evitar comportamento inesperado, caso tente limpar o que não existe
+        """
+        if self.is_open():
+            self.lidar.reset_output_buffer()
+
+    def get_in_buffer(self):
+        """
+        Adquire a quantidade de bytes no buffer de entrada do lidar
 
         Retorna:
-            (in_buffer, out_buffer) Tupla com valores int da quantidade de bytes nos dois buffers
+            in_buffer: Quantidade de bytes no buffer de entrada
         """
 
         if self.is_open():
             in_buffer = self.lidar.in_waiting
+            return in_buffer
+        
+    def get_out_buffer(self):
+        """
+        Adquire a quantidade de bytes no buffer de saida do lidar
+
+        Retorna:
+            out_buffer: Quantidade de bytes no buffer de saida
+        """
+
+        if self.is_open():
             out_buffer = self.lidar.out_waiting
-            return in_buffer, out_buffer
+            return out_buffer
+
 
     def get_read(self):
         """

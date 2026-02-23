@@ -79,5 +79,6 @@ try:
         lidar.kill()
 
 except KeyboardInterrupt or Exception as e:
-    lidar.kill()
-    print("Deu errado ou foi interrompido")
+    if hasattr(lidar, 'stop'):
+        lidar.stop()
+        print("Deu errado ou foi interrompido")
