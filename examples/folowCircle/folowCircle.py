@@ -152,8 +152,8 @@ def folowCircle():
             
             # Controle dos motores caso tenha um cículo
             speed_x =  pid.controller_P(abs(error_x)) * ((100 - BASE_SPEED) / x_center)  # Usando só o controle proporcional
-            right = (speed_x + BASE_SPEED if error_x < 0 else BASE_SPEED)
-            left = (speed_x + BASE_SPEED if error_x > 0 else BASE_SPEED)
+            left = (speed_x + BASE_SPEED if error_x < 0 else BASE_SPEED)
+            right = (speed_x + BASE_SPEED if error_x > 0 else BASE_SPEED)
             
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
