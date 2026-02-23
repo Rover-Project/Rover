@@ -152,8 +152,8 @@ def folowCircle():
             
             # Controle dos motores caso tenha um cículo
             speed_x =  pid.controller_P(abs(error_x)) * ((100 - BASE_SPEED) / x_center)  # Usando só o controle proporcional
-            left = (speed_x + BASE_SPEED if error_x < 0 else BASE_SPEED)
-            right = (speed_x + BASE_SPEED if error_x > 0 else BASE_SPEED)
+            right = (speed_x + BASE_SPEED if error_x < 0 else BASE_SPEED)
+            left = (speed_x + BASE_SPEED if error_x > 0 else BASE_SPEED)
             
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
@@ -183,14 +183,16 @@ def folowCircle():
             # Sem detectar circulos
             if circleHistory is None:
                 print(f"Area vermelha: {red_area}")                  
+                print("Procurando -----------------------------")
                 if error_x > 0:
-                    robot.move(speed_left=SEARCH_SPEED, speed_right=0) # Procura virando para a direita
+                
+                    robot.turn_left(SEARCH_SPEED) # Procura virando para a direita
                 else:
-                    robot.move(speed_left=0, speed_right=SEARCH_SPEED) # Procura virando para a esquerda
-                        
+                    robot.turn_right(SEARCH_SPEED) # Procura virando para a direita
+                      
             else: # Segue circulo                    
                     print(f"Velocidade:\nL - {left}\nR - {right}")
-                    robot.move(speed_left=left, speed_right=right)
+                    robot.move(speed_left=right, speed_right=left)
         
         else:
             robot.stop()
