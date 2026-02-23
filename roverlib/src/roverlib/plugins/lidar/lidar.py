@@ -109,7 +109,7 @@ class Lidar():
             LidarNotStart: Para evitar comportamento inesperado, caso tente limpar o que não existe
         """
         if self.is_open():
-            self.lidar.reset_output_buffer()
+            self.lidar.reset_input_buffer()
 
     def clean_out_buffer(self):
         """
