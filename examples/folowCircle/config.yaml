@@ -10,5 +10,5 @@ gpio:
     right: [16, 15] # in3, in4
     left: [11, 12] # in1, in2
     calibration:
-      right: 0.6
+      right: 1
       left: 1
