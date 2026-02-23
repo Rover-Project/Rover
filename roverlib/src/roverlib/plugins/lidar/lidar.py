@@ -141,13 +141,8 @@ class Lidar():
         """
             
         if not self.is_open():
-            return None, None, None
-            
-        answer = self.lidar.read(9)
-
-        if not answer:
-            raise LidarDoNotRespond("O lidar foi aberto mas não está respondendo. Verifique as conexões")
-        
+            raise LidarNotStart("O Lidar não iniciou")
+                    
         else:
 
             if self.lidar.in_waiting >= 9:
@@ -155,10 +150,12 @@ class Lidar():
                 # Le byte por byte ate encontrar o inicio do pacote
                 byte1 = self.lidar.read(1)
                 if byte1 != b'\x59': # primeiro Header
+                    print("Não leu o header")
                     return None, None, None
                 
                 byte2 = self.lidar.read(1)
                 if byte2 != b'\x59': # segundo Header
+                    print("Não leu o segundo header")
                     return None, None, None
                 
                 # Se achou 0x59 0x59, lê os próximos 7 bytes
@@ -166,7 +163,8 @@ class Lidar():
 
                 # se o payload for menor que o esperado
                 if len(payload) < 7: 
-                    return None, None, None
+                    print("Não tinham leituras suficientes")
+                    return 80, 80, 80
                 
                 # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
                 dist = payload[0] + payload[1] * 256
@@ -183,6 +181,7 @@ class Lidar():
                 return dist, stren, temp
         
         # Retorno de segurança
+        print("Sei lá")
         return None, None, None
     
     def get_reads_until(self, quant:int):
