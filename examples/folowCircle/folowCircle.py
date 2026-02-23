@@ -187,11 +187,12 @@ def folowCircle():
                 if last_circle is not None:
                     robot.turn_right(SEARCH_SPEED)
 
-                elif error_x > 0:
-                    robot.turn_left(SEARCH_SPEED) # Procura virando para a direita
                 else:
-                    robot.turn_right(SEARCH_SPEED) # Procura virando para a direita
-                      
+                    if error_x > 0:
+                        robot.turn_left(SEARCH_SPEED) # Procura virando para a direita
+                    else:
+                        robot.turn_right(SEARCH_SPEED) # Procura virando para a direita
+                        
             else: # Segue circulo                    
                     print(f"Velocidade:\nL - {left}\nR - {right}")
                     robot.move(speed_left=right, speed_right=left)
