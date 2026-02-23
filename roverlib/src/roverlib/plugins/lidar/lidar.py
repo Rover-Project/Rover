@@ -58,7 +58,9 @@ class Lidar():
                 self.timeout
             )
 
-            if not lidar.is_open():
+            state = lidar.is_open()
+
+            if not state:
                 raise LidarNotStart("Não foi possivel iniciar o Lidar. Verifique as conexões")
             
             else:
