@@ -22,7 +22,7 @@ def updateGraph(frame):
     latest_data = None
 
     try:
-        if lidar.get_out_buffer > 570:
+        if lidar.get_out_buffer() > 570:
             lidar.clean_out_buffer()
 
         latest_data = lidar.get_read()
