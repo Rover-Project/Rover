@@ -1,26 +1,35 @@
 from roverlib.plugins.lidar.exceptions import LidarDoNotRespond
 from roverlib.plugins.lidar.lidar import Lidar
-import serial
 import time 
 
 def run_test():
     lidar = Lidar()
-    lidar.start()
+    try:
+        lidar.start()
+    except Exception as e:
+        print(f"Falha ao iniciar: {e}")
+        return
+    
+    print("Iniciando leituras... Pressione Ctrl+C para parar.")
     while True:
         try:
             dist, strenght, temp = lidar.get_read()
 
-            if not dist or not strenght or not temp:
-                print("Alguns dos valores deu None")
+            # Verifica se a leitura falhou (assumindo que get_read retorna None em erro)
+            if dist is None:
+                print("Aguardando dados válidos...")
+                time.sleep(0.1)
                 print(f"{dist} - {temp} - {strenght}")
-                raise LidarDoNotRespond("Não foi possível realizar uma leitura satisfatoria")
+                continue
             
             print(f"Distancia (cm): {dist}, Força: {strenght}, Temperatura: {temp} ")
             time.sleep(0.01)
+
         except KeyboardInterrupt as e:
-            lidar.stop()
-            print('Não deu certo ou foi interrompido')
-            break
+            if hasattr(lidar, 'stop'):
+                lidar.stop()
+                print('Não deu certo ou foi interrompido')
+                break
 
 if __name__ == "__main__":
     run_test()
