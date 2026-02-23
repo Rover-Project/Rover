@@ -29,6 +29,8 @@ def updateGraph(frame):
         # Só processamos dist, stren e temp se latest_data existir
         if latest_data is not None:
             dist, stren, temp = latest_data
+            print(f"DISTANCIA: {dist}")
+
             x_axisData.append(len(x_axisData))
             dist_data.append(dist)
             strength_data.append(stren)
@@ -39,6 +41,8 @@ def updateGraph(frame):
                 dist_data.pop(0)
                 strength_data.pop(0)
                 temp_data.pop(0)
+            
+            lidar.clean_out_buffer()
         
     except Exception as e:
         print(f"Erro: {e}")
