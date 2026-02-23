@@ -3,6 +3,7 @@ from roverlib.plugins.lidar.lidar import Lidar
 import serial 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import time
 
 x_axisData = [] # informacoes para o eixo x (frames)
 dist_data = [] # dados da distancia
@@ -24,7 +25,9 @@ def updateGraph(frame):
     try:
         if lidar.get_out_buffer() > 570:
             lidar.clean_out_buffer()
+            print(lidar.get_out_buffer)
 
+        time.sleep(2)
         latest_data = lidar.get_read()
 
         print(f"DEBUG: {latest_data}")
