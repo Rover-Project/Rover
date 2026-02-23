@@ -22,9 +22,9 @@ def updateGraph(frame):
     while lidar.get_out_buffer() >= 9:
         latest_data = lidar.get_read()
 
-    if latest_data:
-        dist, stren, temp = latest_data
-        
+        if latest_data:
+            dist, stren, temp = latest_data
+            
         # Ignora se os dados forem inválidos (nossos retornos de erro -1)
         if dist is None:
             return dist_line, strengh_line, temp_line
