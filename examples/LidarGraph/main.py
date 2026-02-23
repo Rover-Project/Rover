@@ -22,12 +22,12 @@ except Exception as e:
 def updateGraph(frame):
     latest_data = None
 
-    quant_out_buffer = lidar.get_out_buffer()
+    quant_out_buffer = lidar.get_in_buffer()
     print(f"DEBUG: {quant_out_buffer}")
     try:
-        lidar.clean_out_buffer()
+        lidar.clean_in_buffer()
         latest_data = lidar.get_read()
-        print(f"DEBUG 2: {lidar.get_out_buffer()}")
+        print(f"DEBUG 2: {lidar.get_in_buffer()}")
 
         time.sleep(0.01)
 
