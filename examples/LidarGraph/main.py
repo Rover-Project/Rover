@@ -19,6 +19,10 @@ except Exception as e:
     raise LidarNotStart("O Lidar não iniciou")
 
 def updateGraph(frame):
+    dist = None
+    stren = None
+    temp = None
+    
     while lidar.get_out_buffer() >= 9:
         latest_data = lidar.get_read()
 
