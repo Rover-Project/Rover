@@ -19,13 +19,15 @@ except Exception as e:
     raise LidarNotStart("O Lidar não iniciou")
 
 def updateGraph(frame):
-    dist, stren, temp = lidar.get_read()
-    lidar.clean_in_buffer()
+    while lidar.get_out_buffer() >= 9:
+        latest_data = lidar.get_read()
 
-    if lidar.get_out_buffer() > 570: 
-        print("Leituras em excesso. Limpando...")
-        lidar.clean_out_buffer()
-        print(lidar.get_out_buffer())
+    if latest_data:
+        dist, stren, temp = latest_data
+        
+        # Ignora se os dados forem inválidos (nossos retornos de erro -1)
+        if dist is None:
+            return dist_line, strengh_line, temp_line
         
     x_axisData.append(len(x_axisData))
     dist_data.append(dist)
@@ -79,7 +81,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
-        ani = FuncAnimation(fig, updateGraph, interval=17, cache_frame_data=False)
+        ani = FuncAnimation(fig, updateGraph, interval=17, blit=True, cache_frame_data=False)
 
         plt.show()
         lidar.stop()
