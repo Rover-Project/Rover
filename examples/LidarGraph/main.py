@@ -18,7 +18,7 @@ except Exception as e:
     print(f"Falha ao iniciar: {e}")
     raise LidarNotStart("O Lidar não iniciou")
 
-def updateGraph():
+def updateGraph(frame):
     dist, stren, temp = lidar.get_read()
 
     if lidar.get_out_buffer > 570: 
@@ -77,7 +77,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
-        ani = FuncAnimation(fig, updateGraph, interval=17, cache_frame_data=False)
+        ani = FuncAnimation(fig, updateGraph, interval=20, cache_frame_data=False)
 
         plt.show()
         lidar.stop()
