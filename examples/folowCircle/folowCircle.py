@@ -182,15 +182,11 @@ def folowCircle():
         if not pause:
             # Sem detectar circulos
             if circleHistory is None:
-                print(f"Area vermelha: {red_area}")
-                if red_area >= RED_THRES_LOW and RED_THRES_UPPER > red_area: # Chegou perto o suficiente da bola
-                    robot.stop()
-                    
-                else: # Procura circulo                   
-                    if error_x > 0:
-                        robot.move(speed_left=SEARCH_SPEED, speed_right=0) # Procura virando para a direita
-                    else:
-                        robot.move(speed_left=0, speed_right=SEARCH_SPEED) # Procura virando para a esquerda
+                print(f"Area vermelha: {red_area}")                  
+                if error_x > 0:
+                    robot.move(speed_left=SEARCH_SPEED, speed_right=0) # Procura virando para a direita
+                else:
+                    robot.move(speed_left=0, speed_right=SEARCH_SPEED) # Procura virando para a esquerda
                         
             else: # Segue circulo                    
                     print(f"Velocidade:\nL - {left}\nR - {right}")
