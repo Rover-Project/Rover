@@ -22,31 +22,27 @@ def updateGraph(frame):
     latest_data = None
 
     try:
-        # Tenta pegar o dado mais atual
-        if lidar.get_out_buffer() < 117:
-            latest_data = lidar.get_read()
-
-            print(f"DEBUG: {latest_data}")
-            # Só processamos dist, stren e temp se latest_data existir
-            if latest_data is not None:
-                dist, stren, temp = latest_data
-                print(f"DISTANCIA: {dist}")
-
-                x_axisData.append(len(x_axisData))
-                dist_data.append(dist)
-                strength_data.append(stren)
-                temp_data.append(temp)
-
-                if len(x_axisData) > MAX_POINTS_GRAPH:
-                    x_axisData.pop(0)
-                    dist_data.pop(0)
-                    strength_data.pop(0)
-                    temp_data.pop(0)
-        else:    
+        if lidar.get_out_buffer > 570:
             lidar.clean_out_buffer()
-            print("Limpei")
-        
-        
+
+        latest_data = lidar.get_read()
+
+        print(f"DEBUG: {latest_data}")
+        # Só processamos dist, stren e temp se latest_data existir
+        if latest_data is not None:
+            dist, stren, temp = latest_data
+            print(f"DISTANCIA: {dist}")
+
+            x_axisData.append(len(x_axisData))
+            dist_data.append(dist)
+            strength_data.append(stren)
+            temp_data.append(temp)
+
+            if len(x_axisData) > MAX_POINTS_GRAPH:
+                x_axisData.pop(0)
+                dist_data.pop(0)
+                strength_data.pop(0)
+                temp_data.pop(0)
         
     except Exception as e:
         print(f"Erro: {e}")
@@ -92,7 +88,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
-        ani = FuncAnimation(fig, updateGraph, interval=17, blit=True, cache_frame_data=False)
+        ani = FuncAnimation(fig, updateGraph, interval=15, cache_frame_data=False)
 
         plt.show()
         lidar.stop()
