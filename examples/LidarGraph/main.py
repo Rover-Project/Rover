@@ -25,11 +25,10 @@ def updateGraph(frame):
     quant_out_buffer = lidar.get_out_buffer()
     print(f"DEBUG: {quant_out_buffer}")
     try:
-        if quant_out_buffer > 17:
-            lidar.clean_out_buffer()
-            print(f"QUANT: {lidar.get_out_buffer()}")
-
+        lidar.clean_out_buffer()
         latest_data = lidar.get_read()
+        print(f"DEBUG 2: {lidar.get_out_buffer()}")
+
         time.sleep(0.01)
 
         # Só processamos dist, stren e temp se latest_data existir
