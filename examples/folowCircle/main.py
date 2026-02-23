@@ -1,4 +1,4 @@
-from .folowCircle import FolowCircle
+from .folowCircle import folowCircle
 
 if __name__ == "__main__":
-    FolowCircle.folowCircle()
+    folowCircle()
