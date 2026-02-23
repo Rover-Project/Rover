@@ -13,12 +13,13 @@ class Lidar():
 
     def __init__(
         self, 
-        port: str = '/dev/ttyAMA0',
-        baudrate: int = 115200,
-        parity = serial.PARITY_NONE,
-        stopbits = serial.STOPBITS_ONE,
-        bytesize = serial.EIGHTBITS,
-        timeout: int = 1
+        # Ordem a ser passada para a função .serial()
+        port: str = '/dev/ttyAMA0', # 1º
+        baudrate: int = 115200, # 2º
+        bytesize = serial.EIGHTBITS, # 3º 
+        parity = serial.PARITY_NONE, # 4º
+        stopbits = serial.STOPBITS_ONE, # 5º
+        timeout: int = 1 # 6º
     ):
         """
         Realiza a configuração inicial do Lidar.
@@ -37,9 +38,9 @@ class Lidar():
         
         self.port = port
         self.baudrate = baudrate
+        self.bytesize = bytesize
         self.parity = parity
         self.stopbits = stopbits
-        self.bytesize = bytesize
         self.timeout = timeout
         self.lidar = None
 
@@ -51,9 +52,9 @@ class Lidar():
             lidar = serial.Serial(
                 self.port, 
                 self.baudrate,
+                self.bytesize,
                 self.parity, 
-                self.stopbits,
-                self.bytesize, 
+                self.stopbits, 
                 self.timeout
             )
 
