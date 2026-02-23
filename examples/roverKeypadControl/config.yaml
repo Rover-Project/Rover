@@ -8,11 +8,11 @@ camera:
   - 2464
 gpio:
   motor_direito:
-    in3: 15
-    in4: 16
+    in3: 16
+    in4: 15
   motor_esquerdo:
-    in1: 12
-    in2: 11
+    in1: 11
+    in2: 12
 motor_calibration:
   limiar_motor_direito: 1
   limiar_motor_esquerdo: 1
