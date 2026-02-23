@@ -25,12 +25,11 @@ def updateGraph(frame):
     try:
         if lidar.get_out_buffer() > 570:
             lidar.clean_out_buffer()
-            print(lidar.get_out_buffer)
+            print(f"QUANT: {lidar.get_out_buffer}")
 
-        time.sleep(2)
         latest_data = lidar.get_read()
+        time.sleep(0.5)
 
-        print(f"DEBUG: {latest_data}")
         # Só processamos dist, stren e temp se latest_data existir
         if latest_data is not None:
             dist, stren, temp = latest_data
