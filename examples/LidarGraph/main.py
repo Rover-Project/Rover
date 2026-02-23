@@ -21,7 +21,7 @@ except Exception as e:
 def updateGraph(frame):
     dist, stren, temp = lidar.get_read()
 
-    if lidar.get_out_buffer > 570: 
+    if lidar.get_out_buffer() > 570: 
         print("Leituras em excesso. Limpando...")
         lidar.clean_out_buffer()
         
