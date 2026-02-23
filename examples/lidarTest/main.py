@@ -11,6 +11,8 @@ def run_test():
             dist, strenght, temp = lidar.get_read()
 
             if not dist or not strenght or not temp:
+                print("Alguns dos valores deu None")
+                print(f"{dist} - {temp} - {strenght}")
                 raise LidarDoNotRespond("Não foi possível realizar uma leitura satisfatoria")
             
             print(f"Distancia (cm): {dist}, Força: {strenght}, Temperatura: {temp} ")
