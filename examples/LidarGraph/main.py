@@ -22,6 +22,7 @@ def updateGraph():
     dist, stren, temp = lidar.get_read()
 
     if lidar.get_out_buffer > 570: 
+        print("Leituras em excesso. Limpando...")
         lidar.clean_out_buffer()
         
     x_axisData.append(len(x_axisData))
