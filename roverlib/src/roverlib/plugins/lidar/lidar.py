@@ -122,8 +122,8 @@ class Lidar():
         """
 
         if self.is_open():
-            in_buffer = self.lidar.in_waiting()
-            out_buffer = self.lidar.out_waiting()
+            in_buffer = self.lidar.in_waiting
+            out_buffer = self.lidar.out_waiting
             return in_buffer, out_buffer
 
     def get_read(self):
@@ -146,7 +146,7 @@ class Lidar():
             if not answer:
                 raise LidarDoNotRespond("O lidar não está retornando nada")
             else:
-                if self.lidar.in_waiting() >= 9:
+                if self.lidar.in_waiting >= 9:
 
                     # Le byte por byte ate encontrar o inicio do pacote
                     byte1 = self.lidar.read(1)
