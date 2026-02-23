@@ -58,7 +58,7 @@ class Lidar():
                 self.timeout
             )
 
-            state = lidar.is_open()
+            state = lidar.is_open
 
             if not state:
                 raise LidarNotStart("Não foi possivel iniciar o Lidar. Verifique as conexões")
@@ -76,7 +76,7 @@ class Lidar():
         Retorna:
             Valor Bool: (True se ativo, false se nao)
         """
-        return self.lidar.is_open()
+        return self.lidar.is_open
     
     def stop(self):
         """
