@@ -86,8 +86,6 @@ def folowCircle():
     print(motor_config["left"])
     print(motor_config["right"])
     
-    return 
-    
     robot = Robot(
         left=motor_config["left"], 
         right=motor_config["right"],
