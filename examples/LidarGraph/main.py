@@ -77,7 +77,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
-        ani = FuncAnimation(fig, updateGraph, interval=20, cache_frame_data=False)
+        ani = FuncAnimation(fig, updateGraph, interval=17, cache_frame_data=False)
 
         plt.show()
         lidar.stop()
