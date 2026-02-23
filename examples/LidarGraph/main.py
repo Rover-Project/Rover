@@ -23,26 +23,30 @@ def updateGraph(frame):
 
     try:
         # Tenta pegar o dado mais atual
-        while lidar.get_out_buffer() >= 9:
+        if lidar.get_out_buffer() < 117:
             latest_data = lidar.get_read()
 
-        # Só processamos dist, stren e temp se latest_data existir
-        if latest_data is not None:
-            dist, stren, temp = latest_data
-            print(f"DISTANCIA: {dist}")
+            print(f"DEBUG: {latest_data}")
+            # Só processamos dist, stren e temp se latest_data existir
+            if latest_data is not None:
+                dist, stren, temp = latest_data
+                print(f"DISTANCIA: {dist}")
 
-            x_axisData.append(len(x_axisData))
-            dist_data.append(dist)
-            strength_data.append(stren)
-            temp_data.append(temp)
+                x_axisData.append(len(x_axisData))
+                dist_data.append(dist)
+                strength_data.append(stren)
+                temp_data.append(temp)
 
-            if len(x_axisData) > MAX_POINTS_GRAPH:
-                x_axisData.pop(0)
-                dist_data.pop(0)
-                strength_data.pop(0)
-                temp_data.pop(0)
-            
+                if len(x_axisData) > MAX_POINTS_GRAPH:
+                    x_axisData.pop(0)
+                    dist_data.pop(0)
+                    strength_data.pop(0)
+                    temp_data.pop(0)
+        else:    
             lidar.clean_out_buffer()
+            print("Limpei")
+        
+        
         
     except Exception as e:
         print(f"Erro: {e}")
