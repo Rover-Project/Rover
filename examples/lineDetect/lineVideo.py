@@ -9,17 +9,12 @@ from .lineDecision import decision
 import cv2 as openCV
 from pathlib import Path
 import numpy
+import math
 
 HEIGHT = 640
 WIDTH = 640
-
-# try:
-    #file = sys.argv[1]
-# except IndexError:
-    #print("vode nao passou o arquivo que deseja abrir")
-    #file = None
-    
-#path = Path(__file__).parent / "assets" / file # type: ignore
+start = False
+type = None
 
 try:
     picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
@@ -81,16 +76,17 @@ def extrair_coordenadas_plano(lines, image_shape):
             x1, y1, x2, y2 = map(int, coords[:4])
         else:
             continue
+        dx = x2 - x1
+        dy = y2 - y1
 
-        # Cálculo da inclinação (m)
-        # Se x2 - x1 for zero, a linha é vertical
-        if abs(x2 - x1) < 0.005: 
-            slope = 999 # Valor alto para representar verticalidade
-        else:
-            slope = (y2 - y1) / (x2 - x1)
- 
+        # Cálculo da inclinação
+        rad_angle = math.atan(dx, dy)
+        degree_angle = math.degrees(rad_angle)
+
+        abs_angle = degree_angle
+
         # linhas quase/ou horizontais (ruído, sombras, rachaduras).
-        if abs(slope) < 0.7:
+        if 30 > abs_angle or abs_angle > 160:
             print("Descartei") 
             continue
 
@@ -160,47 +156,29 @@ def lineDetectHough(img, isCut=False):
         for line in lines:
             x1, y1, x2, y2 = line[0]
 
-            declive = (x2 - x1)
+            dx = x2 - x1
+            dy = y2 - y1
 
-            # Evita divisão por 0
-            if declive < 0.1: 
-                slope = 777
-                # Vertical
-            
-            else: 
-                slope = (y2 - y1) / declive
+            rad_angle = math.atan(dy, dx)
+            degree_angle = math.degrees(rad_angle)
 
-                if abs(slope) > 0.6:
-                    ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
-                    openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            abs_angle = abs(degree_angle)
+            if 30 < abs_angle < 160:    
+
+                ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
+                openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
     
     return roi, img, numpy.array(ajustadas) if ajustadas else None
 
 if __name__ == "__main__":
         # incializando    
         memoria = memory(frames_number=10)
-        decisao = decision()
-        # video = openCV.VideoCapture(path)
-
-        # log das tomadas de decisao do rover
-        # log_file = open("rover_decision_log.csv", "w")
-        # log_file.write("timestamp, decisao, erro\n")
+        decisao = decision(HEIGHT, WIDTH)
 
         # *** LOOP ***
         while True:
-            # ret, frame = video.read()
-            # Pra manter videos em loop
-            # if not ret:
-                # video = openCV.VideoCapture(path)
-                # ontinue
-            frame = picam.getFrame() # carrega frame
+            frame = picam.get_frame() # carrega frame
 
-            frame = openCV.resize(
-                frame, 
-                (640, 640),
-                interpolation=openCV.INTER_CUBIC
-            )
-            # 
             roi, frame_linhas, hough_data = lineDetectHough(frame)
 
             y_max = frame.shape[0]           # Base da imagem
@@ -240,6 +218,20 @@ if __name__ == "__main__":
                 else:
                     print("Nao deu para detectar as faixas")
 
+                key = openCV.waitKey(10) & 0xFF
+
+                if key == ord('q'):
+                    break
+                
+                if key == ord('i'):
+                    start = True
+
+                if key == ord('r') and start:
+                    type = 'road'
+
+                if key == ord('l') and start:
+                    type = 'line'
+
                 # Sistema de Decisão
                 direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
 
@@ -263,13 +255,11 @@ if __name__ == "__main__":
 
                 # Desenho de um circulo para debug do centro da tela
                 if ponto_esq and ponto_dir:
-                    # O centro do frame(video5) esta levemente desalinhado com o do carro
-                    calibragem_offset = 47
+                
                     centro_cam = (frame.shape[1] / 2) 
                     centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
-                    centro_real_cam = int(centro_cam) - calibragem_offset # centro cam
 
-                    openCV.circle(result, (centro_real_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
+                    openCV.circle(result, (centro_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
                     openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
 
                 # Exibicao das telas
@@ -279,6 +269,5 @@ if __name__ == "__main__":
 
             key = openCV.waitKey(25)
             
-            if key == ord('q'):
-                break
+            
         openCV.destroyAllWindows()
