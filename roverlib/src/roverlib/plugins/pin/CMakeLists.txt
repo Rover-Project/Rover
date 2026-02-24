@@ -2,20 +2,29 @@ cmake_minimum_required(VERSION 4.1.2)
 
 project(pin)
 
-add_library(${PROJECT_NAME})
+set(PIN_LIB pin_lib)
+
+add_executable(${PROJECT_NAME} src/main.cpp)
+add_library(${PIN_LIB})
+
+target_source(
+    ${PROJECT_NAME} src/testLed.cpp
+)
 
 target_sources(
-    ${PROJECT_NAME}
-    PRIVATE 
+    ${PIN_LIB}
+    PRIVATE
         src/pin.cpp
 
-    PUBLIC 
+    PUBLIC
         FILE_SET HEADERS
         BASE_DIRS include
-        FILES 
+        FILES
 
             include/pin.hpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PIN_LIB})
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
