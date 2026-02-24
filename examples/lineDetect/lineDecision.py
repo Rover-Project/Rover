@@ -7,7 +7,7 @@ from pathlib import Path
 
 class decision:
     def __init__(self):
-        config = Config(Path, (__file__).parent / "config.yaml")
+        config = Config(Path(__file__).parent / "config.yaml")
         self.search_speed = 70
         self.motor_config = config.get("gpio")["motor"]
         self.x_speed = 40
