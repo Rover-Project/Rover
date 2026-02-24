@@ -11,8 +11,12 @@ from .lineDecision import decision
 import cv2 as openCV
 import numpy
 from pathlib import Path
+
 HEIGHT = 640
 WIDTH = 640
+start = False
+type = None
+
 
 try:
     picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
@@ -231,23 +235,7 @@ if __name__ == "__main__":
                     print("Nao deu para detectar as faixas")
 
                 # Sistema de Decisão
-                direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
-                correcao = int(abs(erro) * KP)
-
-                if direcao is "para":
-                    robot.stop()
-                    # implementar uma lógica que ele tenta identificar se é o final da pista ou
-                    # Se ele saiu da pista
-            
-                else:
-                    if erro > 0: 
-                        left = min(100, BASE_SPEED - correcao)
-                        right = max(0, BASE_SPEED + correcao)
-                    elif erro < 0: 
-                        left = max(0, BASE_SPEED + correcao)
-                        right = min(100, BASE_SPEED - correcao)
-
-                    robot.move(speed_left=left, speed_right=right)
+                direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir, type)
 
                 # Desenho do Painel de Log 
                 overlay = result.copy()
@@ -270,7 +258,6 @@ if __name__ == "__main__":
                 # Desenho de um circulo para debug do centro da tela
                 if ponto_esq and ponto_dir:
                     # O centro do frame(video5) esta levemente desalinhado com o do carro
-                    calibragem_offset = 47
                     centro_cam = (frame.shape[1] / 2) 
                     centro_poligono = int((ponto_esq[1][0] + ponto_dir[1][0]) / 2) # centro poligono
 
