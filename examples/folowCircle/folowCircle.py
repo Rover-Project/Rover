@@ -52,17 +52,18 @@ def inInterval(v1: numpy.ndarray, v2: numpy.ndarray, thers: float) -> bool:
 def folowCircle():
     HEIGHT = 640 # Altura da imagem 
     WIDTH = 640 # Largura da imagem
-    RED_THRES_LOW = 200000 # Limite inferior para a detecção de vermelho
-    RED_THRES_UPPER = 400000 # Limite superior para a detecção de vermelho
+    THRES_RED = 350_000 # Limite de proximidade para detectar a bola com base no raio máximo (pi * r²): r = 320
     CIRCLE_THRES = 40  # tolerância para considerar mesma circuferencia
     NO_DET_LIMIT = 10  # número máximo de frames sem detecção
-    BASE_SPEED = 60 # Velocidade base para controle
+    R_SPEED = 60 # Velocidade de investida para seguir a bola
+    X_SPEED = 40 # Velocidade para controle direcional no eixo X
     SEARCH_SPEED = 70
-    last_circle = None  # guarda o ulthimo circulo detectado
+    have_detect = False  # Verifica se já teve alguma detecção
     circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
     counterHistory = 0 # Quantidade de frames acumulados
     noDetCounter = 0 # contador para quantidade de frames sem detecção
     x_center = WIDTH // 2 # Centro do frame no eixo x
+    max_r =  min(WIDTH, HEIGHT) // 2 # Raio máximo
     pause = True # Varial para ativar os motores
     
     # Carrega configurações
@@ -81,10 +82,6 @@ def folowCircle():
     picam.set_contrast(camera_configs["contrast"])
 
     motor_config = config.get("gpio")["motor"]
-
-    # Configura motores
-    print(motor_config["left"])
-    print(motor_config["right"])
     
     robot = Robot(
         left=motor_config["left"], 
@@ -95,10 +92,17 @@ def folowCircle():
         )
     )
     
-    # Configura controlador PID
-    pid = PID(
-        kp=1, 
+    # Configura controlador PID para p eixo x
+    pid_x = PID(
+        kp=(X_SPEED / x_center),  # constante de normalização para a velociade de controle x
         ki=1, 
+        kd=1
+    )
+    
+    # Configura controlador PID para o tamanho do raio 
+    pid_r = PID(
+        kp=(R_SPEED / max_r),
+        ki=1,
         kd=1
     )
     
@@ -108,35 +112,37 @@ def folowCircle():
         
         mask = ProcessingImage.color_dual_segmentation(frame) # Aplica segmentação
         hough, _ = VisionModule.houghCircleDetect(mask) # Detecção via houghTransform
-        contorno = VisionModule.circleCannyDetect(mask) # Detecção, por meio das bordas e circularidade
+        contour =  VisionModule.circleCannyDetect(mask)  # Detecção, por meio das bordas e circularidade
+        
+        # Transforma em numpy array
+        hough = (numpy.array(hough) if hough is not None else None)
+        contour = (numpy.array(contour) if contour is not None else None) 
+
 
         # escolhe a melhor detecção entre hough e canny
-        if hough is not None and contorno is not None:
+        if hough is not None and contour is not None:
             det = voting(
-                numpy.array(hough), 
-                numpy.array(contorno)
-            )
+                hough, 
+                contour
+            )    
         elif hough is not None:
-            det = numpy.array(hough)
-        elif contorno is not None:
-            det = numpy.array(contorno)
+            det = hough
         else:
-            det = None
+            det = contour
 
         # Caso detecte um circulo
         if det is not None:
             noDetCounter = 0  # reset contador de frames sem detecção
-
+            have_detect = True # Passa para true, pois teve uma detecção
+            
             # Verifica a diferença na posição do circulo atual com os alteriores
             if circleHistory is None or not inInterval(det, circleHistory, CIRCLE_THRES):
                 circleHistory = det.copy() # Pega os dados do circulo
                 counterHistory = 1
                 
             else: # Incrementa a media acumulativa
-                circleHistory += det
+                circleHistory = (det + circleHistory) // 2 # Talves dê problema, mas vamo na fé
                 counterHistory += 1
-                
-            last_circle = circleHistory.copy() # captura o ultimo ciculo
 
         else: # Sem detecção de circulos
             noDetCounter += 1
@@ -146,19 +152,22 @@ def folowCircle():
 
         txt = "Nenhum circulo detectado"
         
-        if circleHistory is not None and counterHistory > 0:
-            x, y, r = (circleHistory // counterHistory)
-            error_x = x - x_center 
+        if circleHistory is not None:
+            x, y, r = circleHistory
+            error_x = x - x_center # Velocidade para centralizar a bola
+            error_r = r - max_r # Velocidade para correr atrás da bola
             
             # Controle dos motores caso tenha um cículo
-            speed_x =  pid.controller_P(abs(error_x)) * ((100 - BASE_SPEED) / x_center)  # Usando só o controle proporcional
-            right = (speed_x + BASE_SPEED if error_x < 0 else BASE_SPEED)
-            left = (speed_x + BASE_SPEED if error_x > 0 else BASE_SPEED)
+            speed_x =  pid_x.controller_P(abs(error_x)) # Usando só o controle proporcional
+            speed_r = pid_r.controller_P(abs(error_r))
+            
+            right = (speed_x + speed_r if error_x < 0 else speed_r)
+            left = (speed_x + speed_r if error_x > 0 else speed_r)
             
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-            txt = f"Error = {error_x} | left = {left} | right = {right}"
+            txt = f"Error em X = {error_x} | Error em R = {error_r} | left = {left} | right = {right}"
             
         openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
@@ -182,10 +191,15 @@ def folowCircle():
         if not pause:
             # Sem detectar circulos
             if circleHistory is None:
-                print(f"Area vermelha: {red_area}")                  
-                if last_circle is None:
+                print(f"Area vermelha: {red_area}")      
+                            
+                if not have_detect: # Não detectou nenhum circulo ainda
                     robot.turn_right(SEARCH_SPEED)
-                else:
+                    
+                elif red_area >= THRES_RED: # Verifica proximidade da bola com base na quantidade de vermelho
+                    robot.stop()
+                    
+                else: # Procura com base na ultima detecção
                     if error_x > 0:
                         robot.turn_left(SEARCH_SPEED) # Procura virando para a direita
                     else:
