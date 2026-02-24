@@ -1,7 +1,8 @@
 #include "../include/pin.hpp"
 #include <fstream>
-#include <unistd.h>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 void Pin::writeFile(const std::string& path, const std::string& value) {
     std::ofstream file(path);
@@ -28,7 +29,8 @@ Pin::Pin(int pin, PinMode mode) {
     // exportar pino
     writeFile("/sys/class/gpio/export", std::to_string(pinNumber));
 
-    usleep(100000); // espera o sistema criar o diretório
+    // espera o sistema criar o diretório
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // definir direção
     if (mode == OUTPUT) {
