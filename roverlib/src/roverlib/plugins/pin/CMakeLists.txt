@@ -4,12 +4,8 @@ project(pin)
 
 set(PIN_LIB pin_lib)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/testLed.cpp)
 add_library(${PIN_LIB})
-
-target_source(
-    ${PROJECT_NAME} src/testLed.cpp
-)
 
 target_sources(
     ${PIN_LIB}
