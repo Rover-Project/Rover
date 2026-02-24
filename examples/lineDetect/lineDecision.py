@@ -1,6 +1,6 @@
 from roverlib.modules.movement.PID import PID # type: ignore
 from roverlib.modules.movement.robot import Robot # type: ignore
-from roverlib.modules.movement.motorCalibration import Calibratiion # type: ignore
+from roverlib.modules.movement.motorCalibration import Calibration # type: ignore
 from roverlib.utils.config_manager import Config # type: ignore
 import time
 from pathlib import Path
@@ -23,7 +23,7 @@ class decision:
         self.robot = Robot(
             left=self.motor_config["left"], 
             right=self.motor_config["right"],
-            calibration=Calibratiion(
+            calibration=Calibration(
                 right=self.motor_config["calibration"]["right"],
                 left=self.motor_config["calibration"]["left"]
             )
