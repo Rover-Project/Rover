@@ -1,13 +1,15 @@
 #include "pin.hpp"
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 
 int main() {
     Pin led(15, OUTPUT);
 
     while (true) {
         led.write(1);
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
         led.write(0);
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
