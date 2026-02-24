@@ -159,7 +159,8 @@ def folowCircle():
             
             # Controle dos motores caso tenha um cículo
             speed_x =  pid_x.controller_P(abs(error_x)) # Usando só o controle proporcional
-            speed_r = pid_r.controller_P(abs(error_r))
+            
+            speed_r = (pid_r.controller_P(abs(error_r)) if r <= max_r - 60 else 0)
             
             right = (speed_x + speed_r if error_x < 0 else speed_r)
             left = (speed_x + speed_r if error_x > 0 else speed_r)
