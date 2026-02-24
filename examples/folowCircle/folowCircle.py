@@ -169,7 +169,7 @@ def folowCircle():
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
             txt = f"Error em X = {error_x} | Error em R = {error_r} | left = {left} | right = {right}"
             
-        openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+        openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
         openCv.imshow("Mascara", mask)
 
