@@ -167,7 +167,7 @@ def folowCircle():
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-            txt = f"Error em X = {error_x} | Error em R = {error_r} | left = {left} | right = {right}"
+            txt = f"Error em X = {error_x} | Error em R = {error_r} | R = {r}"
             
         openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
