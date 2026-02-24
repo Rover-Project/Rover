@@ -3,10 +3,10 @@
 # Adicionar mascara de cor como pre-processamento
 
 # Adiciona a pasta 'Rover' principal ao caminho de busc
-from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.camera import Camera # type: ignore
 from .lineMemory import memory
 from .lineDecision import decision
-import cv2 as openCV
+import cv2 as openCV # type: ignore
 from pathlib import Path
 import numpy
 import math
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                 # Quit --- fecha o programa
                 if key == ord('q'):
                     break
-                
+
                 # start --- começa o programa
                 if key == ord('s'):
                     start = True
