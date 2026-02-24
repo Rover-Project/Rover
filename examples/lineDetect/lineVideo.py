@@ -173,7 +173,7 @@ def lineDetectHough(img, isCut=False):
 if __name__ == "__main__":
         # incializando    
         memoria = memory(frames_number=10)
-        decisao = decision(HEIGHT, WIDTH)
+        decisao = decision()
 
         # *** LOOP ***
         while True:
