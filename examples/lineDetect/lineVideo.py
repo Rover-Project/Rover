@@ -266,7 +266,7 @@ if __name__ == "__main__":
                     openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
 
                 # Exibicao das telas
-                openCV.imshow("Navegacao Rover", result)
+            openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
             
         openCV.destroyAllWindows()
