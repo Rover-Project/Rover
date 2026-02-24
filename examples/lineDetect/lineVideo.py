@@ -220,20 +220,24 @@ if __name__ == "__main__":
 
                 key = openCV.waitKey(10) & 0xFF
 
+                # Quit --- fecha o programa
                 if key == ord('q'):
                     break
                 
-                if key == ord('i'):
+                # start --- começa o programa
+                if key == ord('s'):
                     start = True
 
+                # road --- road mode
                 if key == ord('r') and start:
                     type = 'road'
 
+                # line --- line mode
                 if key == ord('l') and start:
                     type = 'line'
 
                 # Sistema de Decisão
-                direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir)
+                direcao, erro = decisao.decide(frame, ponto_esq, ponto_dir, type)
 
                 # Desenho do Painel de Log 
                 overlay = result.copy()
@@ -244,8 +248,7 @@ if __name__ == "__main__":
                 openCV.putText(result, f"Status: {direcao}", (20, 40), 
                             openCV.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
-                distancia = erro
-                openCV.putText(result, f"{distancia:.1f} de erro", (20, 80), 
+                openCV.putText(result, f"{erro:.1f} de erro", (20, 80), 
                             openCV.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1)
 
                 cor_status = (0, 255, 0) if abs(erro) < 20 else (0, 0, 255)
@@ -265,9 +268,5 @@ if __name__ == "__main__":
                 # Exibicao das telas
                 openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
-                # log_file.write(f"{time.time()},{direcao},{erro}\n")
-
-            key = openCV.waitKey(25)
-            
             
         openCV.destroyAllWindows()

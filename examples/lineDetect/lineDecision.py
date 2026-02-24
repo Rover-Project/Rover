@@ -35,14 +35,19 @@ class decision:
             kd=1
         )
 
-    def decide(self, frame, left_line, right_line, type: str ="road"):
+    def decide(self, frame, left_line, right_line, type: str):
         # Não encontrou linha em nenhum dos lados
+        if not type:
+            return "Selecione um modo", 0
+
         if left_line is None and right_line is None:
             if not self.history:
                 self.robot.turn_right(self.search_speed)
+                return "perdido", 0
 
             else:
                 self.robot.backfowards(self.x_speed, 2)
+                return "Voltando", 0
         
         else:
             if len(self.history) > self.max_history:
@@ -54,7 +59,7 @@ class decision:
         if type == "road":
             if left_line and right_line:
                 center_road = (left_line[1][0] + right_line[1][0]) / 2
-
+                
             elif left_line and not right_line:
                 center_road = left_line[1][0] + 100
 
@@ -70,7 +75,22 @@ class decision:
             self.right_s = (self.x_speed - adjustment)
 
         elif type == "line": 
-            pass
+            # passa a linha que ele considerar existente 
+            # para não alterar a lógica de args
+            targent_line = left_line if left_line else right_line
+
+            if targent_line:
+                center_line = targent_line[1][0]
+                erro = center_cam - center_line
+
+                adjustment = self.pid_x.controller_P(erro)
+
+                self.left_s = (self.x_speed - adjustment)
+                self.right_s = (self.x_speed + adjustment)
+
+            else: 
+                print("Não foi possível formar target_line")
+                return "perdido", 0
 
         self.robot.move(speed_left=self.left_s, speed_right=self.right_s)
         direcao = "Frente" if erro < 10 and erro > -10 else ("Direita" if erro < 0 else "Esquerda")
