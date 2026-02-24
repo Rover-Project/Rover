@@ -7,8 +7,8 @@ camera:
 
 gpio:
   motor:
-    right: [12, 11] # in3, in4
-    left: [15, 16] # in1, in2
+    right: [15, 16] # in3, in4
+    left: [12, 11] # in1, in2
     calibration:
       right: 1
       left: 1

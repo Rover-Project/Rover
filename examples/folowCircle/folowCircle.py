@@ -63,7 +63,7 @@ def folowCircle():
     counterHistory = 0 # Quantidade de frames acumulados
     noDetCounter = 0 # contador para quantidade de frames sem detecção
     x_center = WIDTH // 2 # Centro do frame no eixo x
-    max_r =  min(WIDTH, HEIGHT) // 2 # Raio máximo
+    max_r =  min(WIDTH, HEIGHT) # Raio máximo
     pause = True # Varial para ativar os motores
     
     # Carrega configurações
