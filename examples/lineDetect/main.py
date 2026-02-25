@@ -157,7 +157,7 @@ def lineDetectHough(img, isCut=False):
             dx = x2 - x1
             dy = y2 - y1
 
-            rad_angle = math.atan(dy, dx)
+            rad_angle = math.atan2(dy, dx)
             degree_angle = math.degrees(rad_angle)
 
             abs_angle = abs(degree_angle)
