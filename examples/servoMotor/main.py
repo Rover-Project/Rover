@@ -2,19 +2,19 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(10, GPIO.OUT)
+GPIO.setup(15, GPIO.OUT)
 
 # Cria PWM em 50Hz (servo padrão)
-pwm = GPIO.PWM(10, 50)
+pwm = GPIO.PWM(15, 50)
 pwm.start(0)
 
 def set_angle(angle):
     # Converte ângulo (0–180) em duty cycle
     duty = 2 + (angle / 18)
-    GPIO.output(10, True)
+    GPIO.output(15, True)
     pwm.ChangeDutyCycle(duty)
     time.sleep(0.5)
-    GPIO.output(10, False)
+    GPIO.output(15, False)
     pwm.ChangeDutyCycle(0)
 
 try:
