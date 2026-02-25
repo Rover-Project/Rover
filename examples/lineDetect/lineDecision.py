@@ -35,12 +35,12 @@ class decision:
             kd=1
         )
 
-    def decide(self, frame, lr_lines: tuple, target_line, type: str):
+    def decide(self, frame, lr_lines: tuple, target_line, drive_mode: str):
         left_line = lr_lines[0]
         right_line = lr_lines[1]
 
         # Não encontrou linha em nenhum dos lados
-        if not type:
+        if not drive_mode:
             return "Selecione um modo", 0
         
         else:
@@ -50,7 +50,7 @@ class decision:
                 center_cam = frame.shape[1] / 2
 
         # Duas linhas paralelas (Estrada)
-        if type == "road":
+        if drive_mode == "road":
 
             if left_line is None and right_line is None:
                 if not self.history:
@@ -78,7 +78,7 @@ class decision:
             self.left_s = (self.x_speed + adjustment)
             self.right_s = (self.x_speed - adjustment)
 
-        elif type == "line": 
+        elif drive_mode == "line": 
             # passa a linha que ele considerar existente 
             # para não alterar a lógica de args
 
