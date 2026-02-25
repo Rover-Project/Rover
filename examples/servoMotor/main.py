@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(18, GPIO.OUT)
+GPIO.setup(10, GPIO.OUT)
 
 # Cria PWM em 50Hz (servo padrão)
 pwm = GPIO.PWM(10, 50)
