@@ -195,27 +195,26 @@ if __name__ == "__main__":
             
             # Requisita que seja dado o start e que um type seja selecionado
             # Apertar 's' e depois 'r' ou 'l'
-            while not drive_mode:
-                # Quit --- fecha o programa
-                if key == ord('q'):
-                    break
-
                 # start --- começa o programa
-                if key == ord('s'):
-                    start = True
+            if key == ord('s'):
+                start = True
+                print("Rover has been started")
 
-                # change --- Define type para None, permitindo a troca de modo de pista
-                if key == ord('c'):
-                    drive_mode = None
-                    start = False
+            # change --- Define type para None, permitindo a troca de modo de pista
+            if key == ord('c') and start:
+                drive_mode = None
+                start = False
+                print("drive mode resetado")
 
-                # road --- road mode
-                if key == ord('r') and start:
-                    drive_mode = 'road'
+            # road --- road mode
+            if key == ord('r') and start:
+                drive_mode = 'road'
+                print("drive mode = road")
 
-                # line --- line mode
-                if key == ord('l') and start:
-                    drive_mode = 'line'
+            # line --- line mode
+            if key == ord('l') and start:
+                drive_mode = 'line'
+                print("drive mode = line")
 
             # Saiu do loop de selecao de modo, verifica qual type foi escolhido e executa o script apartir disso
 
@@ -313,4 +312,9 @@ if __name__ == "__main__":
             openCV.imshow("Navegacao Rover", result)
             openCV.imshow("ROI", roi)
             
+            # --- ADICIONE ESTA PARTE AQUI ---
+            # Verifica se a tecla 'q' foi pressionada para sair do loop principal
+            if openCV.waitKey(1) & 0xFF == ord('q'):
+                break
+
         openCV.destroyAllWindows()
