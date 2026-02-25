@@ -5,7 +5,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 
 # Cria PWM em 50Hz (servo padrão)
-pwm = GPIO.PWM(18, 50)
+pwm = GPIO.PWM(10, 50)
 pwm.start(0)
 
 def set_angle(angle):
