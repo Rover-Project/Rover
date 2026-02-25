@@ -44,10 +44,16 @@ class decision:
             if lr_lines:
                 left_line = lr_lines[0]
                 right_line = lr_lines[1]
-            if len(self.history) > self.max_history:
-                self.history.pop(0)
-                self.history.append((left_line, right_line))
-                center_cam = frame.shape[1] / 2
+
+                if len(self.history) > self.max_history:
+                    self.history.pop(0)
+                    self.history.append((left_line, right_line))
+                    center_cam = frame.shape[1] / 2
+            
+            else: 
+                left_line = None
+                right_line = None
+                
 
         # Duas linhas paralelas (Estrada)
         if drive_mode == "road":

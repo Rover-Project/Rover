@@ -159,10 +159,12 @@ def lineDetectHough(img, isCut=False):
 
             rad_angle = math.atan2(dy, dx)
             degree_angle = math.degrees(rad_angle)
+            print("Verificando angulo")
 
             abs_angle = abs(degree_angle)
             if 30 < abs_angle < 160:    
 
+                print("Achei uma linha")
                 ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
                 openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
     
