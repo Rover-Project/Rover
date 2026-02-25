@@ -235,7 +235,7 @@ if __name__ == "__main__":
                     error = False 
                 except Exception as e:
                     error = True
-                    result = frame # Garante que result(um dos frames exibidos pelo opencv) chega no fim do script
+                    result = frame_linhas # Garante que result(um dos frames exibidos pelo opencv) chega no fim do script
                     print(f"Não foi possível extrair as coordenadas das linhas {e}")
                     
                 if not error:
@@ -254,8 +254,6 @@ if __name__ == "__main__":
                         left_point = []
                         right_point = []
                         print(f"Não foi possível definir line_points {e}")
-
-                    result = frame.copy() 
 
                     if left_point and right_point:
                         # Desenho do plano verde
@@ -277,7 +275,9 @@ if __name__ == "__main__":
                 except Exception as e:
                     error = True
                     print(f"Não foi possível extrair as coordenadas das linhas {e}")
-                
+
+                result = frame_linhas
+
                 if not error:
                     try: 
                         line_points = cat_x_linepoints(y_min, y_max, line_avg)
@@ -286,6 +286,10 @@ if __name__ == "__main__":
                         line_points = None
                         print(f"Não foi possível definir line_points {e}")
 
+                    if line_points:
+                        # Desenha a linha mestra se quiser
+                        openCV.line(result, tuple(line_points[0]), tuple(line_points[1]), (255, 0, 0), 5)
+                        
                 else:
                     print("Não foi possível detectar a linha")
 
