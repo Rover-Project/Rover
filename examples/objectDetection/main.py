@@ -26,7 +26,7 @@ while True:
     try:
         frame = picam.get_frame()
 
-        results = model(frame, conf=0.5, stream=True)
+        results = model(frame, conf=0.5)
 
         noted_frame = results[0].plot()
 
