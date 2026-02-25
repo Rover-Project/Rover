@@ -30,6 +30,6 @@ int main() {
 
     std::cout << "Encerrando e liberando GPIO...\n";
 
-    inputThread.join();  // <-- CORRETO
+    inputThread.join();
     return 0;
 }
