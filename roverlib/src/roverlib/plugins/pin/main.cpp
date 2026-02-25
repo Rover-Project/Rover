@@ -1,84 +1,97 @@
-#include <iostream>
+#include "../include/pin.hpp"
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <thread>
 #include <chrono>
+#include <filesystem>
 
-// ================= ENUM =================
-enum PinMode {
-    INPUT,
-    OUTPUT
-};
+int bcmToKernel(int bcm) {
+    return bcm + 571; // base do gpiochip0 no Raspberry Pi 5
+}
 
-// ================= CLASSE =================
-class Pin {
-private:
-    int pinNumber;
-    PinMode mode;
-    std::string gpioPath;
+bool pathExists(const std::string& path) {
+    return std::filesystem::exists(path);
+}
 
-    void writeFile(const std::string& path, const std::string& value) {
-        std::ofstream file(path);
-        if (!file) {
-            std::cerr << "Erro ao abrir " << path << "\n";
-            return;
-        }
-        file << value;
+void Pin::writeFile(const std::string& path, const std::string& value) {
+    std::ofstream file(path);
+
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir " << path 
+                  << " (talvez precise de sudo)\n";
+        return;
     }
 
-    std::string readFile(const std::string& path) {
-        std::ifstream file(path);
-        std::string value;
-        file >> value;
-        return value;
+    file << value;
+    file.flush();
+}
+
+std::string Pin::readFile(const std::string& path) {
+    std::ifstream file(path);
+    std::string value;
+
+    if (!file.is_open()) {
+        std::cerr << "Erro ao ler " << path << "\n";
+        return "";
     }
 
-public:
-    Pin(int pin, PinMode mode) {
-        this->pinNumber = pin;
-        this->mode = mode;
+    file >> value;
+    return value;
+}
 
-        gpioPath = "/sys/class/gpio/gpio" + std::to_string(pinNumber);
+Pin::Pin(int pin, PinMode mode) {
+    this->pinNumber = pin;
+    this->mode = mode;
+    this->kernelPin = bcmToKernel(pinNumber);
 
-        // exporta pino
-        writeFile("/sys/class/gpio/export", std::to_string(pinNumber));
+    gpioPath = "/sys/class/gpio/gpio" + std::to_string(kernelPin);
 
-        // espera o sistema criar o diretório
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        // define direção
-        if (mode == OUTPUT) {
-            writeFile(gpioPath + "/direction", "out");
-        } else {
-            writeFile(gpioPath + "/direction", "in");
-        }
+    // Exporta somente se ainda não existir
+    if (!pathExists(gpioPath)) {
+        writeFile("/sys/class/gpio/export", std::to_string(kernelPin));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
-    ~Pin() {
-        writeFile("/sys/class/gpio/unexport", std::to_string(pinNumber));
+    // Define direção
+    if (mode == OUTPUT) {
+        writeFile(gpioPath + "/direction", "out");
+    } else {
+        writeFile(gpioPath + "/direction", "in");
+    }
+}
+
+Pin::~Pin() {
+    // Só desexporta se existir
+    if (pathExists(gpioPath)) {
+        writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
+    }
+}
+
+void Pin::write(int value) {
+    if (mode != OUTPUT) {
+        std::cerr << "Erro: pino não é OUTPUT\n";
+        return;
     }
 
-    void write(int value) {
-        if (mode != OUTPUT) {
-            std::cerr << "Erro: pino não é OUTPUT\n";
-            return;
-        }
-        writeFile(gpioPath + "/value", std::to_string(value));
-    }
+    writeFile(gpioPath + "/value", std::to_string(value));
+}
 
-    int read() {
-        std::string val = readFile(gpioPath + "/value");
-        try {
-            return std::stoi(val);
-        } catch (...) {
-            return -1;
-        }
-    }
-};
+int Pin::read() {
+    std::string val = readFile(gpioPath + "/value");
 
-// ================= MAIN =================
+    try {
+        return std::stoi(val);
+    } catch (...) {
+        std::cerr << "Erro ao converter leitura do pino\n";
+        return -1;
+    }
+}
+
+// ================= MAIN DE TESTE =================
 int main() {
-    // GPIO 15 = pino físico 10
+    std::cout << "Iniciando teste de GPIO...\n";
+
+    // GPIO BCM 15 = pino físico 10
     Pin led(15, OUTPUT);
 
     while (true) {

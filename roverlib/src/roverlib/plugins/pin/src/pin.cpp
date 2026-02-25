@@ -4,6 +4,10 @@
 #include <thread>
 #include <chrono>
 
+int bcmToKernel(int bcm) {
+    return bcm + 571;
+}
+
 void Pin::writeFile(const std::string& path, const std::string& value) {
     std::ofstream file(path);
     if (!file) {
@@ -24,15 +28,14 @@ Pin::Pin(int pin, PinMode mode) {
     this->pinNumber = pin;
     this->mode = mode;
 
-    gpioPath = "/sys/class/gpio/gpio" + std::to_string(pinNumber);
+    this->kernelPin = bcmToKernel(pinNumber);
 
-    // exportar pino
-    writeFile("/sys/class/gpio/export", std::to_string(pinNumber));
+    gpioPath = "/sys/class/gpio/gpio" + std::to_string(kernelPin);
 
-    // espera o sistema criar o diretório
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    writeFile("/sys/class/gpio/export", std::to_string(kernelPin));
 
-    // definir direção
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
     if (mode == OUTPUT) {
         writeFile(gpioPath + "/direction", "out");
     } else {
@@ -41,7 +44,7 @@ Pin::Pin(int pin, PinMode mode) {
 }
 
 Pin::~Pin() {
-    writeFile("/sys/class/gpio/unexport", std::to_string(pinNumber));
+    writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
 }
 
 void Pin::write(int value) {
@@ -55,5 +58,9 @@ void Pin::write(int value) {
 
 int Pin::read() {
     std::string val = readFile(gpioPath + "/value");
-    return std::stoi(val);
+    try {
+        return std::stoi(val);
+    } catch (...) {
+        return -1;
+    }
 }
