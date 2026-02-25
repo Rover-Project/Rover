@@ -168,8 +168,6 @@ def lineDetectHough(img, isCut=False):
             if 30 < abs_angle < 160:    
                 ajustadas.append([[x1, y1 + y_offset, x2, y2 + y_offset]])
                 openCV.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            else: 
-                print(f"Linha ignorada: Angulo {abs_angle:.1f}")
                 
     return roi, img, numpy.array(ajustadas) if ajustadas else None
 
