@@ -36,13 +36,17 @@ class decision:
         )
 
     def decide(self, frame, lr_lines: tuple, target_line, drive_mode: str):
+        if not lr_lines:
+            print("Não foi iniciado ou não está identifcando linhas")
+            return "Perdido ou não inicado", 0
+
         left_line = lr_lines[0]
         right_line = lr_lines[1]
 
         # Não encontrou linha em nenhum dos lados
         if not drive_mode:
             return "Selecione um modo", 0
-        
+
         else:
             if len(self.history) > self.max_history:
                 self.history.pop(0)
