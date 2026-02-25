@@ -35,19 +35,13 @@ class decision:
             kd=1
         )
 
-    def decide(self, frame, left_line, right_line, type: str):
+    def decide(self, frame, lr_lines: tuple, target_line, type: str):
+        left_line = lr_lines[0]
+        right_line = lr_lines[1]
+
         # Não encontrou linha em nenhum dos lados
         if not type:
             return "Selecione um modo", 0
-
-        if left_line is None and right_line is None:
-            if not self.history:
-                self.robot.turn_right(self.search_speed)
-                return "perdido", 0
-
-            else:
-                self.robot.backfowards(self.x_speed, 2)
-                return "Voltando", 0
         
         else:
             if len(self.history) > self.max_history:
@@ -57,6 +51,16 @@ class decision:
 
         # Duas linhas paralelas (Estrada)
         if type == "road":
+
+            if left_line is None and right_line is None:
+                if not self.history:
+                    self.robot.turn_right(self.search_speed)
+                    return "perdido", 0
+
+                else:
+                    self.robot.backfowards(self.x_speed, 2)
+                    return "Voltando", 0
+                
             if left_line and right_line:
                 center_road = (left_line[1][0] + right_line[1][0]) / 2
                 
@@ -77,10 +81,9 @@ class decision:
         elif type == "line": 
             # passa a linha que ele considerar existente 
             # para não alterar a lógica de args
-            targent_line = left_line if left_line else right_line
 
-            if targent_line:
-                center_line = targent_line[1][0]
+            if target_line:
+                center_line = target_line[1][0]
                 erro = center_cam - center_line
 
                 adjustment = self.pid_x.controller_P(erro)

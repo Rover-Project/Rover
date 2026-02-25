@@ -9,7 +9,7 @@ from pathlib import Path
 script_dir = Path(__file__).parent
 
 # Monta o caminho para a foto na mesma pasta do script
-img_path = str(script_dir / "assets/foto4.jpg")
+img_path = str(script_dir / "foto.jpg")
 
 results = model(img_path, save=True, conf=0.25)
 

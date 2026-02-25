@@ -22,6 +22,8 @@ picam.set_contrast(camera_configs["contrast"])
 
 model = YOLO("yolov8n.pt")
 
+model.export(format="ncnn")
+
 while True:
     try:
         frame = picam.get_frame()

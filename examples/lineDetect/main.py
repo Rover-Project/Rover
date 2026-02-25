@@ -9,12 +9,13 @@ import math
 HEIGHT = 640 # Altura da camera
 WIDTH = 640 # Comprimento da camera
 start = False # Flag para controlar o inicio do movimento do Rover
-type = None # Flag para controlar o modelo de pista que o Rover deve esperar
+drive_mode = None # Flag para controlar o modelo de pista que o Rover deve esperar
 left_avg = None
 right_avg = None
 right_point = None
 left_point = None
 all_points = None
+target_line = None
 
 try:
     picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
@@ -24,7 +25,7 @@ except:
     pass
 
 # Funcao que limita a area utilizada para desenho das linhas
-def roi_definition(img, type):
+def roi_definition(img):
     height, width = img.shape[:2]
 
     # Definição do ROI(Region of Interest) (Ajustavel de acordo com a camera e ambiente)
@@ -49,14 +50,16 @@ def roi_definition(img, type):
     return mask_img
 
 # Extrai as coordenadas a partir das linhas para desenho do poligono (Regiao dirigivel dentro do ROI)
-def extract_coords(lines, image_shape):
+def extract_coords(lines, drive_mode: str, image_shape):
     # lists para os pontos das linhas na esquerda e direita
     left_pts = []
     right_pts = []
-    
-    if lines is None: return None
+    line_pts = []
+
+    if lines is None or not drive_mode: return None
 
     for line in lines:
+
         # Muda as dimensoes do array de forma automatica (param -> -1)
         coords = line.reshape(-1)
         if len(coords) >= 4:
@@ -64,6 +67,7 @@ def extract_coords(lines, image_shape):
             x1, y1, x2, y2 = map(int, coords[:4])
         else:
             continue
+
         dx = x2 - x1
         dy = y2 - y1
 
@@ -77,22 +81,28 @@ def extract_coords(lines, image_shape):
         if 30 > abs_angle or abs_angle > 160:
             print("Descartei") 
             continue
-
+        
         parameters = numpy.polyfit((x1, x2), (y1, y2), 1) # retorna n + 1 coeficientes para um angulo n (1 nesse caso) polinomial
         slope = parameters[0] # inclinacao da reta
         intercept = parameters[1]  # Onde a linha toca o eixo x(Ajuda separar linha da esquerda da linha da direita)
-        
-        if slope < 0:
-            left_pts.append((slope, intercept))
-        else:
-            right_pts.append((slope, intercept))
 
-    # Tira a média de todas as linhas da esquerda e todas da direita
-    left_avg = numpy.average(left_pts, axis=0) if left_pts else None
-    right_avg = numpy.average(right_pts, axis=0) if right_pts else None
+        if drive_mode == 'road':
+            if slope < 0:
+                left_pts.append((slope, intercept))
+            else:
+                right_pts.append((slope, intercept))
+
+            # Tira a média de todas as linhas da esquerda e todas da direita
+            left_avg = numpy.average(left_pts, axis=0) if left_pts else None
+            right_avg = numpy.average(right_pts, axis=0) if right_pts else None
+            
+            return left_avg, right_avg
     
-    return left_avg, right_avg
-
+        else:
+            line_pts.append((slope, intercept))
+            line_avg = numpy.average(line_pts, axis=0) if line_pts else None
+            return line_avg
+        
 def cat_x_linepoints(y_min, y_max, line_parameters):
     if line_parameters is None: return None
 
@@ -185,7 +195,7 @@ if __name__ == "__main__":
             
             # Requisita que seja dado o start e que um type seja selecionado
             # Apertar 's' e depois 'r' ou 'l'
-            while not type:
+            while not drive_mode:
                 # Quit --- fecha o programa
                 if key == ord('q'):
                     break
@@ -194,15 +204,23 @@ if __name__ == "__main__":
                 if key == ord('s'):
                     start = True
 
+                # change --- Define type para None, permitindo a troca de modo de pista
+                if key == ord('c'):
+                    drive_mode = None
+                    start = False
+
                 # road --- road mode
                 if key == ord('r') and start:
-                    type = 'road'
+                    drive_mode = 'road'
 
                 # line --- line mode
                 if key == ord('l') and start:
-                    type = 'line'
+                    drive_mode = 'line'
+
             # Saiu do loop de selecao de modo, verifica qual type foi escolhido e executa o script apartir disso
-            if type == 'road':
+
+            # TYPE == ROAD
+            if drive_mode == 'road':
 
                 # Tenta pegar a posicao media das linhas a partir da hough_data
                 try:
@@ -210,7 +228,7 @@ if __name__ == "__main__":
                     error = False 
                 except Exception as e:
                     error = True
-                    print("deu errado")
+                    print(f"Não foi possível extrair as coordenadas das linhas {e}")
                     
                 if not error:
                     try:
@@ -218,34 +236,52 @@ if __name__ == "__main__":
                         left_avg = memoria.suavizar(left_avg, "left") 
                         right_avg = memoria.suavizar(right_avg, "right")
 
-                        # usa funcao da r= Noneeta reorganizada nao depender do que o Rover ve logo a sua frente, apenas
-                        left_point = None = cat_x_linepoints(y_min, y_max, left_avg)
+                        # usa funcao da reta reorganizada nao depender do que o Rover ve logo a sua frente, apenas
+                        left_point = cat_x_linepoints(y_min, y_max, left_avg)
                         right_point = cat_x_linepoints(y_min, y_max, right_avg)
                         all_points = (left_point, right_point)
                     except Exception as e:
                         left_avg = memoria.suavizar(left_avg, "left")
                         right_avg = memoria.suavizar(right_avg, "right")
-                        left_point = None = []
+                        left_point = []
                         right_point = []
-                        print(e)
+                        print(f"Não foi possível definir line_points {e}")
 
                     result = frame.copy() 
 
                     if left_point and right_point:
-                        # Desenho do plano verde= None
+                        # Desenho do plano verde
                         pts = numpy.array([left_point[0], right_point[0], right_point[1], left_point[1]], numpy.int32)
                         mask = numpy.zeros_like(frame)
                         openCV.fillPoly(mask, [pts], (0, 255, 0))
+
                         # Aplica o plano sobre o frame
                         result = openCV.addWeighted(frame, 1, mask, 0.4, 0)
                     else:
                         print("Nao deu para detectar as faixas")
             
-            if type == 'line':
-                pass
+            if drive_mode == 'line':
+                try:
+                    line_avg = extract_coords(hough_data, drive_mode, frame_shape)
+                    error = False
+                
+                except Exception as e:
+                    error = True
+                    print(f"Não foi possível extrair as coordenadas das linhas {e}")
+                
+                if not error:
+                    try: 
+                        line_points = cat_x_linepoints(y_min, y_max, line_avg)
+                    
+                    except Exception as e:
+                        line_points = None
+                        print(f"Não foi possível definir line_points {e}")
 
-            # Sistema de Decisão= None
-            direcao, erro = decisao.decide(frame, all_points, type)
+                else:
+                    print("Não foi possível detectar a linha")
+
+            # decisão do Rover
+            direcao, erro = decisao.decide(frame, all_points, target_line, drive_mode)
 
             # Desenho do Painel de Log 
             overlay = result.copy()
@@ -264,11 +300,11 @@ if __name__ == "__main__":
             openCV.putText(result, label_status, (20, 110), 
                         openCV.FONT_HERSHEY_SIMPLEX, 0.5, cor_status, 2)
 
-            # Desenho de um circ= Noneulo para debug do centro da tela
-            if left_point and right_point:
+            # Desenho de um circulo para debug do centro da tela
+            if left_point and right_point or line_points:
             
                 centro_cam = (frame.shape[1] / 2)
-                centro_poligono = int((left_point[1][0] + right_point[1][0]) / 2) # centro poligo
+                centro_poligono = int((left_point[1][0] + right_point[1][0]) / 2 if not line_points else line_points[1][0]) # centro poligo
 
                 openCV.circle(result, (centro_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
                 openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada
