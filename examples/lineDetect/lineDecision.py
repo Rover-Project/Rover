@@ -35,7 +35,7 @@ class decision:
             kd=1
         )
 
-    def decide(self, frame, left_line, right_line, type: str):
+    def decide(self, frame, points, type: str):
         # Não encontrou linha em nenhum dos lados
         if not type:
             return "Selecione um modo", 0
