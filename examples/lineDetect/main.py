@@ -227,6 +227,7 @@ if __name__ == "__main__":
                     error = False 
                 except Exception as e:
                     error = True
+                    result = frame # Garante que result(um dos frames exibidos pelo opencv) chega no fim do script
                     print(f"Não foi possível extrair as coordenadas das linhas {e}")
                     
                 if not error:
