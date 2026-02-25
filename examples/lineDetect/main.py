@@ -258,6 +258,7 @@ if __name__ == "__main__":
                         result = openCV.addWeighted(frame, 1, mask, 0.4, 0)
                     else:
                         print("Nao deu para detectar as faixas")
+                        result = frame
             
             if drive_mode == 'line':
                 try:
