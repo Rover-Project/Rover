@@ -12,7 +12,7 @@ start = False # Flag para controlar o inicio do movimento do Rover
 drive_mode = None # Flag para controlar o modelo de pista que o Rover deve esperar
 
 try:
-    picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
+    picam = Camera(HEIGHT, WIDTH,verticalFlip=True) # Inicia a camera 
     picam.start()
 except:
     #picam = Webcam(HEIGHT, WIDTH)
