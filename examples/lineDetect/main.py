@@ -24,11 +24,13 @@ def roi_definition(img):
 
     # Definição do ROI(Region of Interest) (Ajustavel de acordo com a camera e ambiente)
     # Topo = Quanto maior o valor, mais baixo o Poligono
-    bottom_left  = [width * 0.9, height]      # Canto inferior esquerdo 
-    top_left     = [width * 0.65, height * 0.6] # Topo esquerdo 
-    top_right    = [width * 0.65, height * 0.6] # Topo direito
-    bottom_right = [width * 0.9, height]      # Canto inferior direito
+    # LADO ESQUERDO (Valores baixos de Width)
+    bottom_left  = [width * 0.1, height]       # Canto inferior esquerdo
+    top_left     = [width * 0.4, height * 0.6] # Topo esquerdo (mais para o centro)
 
+    # LADO DIREITO (Valores altos de Width)
+    top_right    = [width * 0.6, height * 0.6] # Topo direito (mais para o centro)
+    bottom_right = [width * 0.9, height]
     # Forma o poligono de acordo com as medidas do ROI
     poligono = numpy.array([[bottom_left, top_left, top_right, bottom_right]], dtype=numpy.int32)
 
@@ -142,8 +144,8 @@ def lineDetectHough(img, isCut=False):
         roi,
         rho=2,
         theta=numpy.pi / 180,
-        threshold=60,
-        minLineLength=65,
+        threshold=30,
+        minLineLength=30,
         maxLineGap=175
     )
 
