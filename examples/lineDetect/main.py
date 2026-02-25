@@ -10,12 +10,6 @@ HEIGHT = 640 # Altura da camera
 WIDTH = 640 # Comprimento da camera
 start = False # Flag para controlar o inicio do movimento do Rover
 drive_mode = None # Flag para controlar o modelo de pista que o Rover deve esperar
-left_avg = None
-right_avg = None
-right_point = None
-left_point = None
-all_points = None
-target_line = None
 
 try:
     picam = Camera(HEIGHT, WIDTH) # Inicia a camera 
@@ -182,6 +176,18 @@ if __name__ == "__main__":
         # *** LOOP ***
         while True:
             frame = picam.get_frame() # carrega frame
+
+            # --- INICIALIZAÇÃO DE FALLBACK ---
+            left_avg = None # Media das linhas a esquerda (road mode)
+            right_avg = None # Media das linhas a direita (road mode)
+            right_point = None # Pontos a direita pro desenho da região dirigivel
+            left_point = None # Pontos a esquerda pro desenho da região dirigivel
+            target_line = None # Linha que o Rover deve se manter (line mode)
+            result = frame.copy()  # Garante que 'result' sempre exista
+            all_points = None # futura tupla pra guardar right e left points
+            line_points = None # guarda os pontos da linha
+            direcao, erro = "Aguardando", 0 # Define uma direção e valor de erro padrão 
+            # --------------------------------
 
             # retorna o ROI, frame com as linhas desenhadas e os dados das linhas encontradas
             roi, frame_linhas, hough_data = lineDetectHough(frame)
