@@ -92,8 +92,13 @@ class decision:
                 self.right_s = (self.x_speed + adjustment)
 
             else: 
-                print("Não foi possível formar target_line")
-                return "perdido", 0
+                if not self.history:
+                    self.robot.turn_right(self.search_speed)
+                    return "no target line", 0
+
+                else:
+                    self.robot.backfowards(self.x_speed, 2)
+                    return "Voltando", 0
 
         self.robot.move(speed_left=self.left_s, speed_right=self.right_s)
         direcao = "Frente" if erro < 10 and erro > -10 else ("Direita" if erro < 0 else "Esquerda")
