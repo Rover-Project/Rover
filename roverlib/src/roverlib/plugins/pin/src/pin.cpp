@@ -35,7 +35,7 @@ Pin::Pin(int pin, PinMode mode) {
     writeFile("/sys/class/gpio/export", std::to_string(kernelPin));
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
+    
     if (mode == OUTPUT) {
         writeFile(gpioPath + "/direction", "out");
     } else {

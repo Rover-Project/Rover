@@ -11,6 +11,7 @@ enum PinMode {
 class Pin {
 private:
     int pinNumber;
+    int kernelPin;
     PinMode mode;
 
     std::string gpioPath;
