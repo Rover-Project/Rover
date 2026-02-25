@@ -289,7 +289,7 @@ if __name__ == "__main__":
                     if line_points:
                         # Desenha a linha mestra se quiser
                         openCV.line(result, tuple(line_points[0]), tuple(line_points[1]), (255, 0, 0), 5)
-                        
+
                 else:
                     print("Não foi possível detectar a linha")
 
@@ -316,7 +316,7 @@ if __name__ == "__main__":
             # Desenho de um circulo para debug do centro da tela
             if left_point and right_point or line_points:
             
-                centro_cam = (frame.shape[1] / 2)
+                centro_cam = int((frame.shape[1] / 2))
                 centro_poligono = int((left_point[1][0] + right_point[1][0]) / 2 if not line_points else line_points[1][0]) # centro poligo
 
                 openCV.circle(result, (centro_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
