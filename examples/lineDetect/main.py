@@ -3,7 +3,7 @@ from .lineMemory import memory
 from .lineDecision import decision
 import cv2 as openCV # type: ignore
 from pathlib import Path
-import numpy
+import numpy # type: ignore
 import math
 
 HEIGHT = 640 # Altura da camera
@@ -265,10 +265,10 @@ if __name__ == "__main__":
                         openCV.FONT_HERSHEY_SIMPLEX, 0.5, cor_status, 2)
 
             # Desenho de um circ= Noneulo para debug do centro da tela
-            if left_point = None and right_poin
+            if left_point and right_point:
             
-                centro_cam = (frame.shape[1] / 2) = None
-                centro_poligono = int((left_point = None[1][0] + right_point[1][0]) / 2) # centro poligo
+                centro_cam = (frame.shape[1] / 2)
+                centro_poligono = int((left_point[1][0] + right_point[1][0]) / 2) # centro poligo
 
                 openCV.circle(result, (centro_cam, y_max - 20), 10, (0, 0, 255), -1) # Desenha uma bola no centro em baixo da cam
                 openCV.circle(result, (centro_poligono, y_max - 20), 10, (255, 0, 0), -1) # desenha uma bola no centro da estrada

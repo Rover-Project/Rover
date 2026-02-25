@@ -1,20 +1,29 @@
-import cv2
-from ultralytics import YOLO
-from pathlib import Path
+import cv2 as opencv # type: ignore
+from ultralytics import YOLO # type: ignore
 
 model = YOLO("yolov8n.pt")
 
-img_path = "test.jpg"
+from pathlib import Path
+
+# Descobre a pasta onde este script está salvo
+script_dir = Path(__file__).parent
+
+# Monta o caminho para a foto na mesma pasta do script
+img_path = str(script_dir / "assets/foto4.jpg")
 
 results = model(img_path, save=True, conf=0.25)
+
+dimensions = (640, 640)
 
 for result in results:
     annotated_img = result.plot()
     
-    cv2.imshow("Resultado da Detecção", annotated_img)
+    resized_img = opencv.resize(annotated_img, dimensions, interpolation=opencv.INTER_AREA)
+
+    opencv.imshow("Resultado da Detecção", resized_img)
     
     print("Pressione qualquer tecla para fechar...")
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    opencv.waitKey(0)
+    opencv.destroyAllWindows()
 
-    # cv2.imwrite("resultado_final.jpg", annotated_img)
+    # opencv.imwrite("resultado_final.jpg", annotated_img)
