@@ -161,7 +161,6 @@ def lineDetectHough(img, isCut=False):
 
             rad_angle = math.atan2(dy, dx)
             degree_angle = math.degrees(rad_angle)
-            print("Verificando angulo")
 
             abs_angle = abs(degree_angle)
 
