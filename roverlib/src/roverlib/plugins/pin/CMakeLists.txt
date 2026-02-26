@@ -1,29 +1,15 @@
-cmake_minimum_required(VERSION 4.1.2)
-
+cmake_minimum_required(VERSION 3.14)
 project(pin)
 
-set(PIN_LIB pin_lib)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(${PROJECT_NAME} src/testLed.cpp)
-add_library(${PIN_LIB})
+# Encontra pybind11
+find_package(pybind11 REQUIRED)
 
-target_sources(
-    ${PIN_LIB}
-    PRIVATE
-        src/pin.cpp
-
-    PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS include
-        FILES
-
-            include/pin.hpp
+# Cria módulo Python
+pybind11_add_module(pin
+    src/bindings.cpp
+    src/pin.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PIN_LIB})
-
-set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
-)
+target_include_directories(pin PRIVATE include)
