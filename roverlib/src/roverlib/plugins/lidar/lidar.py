@@ -36,13 +36,14 @@ class Lidar():
         if not availableSerial:
             raise ModuleNotFoundError("Não foi possível importar o modulo serial")
         
-        self.port = port
-        self.baudrate = baudrate
-        self.bytesize = bytesize
-        self.parity = parity
-        self.stopbits = stopbits
-        self.timeout = timeout
-        self.lidar = None
+        self.port = port # Portas onde o Lidar foi conectado
+        self.baudrate = baudrate # Frequencia de operacao
+        self.bytesize = bytesize # Tamanho da informacao transmitida
+        self.parity = parity # Estado do bit de paridade
+        self.stopbits = stopbits # Quantidade de stopbits para cada pacote
+        self.timeout = timeout # Intervalo entre cada leitura 
+        self.lidar = None # Objeto do Lidar
+        self.max_buffer_reads = 517 # threshold para a quantidade de leituras armazenadas no buffer
 
     def start(self):
         """
@@ -164,7 +165,11 @@ class Lidar():
             raise LidarNotStart("O Lidar não iniciou")
                     
         else:
-
+            if self.get_in_buffer() > self.max_buffer_reads:
+                self.clean_in_buffer()
+            
+                self.get_read()
+            
             if self.lidar.in_waiting >= 9:
 
                 # Le byte por byte ate encontrar o inicio do pacote
