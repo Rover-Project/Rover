@@ -1,5 +1,6 @@
 from .exceptions import LidarNotStart, LidarDoNotRespond
-
+from threading import Thread
+import time
 try:
     import serial
     availableSerial = True
@@ -44,6 +45,11 @@ class Lidar():
         self.timeout = timeout # Intervalo entre cada leitura 
         self.lidar = None # Objeto do Lidar
         self.max_buffer_reads = 517 # threshold para a quantidade de leituras armazenadas no buffer
+        self.distance = -1
+        self.strenght = -1
+        self.temperature = -1
+        self.is_read_running = False
+        self._thread = None
 
     def start(self):
         """
@@ -66,6 +72,9 @@ class Lidar():
             
             else:
                 self.lidar = lidar
+                self.is_read_running = True
+                self._thread = Thread(target=self._update_data, daemon=True)
+                self._thread.start()
             
         except serial.SerialException as e:
             raise LidarNotStart(f"Houve algum tipo de falha física {e}")
@@ -79,6 +88,54 @@ class Lidar():
         """
         return self.lidar.is_open
     
+    def _update_data(self):
+        """
+        Realiza as leituras e atualiza as variaveis de distancia, forca do sinal
+        E temperatura com as informacoes vindas do Lidar
+        
+        Raises:
+            LidarNotStart: RunTimeError pois o Lidar não foi iniciado corretamente
+            LidarNotRespond: O Lidar foi iniciado, mas não envia nenhum dado
+        """
+
+        # Raises podem nao aparecer no terminal vindo de threads
+        if not self.is_open():
+            print("O lidar nao foi iniciado")
+            return
+
+        while self.is_read_running:
+
+            if self.get_in_buffer() > self.max_buffer_reads:
+                self.clean_in_buffer()
+            
+            data = self.lidar.read(9)
+            
+            if self.lidar.in_waiting >= 9:
+                
+                if data[0] == b'\x59' and data[1] == b'\x59':
+                
+                    # Distância: Byte 2 e 3 (índices 0 e 1 do data)
+                    self.distance = data[2] + data[3] * 256
+                    
+                    # Força do sinal: Byte 4 e 5 (índices 2 e 3 do data)
+                    self.strenght = data[4] + data[5] * 256
+        
+                    # Temperatura: Byte 6 e 7 (índices 4 e 5 do data)
+                    temp_raw = data[6] + data[7] * 256
+                    self.temperature = temp_raw / 8 - 256
+            time.sleep(0.017)
+
+    def get_read(self):
+        """
+        Getter das leituras do Lidar
+
+        Retorna:
+            Distância da superfície, força do sinal e temperatura do chip
+            Nessa ordem
+        """
+        
+        return self.distance, self.strenght, self.temperature
+        
     def stop(self):
         """
         Encerra a operação do Lidar
@@ -87,6 +144,10 @@ class Lidar():
             self.lidar.reset_input_buffer()
             self.lidar.reset_output_buffer()
             self.lidar.close()
+
+            self.is_read_running = False
+            if self._thread:
+                self._thread.join()
         
     def change_config(self):
         """
@@ -145,69 +206,6 @@ class Lidar():
         if self.is_open():
             out_buffer = self.lidar.out_waiting
             return out_buffer
-
-
-    def get_read(self):
-        """
-        Realiza uma leitura simples dos dados adquiridos pelo Lidar
-        (Leitura simples = 9 bytes, que representam um pacote completo)
-
-        Retorna:
-            Distância da superfície, força do sinal e temperatura do chip
-            Nessa ordem
-
-        Raises:
-            LidarNotStart: RunTimeError pois o Lidar não foi iniciado corretamente
-            LidarNotRespond: O Lidar foi iniciado, mas não envia nenhum dado
-        """
-            
-        if not self.is_open():
-            raise LidarNotStart("O Lidar não iniciou")
-                    
-        else:
-            if self.get_in_buffer() > self.max_buffer_reads:
-                self.clean_in_buffer()
-            
-                self.get_read()
-            
-            if self.lidar.in_waiting >= 9:
-
-                # Le byte por byte ate encontrar o inicio do pacote
-                byte1 = self.lidar.read(1)
-                if byte1 != b'\x59': # primeiro Header
-                    print("Não leu o header")
-                    return None, None, None
-                
-                byte2 = self.lidar.read(1)
-                if byte2 != b'\x59': # segundo Header
-                    print("Não leu o segundo header")
-                    return None, None, None
-                
-                # Se achou 0x59 0x59, lê os próximos 7 bytes
-                payload = self.lidar.read(7)
-
-                # se o payload for menor que o esperado
-                if len(payload) < 7: 
-                    print("Não tinham leituras suficientes")
-                    return 80, 80, 80
-                
-                # Distância: Byte 2 e 3 (índices 0 e 1 do payload)
-                dist = payload[0] + payload[1] * 256
-                
-                # Força do sinal: Byte 4 e 5 (índices 2 e 3 do payload)
-                stren = payload[2] + payload[3] * 256
-                
-                # Temperatura: Byte 6 e 7 (índices 4 e 5 do payload)
-                temp_raw = payload[4] + payload[5] * 256
-                temp = temp_raw / 8 - 256
-
-                print(f"{dist} - {stren} - {temp}")
-                
-                return dist, stren, temp
-        
-        # Retorno de segurança
-        print("Sei lá")
-        return None, None, None
     
     def get_reads_until(self, quant:int):
         """
