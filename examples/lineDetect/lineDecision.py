@@ -8,17 +8,16 @@ from pathlib import Path
 class decision:
     def __init__(self):
         config = Config(Path(__file__).parent / "config.yaml")
-        self.search_speed = 60
-        self.motor_config = config.get("gpio")["motor"]
-        self.x_speed = 40
-        self.height = 640
+        self.search_speed = 60 # Velocidade padrao de busca
+        self.motor_config = config.get("gpio")["motor"] # Arquivo de configuracao dos motores
+        self.line_speed = 40 # Velocidade utilizada para seguir a linha
+        self.height = 640 
         self.width = 640
-        self.history = []
-        self.max_history = 30
-        # Implementar algo que, caso o Rover estiver no centro da pista, acelere ele por completo
-        x_center = 640 / 2
-        self.right_s = self.x_speed
-        self.left_s = self.x_speed
+        self.history = [] # memoria para corrigir um desvio de percurso
+        self.max_history = 30 # Limite de deteccoes na memoria
+        self.x_center = self.width / 2 # Centro da cam
+        self.right_s = self.x_speed # Velocidade padrao para motor direito
+        self.left_s = self.x_speed # Velocidade padrao para motor esquerdo
 
         self.robot = Robot(
             left=self.motor_config["left"], 
@@ -30,43 +29,45 @@ class decision:
         )
         
         self.pid_x = PID(
-            kp=(self.x_speed / x_center),
+            kp=(self.x_speed / self.x_center),
             ki=1,
             kd=1
         )
 
     def decide(self, frame, lr_lines: tuple, target_line, drive_mode: str):
-        # Não encontrou linha em nenhum dos lados
+        # Se nao houver um modo selecionado
         if not drive_mode:
             return "Selecione um modo", 0
+        
+        # Define o centro da camera para o calculo do erro
+        center_cam = frame.shape[1] / 2
 
-        else:
+        # Duas linhas paralelas (Estrada)
+        if drive_mode == "road":
+            # Se a tupla de linhas left e right nao for none:
             if lr_lines:
                 left_line = lr_lines[0]
                 right_line = lr_lines[1]
 
                 if len(self.history) > self.max_history:
                     self.history.pop(0)
-                    self.history.append((left_line, right_line))
-                    center_cam = frame.shape[1] / 2
+
+                self.history.append((left_line, right_line))
             
+            # Se for none, define left e right como none
             else: 
                 left_line = None
                 right_line = None
-                
 
-        # Duas linhas paralelas (Estrada)
-        if drive_mode == "road":
-
-            if left_line is None and right_line is None:
                 if not self.history:
                     self.robot.turn_right(self.search_speed)
                     return "perdido", 0
 
                 else:
                     self.robot.backfowards(self.x_speed, 2)
-                    return "Voltando", 0
-                
+                    return "voltando", 0
+            
+            # Se tem as duas linhas, centro da pista = (x1 + x2) / 2
             if left_line and right_line:
                 center_road = (left_line[1][0] + right_line[1][0]) / 2
                 
@@ -78,17 +79,23 @@ class decision:
 
             # calculo do erro
             erro = center_cam - center_road
-
+            # Ajuste de velocidad
             adjustment = self.pid_x.controller_P(erro)
-
+            # Atribuicao dos Velocidade dos motores esquerdo e direito 
             self.left_s = (self.x_speed + adjustment)
             self.right_s = (self.x_speed - adjustment)
 
+        # Linha unica (Competicao)
         elif drive_mode == "line": 
-            # passa a linha que ele considerar existente 
-            # para não alterar a lógica de args
-
+            # Se a linha alvo for detectada
             if target_line:
+
+                if len(self.history) > self.max_history:
+                    self.history.pop(0)
+
+                self.history.append(target_line)
+
+                # center_line = posicao x da linha
                 center_line = target_line[1][0]
                 erro = center_cam - center_line
 
@@ -100,7 +107,7 @@ class decision:
             else: 
                 if not self.history:
                     self.robot.turn_right(self.search_speed)
-                    return "no target line", 0
+                    return "perdido", 0
 
                 else:
                     self.robot.backfowards(self.x_speed, 2)
