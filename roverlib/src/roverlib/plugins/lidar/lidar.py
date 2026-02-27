@@ -2,7 +2,7 @@ from .exceptions import LidarNotStart, LidarDoNotRespond
 from threading import Thread
 import time
 try:
-    import serial
+    import serial # type: ignore
     availableSerial = True
 except (ImportError, ModuleNotFoundError):
     availableSerial = False
