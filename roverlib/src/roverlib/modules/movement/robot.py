@@ -152,7 +152,24 @@ class Robot:
         if duration is not None:
             time.sleep(duration)
             self.stop()
+
+    def turn_360(self):
+        print("Ainda nao implementei")
+        pass
     
+    def turn_180(self):
+        print("Ainda nao implementei")
+        pass
+
+    def turn_90(self):
+        print("Ainda nao implementei")
+        pass
+
+    # OU SO ESSA AQUI (PASSA A QUANTIDADE DE GRAUS DESEJADA)
+    def turn_degrees(self, degress: float):
+        print("Ainda nao implementei")
+        pass
+
     def stop(self):
         """Para o Rover imediatamente."""
         self.left_motor.stop()
