@@ -153,7 +153,7 @@ class Robot:
             time.sleep(duration)
             self.stop()
 
-    def turn_360(self):
+    def turn_360(self, speed=50):
         print("Ainda nao implementei")
         pass
     
