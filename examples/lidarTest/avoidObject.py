@@ -10,17 +10,19 @@ import cv2 as openCv
 import time
 from pathlib import Path
 
-X_SPEED = 50 # Velocidade para controle direcional no eixo X
-SEARCH_SPEED = 70
 HEIGHT = 640 # Altura da imagem 
 WIDTH = 640 # Largura da imagem
 x_center = WIDTH / 2
-avoid_type = "only" # or "both"
 max_dist = 40 # Distancia maxima para o Rover nao parar (em cm)
 min_dist = 150 # Distancia minima para tomada de atitude (em cm)
 dist_history = []
 dist_limit = 30
-
+X_SPEED = 50 # Velocidade para controle direcional no eixo X
+SEARCH_SPEED = 70 # Velocidade de busca
+left_speed = X_SPEED # Velocidade do motor esquerdo
+right_speed = X_SPEED # Velocidade do motor direito
+avoid_type = "only" # or "both"
+last_attempt = None # Flag para registrar o ultimo lado em que o Rover tentou achar uma saida
 
 # --- CONFIG SECTION ---
 config = Config(Path(__file__).parent / "config.yaml")
@@ -55,13 +57,18 @@ robot = Robot(
 
 # Configura controlador PID para p eixo x
 pid_x = PID(
-    kp=(X_SPEED / x_center),  # constante de normalização para a velociade de controle x
+    kp=(X_SPEED / max_dist),  # constante de normalização para a velociade de controle x
     ki=1, 
     kd=1
 )
 
 # Funcao de tomada de decisao do Rover a partir do Lidar e/ou da Picam
 def decide(dist: float, no_way: bool):
+        global last_attempt
+        global min_dist
+        global max_dist
+
+        # --- CASO 4 ---
         # Logica extrema para fazer o Rover encontrar um caminho
         if no_way:
             robot.stop()
@@ -69,26 +76,49 @@ def decide(dist: float, no_way: bool):
             robot.turn_degrees(180)
             return False
 
+        # --- CASO 1 ---
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
+            left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
+            right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
             print("Caminho livre a frente")
             robot.forward()
             return False
-                
+        
+        # --- CASO 2 --- 
+        # O Rover nao esta muito longe do objeto, mas tambem nao esta muito perto
         if dist < min_dist and dist > max_dist:
-            print(f"Possivel objeto se aproximando em {dist} cm. Reduzindo")
-            robot.forward(speed= 50*0.8)
-            return False
+            error_dist = max_dist - dist
 
+            correction = pid_x.controller_PID(error_dist)
+
+            if not last_attempt or last_attempt == "left":
+                aux_l = left_speed + correction
+                aux_r = right_speed - correction
+                last_attempt = "right"
+            
+            if last_attempt == "right":
+                aux_l = left_speed - correction
+                aux_r = right_speed + correction
+                last_attempt = "left"
+
+            left_speed = max(0, min(90, aux_l))
+            right_speed = max(0, min(90, aux_r))
+
+            print(f"Possivel objeto se aproximando em {dist} cm. Reduzindo")
+            robot.move(left_speed, right_speed)
+            return False
+        
+        # --- CASO 3 --- 
         # Distancia maxima entre o Rover e a superficie alcancada (muito perto)
         if dist <= max_dist:
             # Para o Rover e faz ele tomar um pouco de distancia da superfice
             robot.stop()
-            robot.backward(duration=0.4)
+            robot.backward(duration=0.3)
             time.sleep(0.1)
 
-            robot.turn_right(speed= SEARCH_SPEED)
-            time.sleep(1)
+            robot.turn_degrees(90)
+            time.sleep(0.2)
             robot.stop()
 
             new_dist, _, _ = lidar.get_read()
@@ -98,8 +128,8 @@ def decide(dist: float, no_way: bool):
                 return False
             
             else:
-                robot.turn_left(speed= SEARCH_SPEED)
-                time.sleep(2)
+                robot.turn_degrees(-180)
+                time.sleep(0.2)
                 robot.stop()
 
             new_dist, _, _ = lidar.get_read()
@@ -127,6 +157,7 @@ def avoidObject(avoid_type: str):
                 frame = picam.get_frame()
 
             dist, stren, temp = lidar.get_read()
+            
             if len(dist_history) > dist_limit:
                 dist_history.pop(0)
 
