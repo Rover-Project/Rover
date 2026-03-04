@@ -68,19 +68,12 @@ def decide(dist: float, no_way: bool):
         global min_dist
         global max_dist
 
-        # --- CASO 4 ---
-        # Logica extrema para fazer o Rover encontrar um caminho
-        if no_way:
-            robot.stop()
-            robot.backward(duration=1)
-            robot.turn_degrees(180)
-            return False
-
         # --- CASO 1 ---
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
             left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
             right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
+            last_attempt = None
             print("Caminho livre a frente")
             robot.forward()
             return False
@@ -92,12 +85,12 @@ def decide(dist: float, no_way: bool):
 
             correction = pid_x.controller_PID(error_dist)
 
-            if not last_attempt or last_attempt == "left":
+            if not last_attempt or (last_attempt == "left" and no_way):
                 aux_l = left_speed + correction
                 aux_r = right_speed - correction
                 last_attempt = "right"
             
-            if last_attempt == "right":
+            if last_attempt == "right" and no_way:
                 aux_l = left_speed - correction
                 aux_r = right_speed + correction
                 last_attempt = "left"
@@ -141,14 +134,19 @@ def decide(dist: float, no_way: bool):
             else:
                 print("Beco sem saida")
                 return True # Boolean para uma variavel chamada no_ways_to go
+            
+            # --- CASO 4 ---
+        # Logica extrema para fazer o Rover encontrar um caminho
+        if no_way:
+            robot.stop()
+            robot.backward(duration=2)
+            robot.turn_degrees(180)
+            return False
         
 def avoidObject(avoid_type: str):
     """
     Funcao principal para capacitar o Rover a detectar e desviar de objetos
-    ecolhendo a melhor rota para tal
-
-    Args:
-        avoid_type (string): only => only lidar | both => lidar and camera
+    ecolhendo a melhor rota
     """
     no_way = False
     while True:

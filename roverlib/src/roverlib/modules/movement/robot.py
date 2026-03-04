@@ -153,22 +153,19 @@ class Robot:
             time.sleep(duration)
             self.stop()
 
-    def turn_360(self, speed=50):
-        print("Ainda nao implementei")
-        pass
-    
-    def turn_180(self):
-        print("Ainda nao implementei")
-        pass
+    # Considerando que o Rover leva x segundos para girar 360 graus em uma velocidade estabelecida
+    def turn_degrees(self, degress: float, time_to_turn = 4, turn_speed =50): # Valores ainda nao testados
+        """
+        Gira o robô por uma quantidade específica de graus baseada em tempo.
+        Positivo para Direita, Negativo para Esquerda.
+        """
+        turn_duration = abs(degress) * (360 / time_to_turn)
 
-    def turn_90(self):
-        print("Ainda nao implementei")
-        pass
+        if degress > 0:
+            self.turn_right(speed=turn_speed, duration=turn_duration)
+        else:
+            self.turn_left(speed=turn_speed, duration=turn_duration)
 
-    # OU SO ESSA AQUI (PASSA A QUANTIDADE DE GRAUS DESEJADA)
-    def turn_degrees(self, degress: float):
-        print("Ainda nao implementei")
-        pass
 
     def stop(self):
         """Para o Rover imediatamente."""
