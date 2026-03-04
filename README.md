@@ -1,5 +1,8 @@
 # Roverlib: Biblioteca de Robótica Autônoma em Python
+<p align="center">
+<img src="./docs/assets/logo-Rover.png" alt="Descrição da Imagem" style="width: 200px; height: auto; margin: 0 auto;" />
 
+  
 ## Apresentação
 
 O **Rover** é uma biblioteca para robótica de código aberto baseada em **Raspberry Pi 5**, projetada para implementar arquiteturas inovadoras a partir de uma abordagem totalmente modular em Python, com suporte a visão computacional híbrida e controle de motores DC em tempo real.
