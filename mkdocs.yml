@@ -6,16 +6,17 @@ repo_name: Rover-Project/Rover
 theme:
   name: material
   language: pt-BR
+  logo: assets/logo-Rover.png
   palette: 
     - scheme: default
-      primary: teal
-      accent: purple 
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: teal
-      accent: lime
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -25,6 +26,9 @@ theme:
     - navigation.expand
     - content.code.copy 
     - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
 
 markdown_extensions:
   - pymdownx.highlight: 

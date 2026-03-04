@@ -1,0 +1,11 @@
+:root {
+  /* Define custom colors */
+  --md-primary-fg-color: #073a59;
+  --md-primary-fg-color--light: #0d547f;
+  --md-primary-fg-color--dark: #042436;
+  --md-primary-bg-color: #ffffff;
+  
+  --md-accent-fg-color: #fe8003;
+  --md-accent-fg-color--transparent: rgba(254, 128, 3, 0.1);
+  --md-accent-bg-color: #ffffff;
+}

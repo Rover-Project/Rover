@@ -1,39 +1,33 @@
 # Bem-vindo à RoverLib
 
-A **RoverLib** é uma biblioteca modular em Python para **Raspberry Pi 5**, projetada especificamente para viabilizar arquiteturas de robótica. A plataforma abstrai a complexidade de drivers de hardware em uma API de alto nível compreensível para Large Language Models (LLMs), permitindo orquestração automática de tarefas robóticas em linguagem natural.
+A **RoverLib** é uma biblioteca modular em Python para **Raspberry Pi 5**, projetada especificamente para viabilizar arquiteturas de robótica. A plataforma abstrai a complexidade de drivers de hardware em uma API de alto nível altamente coesa e compreensível, ideal para rápida prototipagem e desenvolvimento de comportamentos complexos.
 
 ## Conceito Fundamental
 
-Em arquiteturas tradicionais de robótica, a especificação do movimento é estruturada como um conjunto de instruções imperativas. Diferentemente, a abordagem **Code as Policies** permite que um operador humano defina o objetivo em linguagem natural, enquanto um LLM gera o código Python executável que coordena os módulos da plataforma. Isto reduz a necessidade de expertise em programação de sistemas embarcados.
+A **RoverLib** foca em uma abordagem modular, onde os desenvolvedores podem compor instâncias que lidam de forma transparente com os hardwares de baixo nível (Câmera, Motores, GPIO) através de comandos simples e limpos. Isto reduz a necessidade de expertise em programação de sistemas embarcados para focar no fluxo do processo.
 
 ### Exemplo de Fluxo Operacional
 
-**Descrição de tarefa (usuário):**
+**Descrição de Movimento Básico:**
 
-> Ande para frente por 2 segundos e depois procure por uma bola vermelha. Se encontrar, me avise.
-
-**Código gerado e executado (sistema):**
+**Código Python executável:**
 
 ```python
-from rover_lib import Rover
+from roverlib.modules.movement.robot import Robot
+import time
 
-# Inicializa componentes de hardware
-rover = Rover()
+def main():
+    # Inicializa componentes de hardware (usa mocks virtuais no PC)
+    rover = Robot(left=(17, 27), right=(22, 23))
 
-# Executa movimento com duração temporal
-rover.movement.forward(speed=50, duration=2.0)
+    # Executa movimento com duração temporal
+    rover.forward(speed=50, duration=2.0)
 
-# Captura frame da câmera
-frame = rover.camera.get_frame()
+    # Libera recursos
+    rover.cleanup()
 
-# Processa visão para detecção de objetos circulares
-circle = rover.vision.detect_circle(frame, color_range='red')
-
-if circle:
-    print(f"Objeto detectado nas coordenadas: {circle}")
-
-# Libera recursos
-rover.stop_and_cleanup()
+if __name__ == "__main__":
+    main()
 ```
 
 ---
@@ -55,9 +49,11 @@ rover.stop_and_cleanup()
 ## Instalação Rápida
 
 ```bash
-git clone https://github.com/Rover-Project/Rover.git
-cd Rover
-pip install -r requirements.txt
+# Instala diretamente do PyPI (ambiente virtual recomendado)
+pip install roverlib[cli]
+
+# Cria um novo projeto via CLI
+rover new meu_projeto
 ```
 
 Para configuração avançada em Raspberry Pi (habilitação de câmera, ajustes GPIO), consulte [Instalação Detalhada](instalacao.md).
