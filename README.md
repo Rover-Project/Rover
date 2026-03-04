@@ -1,26 +1,23 @@
-# Rover: Plataforma de Robótica Autônoma com Code as Policies
+# Roverlib: Biblioteca de Robótica Autônoma em Python
 
 ## Apresentação
 
-O **Rover** é uma plataforma de robótica de código aberto baseada em **Raspberry Pi 5**, projetada para implementar arquiteturas inovadoras de **Code as Policies**. O sistema permite que um operador humano defina objetivos em linguagem natural e um LLM (Large Language Model) gere automaticamente código Python executável que coordena todos os subsistemas robóticos.
-
-O projeto moderniza um rover 1.0 original, substituindo seu sistema de controle por uma arquitetura totalmente modular em Python, com suporte a visão computacional híbrida, controle de motores DC em tempo real e orquestração por LLM.
+O **Rover** é uma biblioteca para robótica de código aberto baseada em **Raspberry Pi 5**, projetada para implementar arquiteturas inovadoras a partir de uma abordagem totalmente modular em Python, com suporte a visão computacional híbrida e controle de motores DC em tempo real.
 
 ---
 
 ## Características
 
 - **Arquitetura Modular em Python:** Separação clara entre drivers, comportamento e inteligência.
-- **Visão Computacional Clássica:** Algoritmos otimizados (Hough, Canny, HSV) rodando a 30 FPS na RPi 5.
+- **Visão Computacional Clássica:** Algoritmos otimizados (Hough, Canny, HSV).
 - **Line-Following com PID:** Algoritmo de controle proporcional simplificado com detecção de obstáculos.
 - **Compatibilidade Multiplataforma:** Fallback automático para câmera mock, permitindo desenvolvimento em PC.
-- **Code as Policies:** Integração com LLMs para geração automática de comportamentos.
 
 ---
 
 ## Requisitos de Hardware
 
-### Obrigatório
+### Stack da Equipe de desenvolvimento
 - **Raspberry Pi 5 Model B** (8 GB RAM recomendado)
 - **Câmera Picamera2** (ou webcam USB como fallback)
 - **Ponte-H L298N** para controle de motores DC
@@ -36,27 +33,25 @@ O projeto moderniza um rover 1.0 original, substituindo seu sistema de controle 
 
 ### Pré-requisitos
 ```bash
-python --version  # Python 3.8+
+python --version  # Python 3.9+  (Conforme pyproject.toml)
 pip --version     # pip 22.0+
 ```
 
 ### Passos de Instalação
 
-1. **Clone o repositório:**
+A biblioteca `roverlib` foi disponibilizada via gerenciador de pacotes, então você não precisa clonar este repositório para testá-la.
+
+1. **Instale a biblioteca diretamente do PyPI:**
 ```bash
-git clone https://github.com/Rover-Project/Rover.git
-cd Rover
+pip install roverlib[cli]
 ```
 
-2. **Instale dependências Python:**
+2. **Verifique instalação (CLI disponível):**
 ```bash
-pip install -r requirements.txt
+rover hello
 ```
 
-3. **Verifique instalação:**
-```bash
-python -c "from rover_lib import Rover; print('Rover importado com sucesso')"
-```
+*(Opcional) Para desenvolvimento local, basta clonar o repositório e executar `pip install -e .[cli,dev]` na pasta `roverlib/`.*
 
 ---
 
@@ -98,83 +93,73 @@ sudo usermod -a -G gpio $USER
 
 ### Para Desenvolvimento em PC
 
-Não é necessária configuração adicional. O sistema detecta automaticamente a ausência de `picamera2` e utiliza uma câmera mock com gradiente de teste.
+Não é necessária configuração adicional. O sistema detecta automaticamente a ausência de drivers de RPi e utiliza motores virtuais (mock).
 
 ```bash
-# Teste:
-python -c "from rover_lib import Rover; r = Rover(); print(r.camera)"
+# Teste via CLI:
+rover new teste_pc
+rover run teste_pc
 ```
 
 ---
 
 ## Utilização
 
+Os exemplos a seguir detalham o uso programático da biblioteca. Através da CLI (`rover new meu_projeto`), arquivos básicos serão gerados, bastando adaptá-los.
+
 ### Exemplo Básico: Avanço Simples
 
 ```python
-from rover_lib import Rover
-import time
+from roverlib.modules.movement.robot import Robot
 
-rover = Rover()
+def main():
+    # Inicializa os controladores dos motores (usará motor virtual em PC)
+    robot = Robot(left=(17, 27), right=(22, 23))
 
-# Move para frente por 3 segundos a velocidade 50
-rover.movement.forward(speed=50, duration=3.0)
+    # Move para frente por 3 segundos a velocidade 50
+    robot.forward(speed=50, duration=3.0)
 
-rover.stop_and_cleanup()
+    robot.cleanup()
+
+if __name__ == "__main__":
+    main()
 ```
 
-### Exemplo: Line-Following
+### Exemplo: Capturando Imagem (Webcam em PC/PiCamera2 na RPi)
 
 ```python
-from rover_lib import Rover
+from roverlib.plugins.camera.webcam import Webcam
 
-rover = Rover()
+def main():
+    # Inicia a captura da webcam (em PC ou USB)
+    cam = Webcam(height=480, width=640)
+    frame = cam.get_frame()
+    
+    if frame is not None:
+        print("Quadro capturado com sucesso!")
+        
+    cam.cleanup()
 
-# Inicia line-following com ganho proporcional 0.7
-# Executa por 30 segundos
-rover.follow_line(base_speed=30, kp=0.7, duration=30.0)
-
-rover.stop_and_cleanup()
-```
-
-### Exemplo: Detecção de Círculos
-
-```python
-from rover_lib import Rover
-
-rover = Rover()
-
-# Captura um frame
-frame = rover.camera.get_frame()
-
-# Detecta círculos
-circle = rover.vision.detect_circle(frame, color_range='red')
-
-if circle:
-    print(f"Círculo detectado em: x={circle['x']}, y={circle['y']}, raio={circle['radius']}")
-
-rover.stop_and_cleanup()
+if __name__ == "__main__":
+    main()
 ```
 
 ---
 
 ## Estrutura de Diretórios
 
-```
+```markdown
 Rover/
-├── lib_rover/                          # Biblioteca principal
-│   ├── rover_lib/
-│   │   ├── rover.py                   # Classe principal (Rover)
-│   │   ├── configs/
-│   │   │   └── config.yaml            # Configuração de GPIO e câmera
-│   │   ├── modules/
-│   │   │   ├── movement/              # Controle de motores (Robot, Motor)
-│   │   │   ├── camera/                # Captura de câmera (CameraModule, Webcam)
-│   │   │   ├── processing/            # Processamento de imagem
-│   │   │   └── vision/                # Visão computacional (VisionModule)
-│   │   └── utils/
-│   │       └── config_manager.py      # Carregamento de configuração
-│   └── setup.py
+├── roverlib/
+│   ├── pyproject.toml                 # Definições da biblioteca e plugins
+│   └── src/
+│       └── roverlib/
+│           ├── cli/                   # Interface de linha de comando (CLI)
+│           ├── core/                  # Execução e instanciação lógica de projetos
+│           ├── modules/               # Módulos abstratos (movement, vision, processing)
+│           ├── plugins/               # Drivers de Hardware (camera, motor, lidar)
+│           ├── templates/             # Instruções pré-definidas para o comando 'new' do cli (ex: FollowCircle, LineDetect)
+│           └── utils/                 # Ferramentas auxiliares
 │
 ├── examples/
 │   ├── circleDetect/                  # Exemplo: detecção de círculos
@@ -193,7 +178,6 @@ Rover/
 │       └── drivers.md                 # Referência de API
 │
 ├── mkdocs.yml                         # Configuração de documentação
-├── requirements.txt                   # Dependências Python
 └── README.md                          # Este arquivo
 ```
 
@@ -241,22 +225,22 @@ main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120)
 
 ## Dependências
 
-O arquivo `requirements.txt` especifica todas as dependências:
 
+Instale os essenciais acessando o arquivo `pyproject.toml`:
 ```
-gpiozero          # Abstração de GPIO
-Pillow            # Processamento de imagem
-rpi.gpio          # GPIO para RPi (RPi apenas)
-picamera2         # Câmera RPi (RPi apenas)
-opencv-python     # Visão computacional (Hough, Canny, etc.)
 numpy             # Álgebra linear
+opencv-python     # Visão computacional (Hough, Canny, etc.)
+click             # Para a CLI "rover"
 PyYAML            # Carregamento de configuração
 ```
+
+**Dependências de Hardware (RPi):**
+- `rpi.gpio`, `gpiozero`, `picamera2`
 
 **Dependências opcionais:**
 - `mkdocs-material`: Para compilar documentação localmente (`mkdocs serve`).
 - `ultralytics`: Para integração com YOLO (detecção avançada).
-- `tflite-runtime`: Para modelos TensorFlow Lite (inferência em RPi).
+- `pytest`, `black`, `ruff`: Para ambiente de desenvolvimento (`pip install -e .[dev]`).
 
 ---
 
@@ -303,12 +287,6 @@ motor.forward()
 
 Consulte a documentação online ou localmente:
 
-```bash
-# Compilar documentação localmente
-pip install mkdocs-material
-mkdocs serve
-# Acesse http://localhost:8000
-```
 
 **Seções de documentação:**
 - [Visão Geral](docs/index.md)
@@ -316,20 +294,6 @@ mkdocs serve
 - [API da Classe Rover](docs/api/rover.md)
 - [Módulos de Hardware](docs/api/drivers.md)
 
----
-
-## Deploy de Documentação
-
-A documentação é publicada automaticamente no GitHub Pages quando há mudanças em:
-- `docs/**` (diretório de documentação)
-- `mkdocs.yml` (configuração)
-- `lib_rover/**` (código com docstrings)
-
-**Deploy manual:**
-```bash
-pip install mkdocs-material mkdocs-glightbox
-mkdocs gh-deploy --force
-```
 
 ---
 
@@ -338,13 +302,6 @@ mkdocs gh-deploy --force
 Contribuições são bem-vindas. Para reportar bugs ou sugerir features, abra uma issue no repositório.
 
 ---
-
-## Licença
-
-Este projeto é licenciado sob [especificar licença - ex.: MIT].
-
----
-
 
 ## Referências e Recursos
 
