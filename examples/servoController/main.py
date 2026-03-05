@@ -5,8 +5,8 @@ import termios
 import tty
 
 # Configuração dos Servos
-servo_a = Servo(17)
-servo_b = Servo(27)
+servo_a = Servo(15) #n360
+servo_b = Servo(14) #n90
 
 pos_a = 0.0
 pos_b = 0.0
