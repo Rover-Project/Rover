@@ -113,7 +113,7 @@ class Lidar():
             
             if self.lidar.in_waiting >= 9:
                 print("Leitura realizada mas não casou com o cabeçalho")
-                if data[0] == b'\x59' and data[1] == b'\x59':
+                if data[0] == 0x59 and data[1] == 0x59:
                 
                     # Distância: Byte 2 e 3 (índices 0 e 1 do data)
                     self.distance = data[2] + data[3] * 256
