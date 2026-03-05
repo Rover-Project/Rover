@@ -75,6 +75,7 @@ class Lidar():
                 self.is_read_running = True
                 self._thread = Thread(target=self._update_data, daemon=True)
                 self._thread.start()
+                print("lidar iniciado e leitura rolando")
             
         except serial.SerialException as e:
             raise LidarNotStart(f"Houve algum tipo de falha física {e}")
@@ -111,7 +112,7 @@ class Lidar():
             data = self.lidar.read(9)
             
             if self.lidar.in_waiting >= 9:
-                
+                print("Leitura realizada mas não casou com o cabeçalho")
                 if data[0] == b'\x59' and data[1] == b'\x59':
                 
                     # Distância: Byte 2 e 3 (índices 0 e 1 do data)
@@ -126,7 +127,7 @@ class Lidar():
                 
             else:
                 print("Não foi possível realizar leitura")
-            time.sleep(0.017)
+            time.sleep(0.01)
 
 
     def get_read(self):
