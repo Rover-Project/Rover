@@ -1,24 +1,19 @@
 from gpiozero import Servo
 from time import sleep
-from gpiozero.pins.pigpio import PiGPIOFactory
 import sys
 import termios
 import tty
 
-# Configuração de Fábrica para Pi 5
-factory = PiGPIOFactory()
+# Inicialização direta (O gpiozero usa o driver padrão do SO)
+# Se o servo estiver 'trepidando', tente usar a propriedade 'frame_width'
+servo_a = Servo(17)
+servo_b = Servo(27)
 
-# Pinos GPIO (Altere conforme sua montagem)
-servo_a = Servo(10, pin_factory=factory) # 360
-servo_b = Servo(8, pin_factory=factory) # 180
-
-# Valores Iniciais (0.0 é o meio/90 graus)
 pos_a = 0.0
 pos_b = 0.0
-passo = 0.1 # O quanto o ângulo muda por clique (ajuste a gosto)
+passo = 0.1 
 
 def getch():
-    """Função para ler teclas do teclado sem precisar dar Enter"""
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -28,35 +23,26 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-print("Controle Iniciado!")
-print("Servo A: 'w' aumenta, 's' diminui")
-print("Servo B: 'i' aumenta, 'k' diminui")
-print("Pressione 'q' para sair")
+print("Controle Iniciado (Sem PiGPIOFactory)!")
+print("Use 'w/s' para Servo A | 'i/k' para Servo B | 'q' para sair")
 
 try:
     while True:
         char = getch()
-        
         if char == 'q':
             break
 
-        # Lógica Servo A
-        if char == 'w':
-            pos_a = min(1.0, pos_a + passo) # Limite máximo 1.0
-        elif char == 's':
-            pos_a = max(-1.0, pos_a - passo) # Limite mínimo -1.0
+        # Lógica de incremento
+        if char == 'w': pos_a = min(1.0, pos_a + passo)
+        elif char == 's': pos_a = max(-1.0, pos_a - passo)
+        elif char == 'i': pos_b = min(1.0, pos_b + passo)
+        elif char == 'k': pos_b = max(-1.0, pos_b - passo)
 
-        # Lógica Servo B
-        if char == 'i':
-            pos_b = min(1.0, pos_b + passo)
-        elif char == 'k':
-            pos_b = max(-1.0, pos_b - passo)
-
-        # Aplica os novos valores
+        # Aplica valor
         servo_a.value = pos_a
         servo_b.value = pos_b
         
-        print(f"\rPosições -> Servo A: {pos_a:.1f} | Servo B: {pos_b:.1f}", end="")
+        print(f"\rA: {pos_a:.1f} | B: {pos_b:.1f}", end="")
 
 except KeyboardInterrupt:
     pass
