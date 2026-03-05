@@ -4,16 +4,15 @@ import sys
 import termios
 import tty
 
-# Inicialização direta (O gpiozero usa o driver padrão do SO)
-# Se o servo estiver 'trepidando', tente usar a propriedade 'frame_width'
-servo_a = Servo(15)
-servo_b = Servo(14)
+# Configuração dos Servos
+servo_a = Servo(17)
+servo_b = Servo(27)
 
 pos_a = 0.0
 pos_b = 0.0
-passo = 0.1 
+passo = 0.1
 
-def getch():
+def get_key():
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -23,28 +22,33 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-print("Controle Iniciado (Sem PiGPIOFactory)!")
-print("Use 'w/s' para Servo A | 'i/k' para Servo B | 'q' para sair")
+print("Controle Anti-Tremor Ativado!")
+print("Movimente e o motor 'relaxará' após 0.3s")
 
 try:
     while True:
-        char = getch()
-        if char == 'q':
-            break
+        tecla = get_key().lower()
+        if tecla == 'q': break
 
-        # Lógica de incremento
-        if char == 'w': pos_a = min(1.0, pos_a + passo)
-        elif char == 's': pos_a = max(-1.0, pos_a - passo)
-        elif char == 'i': pos_b = min(0.4, pos_b + passo)
-        elif char == 'k': pos_b = max(-0.4, pos_b - passo)
+        # Movimentação
+        if tecla == 'w': pos_a = min(1.0, pos_a + passo)
+        elif tecla == 's': pos_a = max(-1.0, pos_a - passo)
+        if tecla == 'i': pos_b = min(1.0, pos_b + passo)
+        elif tecla == 'k': pos_b = max(-1.0, pos_b - passo)
 
-        # Aplica valor
+        # 1. Envia o sinal para mover
         servo_a.value = pos_a
         servo_b.value = pos_b
         
-        print(f"\rA: {pos_a:.1f} | B: {pos_b:.1f}", end="")
+        # 2. Espera o motor chegar na posição (ajuste se o movimento for longo)
+        sleep(0.3) 
+        
+        # 3. "Desliga" o sinal (Cura o tremor)
+        servo_a.value = None
+        servo_b.value = None
+
+        sys.stdout.write(f"\rA: {pos_a:+.1f} | B: {pos_b:+.1f} [Sinal OFF - Sem Tremor]")
+        sys.stdout.flush()
 
 except KeyboardInterrupt:
     pass
-
-print("\nEncerrando...")
