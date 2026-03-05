@@ -24,7 +24,6 @@ def updateGraph(frame):
 
     try:
         latest_data = lidar.get_read()
-        print(f"DEBUG: {lidar.get_in_buffer()}")
 
         # Só processamos dist, stren e temp se latest_data existir
         if latest_data:
