@@ -154,6 +154,7 @@ def avoidObject(avoid_type: str):
                 frame = picam.get_frame()
 
             dist, stren, temp = lidar.get_read()
+            print(dist)
             
             if len(dist_history) > dist_limit:
                 dist_history.pop(0)

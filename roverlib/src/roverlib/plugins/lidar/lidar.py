@@ -110,6 +110,7 @@ class Lidar():
                 self.clean_in_buffer()
             
             data = self.lidar.read(9)
+            print(data)
             
             if self.lidar.in_waiting >= 9:
     
@@ -130,7 +131,7 @@ class Lidar():
                         self.stop()
             else:
                 print("Não foi possível realizar leitura")
-            time.sleep(0.01)
+            time.sleep(0.001)
 
 
     def get_read(self):
