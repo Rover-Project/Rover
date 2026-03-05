@@ -176,5 +176,8 @@ def avoidObject(avoid_type: str):
             break
 
     robot.cleanup()
-    picam.cleanup()
-    openCv.destroyAllWindows()
+
+    try:
+        picam.cleanup()
+    except Exception as e:
+        print("Camera não inicializada")
