@@ -6,8 +6,8 @@ import tty
 
 # Inicialização direta (O gpiozero usa o driver padrão do SO)
 # Se o servo estiver 'trepidando', tente usar a propriedade 'frame_width'
-servo_a = Servo(17)
-servo_b = Servo(27)
+servo_a = Servo(15)
+servo_b = Servo(14)
 
 pos_a = 0.0
 pos_b = 0.0
@@ -35,8 +35,8 @@ try:
         # Lógica de incremento
         if char == 'w': pos_a = min(1.0, pos_a + passo)
         elif char == 's': pos_a = max(-1.0, pos_a - passo)
-        elif char == 'i': pos_b = min(1.0, pos_b + passo)
-        elif char == 'k': pos_b = max(-1.0, pos_b - passo)
+        elif char == 'i': pos_b = min(0.4, pos_b + passo)
+        elif char == 'k': pos_b = max(-0.4, pos_b - passo)
 
         # Aplica valor
         servo_a.value = pos_a
