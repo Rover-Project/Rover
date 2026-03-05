@@ -123,7 +123,11 @@ class Lidar():
                     # Temperatura: Byte 6 e 7 (índices 4 e 5 do data)
                     temp_raw = data[6] + data[7] * 256
                     self.temperature = temp_raw / 8 - 256
+                
+            else:
+                print("Não foi possível realizar leitura")
             time.sleep(0.017)
+
 
     def get_read(self):
         """
