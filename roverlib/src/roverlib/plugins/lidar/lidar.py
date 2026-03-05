@@ -131,6 +131,8 @@ class Lidar():
                         self.stop()
             else:
                 print("Não foi possível realizar leitura")
+                return -1, -1, -1
+            
             time.sleep(0.001)
 
 

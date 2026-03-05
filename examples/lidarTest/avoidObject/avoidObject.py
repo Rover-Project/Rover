@@ -70,16 +70,18 @@ def decide(dist: float, no_way: bool):
         # --- CASO 1 ---
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
+            print("Caso 1")
             left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
             right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
             last_attempt = None
             print("Caminho livre a frente")
             robot.forward()
             return False
-        
+            
         # --- CASO 2 --- 
         # O Rover nao esta muito longe do objeto, mas tambem nao esta muito perto
         if dist < min_dist and dist > max_dist:
+            print("Caso 2")
             error_dist = max_dist - dist
 
             correction = pid_x.controller_PID(error_dist)
@@ -105,6 +107,7 @@ def decide(dist: float, no_way: bool):
         # Distancia maxima entre o Rover e a superficie alcancada (muito perto)
         if dist <= max_dist:
             # Para o Rover e faz ele tomar um pouco de distancia da superfice
+            print("Caso 3")
             robot.stop()
             robot.backward(duration=0.3)
             time.sleep(0.1)
@@ -141,6 +144,9 @@ def decide(dist: float, no_way: bool):
             robot.backward(duration=2)
             robot.turn_degrees(180)
             return False
+        
+        print("Não decidiu nada")
+        return False
         
 def avoidObject(avoid_type: str):
     """
