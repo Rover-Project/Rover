@@ -69,7 +69,7 @@ if __name__ == "__main__":
                         str_erro = str(erro)
                         situation = "Avoid"
                         print(erro)
-                        
+   
                     else:
                         avoid = False
                         situation = "Persue"
