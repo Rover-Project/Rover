@@ -13,22 +13,27 @@ class ObjectDetection:
         erro = x_center - self.center_cam
 
         print(avoid_object)
-        
+
         if avoid_object:
             if erro > 20:
                 print("Objeto desviavel fora de rota")
-                return erro
             
             elif erro < 20:
                 print("Objeto no caminho")
-        
+
         else:
             if erro > 20:
                 print("Persue object away from the center. Align")
+                
 
             elif erro < 20:
                 print("Right on line of the object")
 
+        if erro:
+            return erro
+        
+        else:
+            return 999
 
 
 

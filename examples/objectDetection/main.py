@@ -58,6 +58,11 @@ if __name__ == "__main__":
                     coords = box.xyxy[0].tolist()
                     id = int(box.cls[0])
 
+                    if not coords:
+                        print("Nenhum objeto")
+                        situation = "Nothing to do"
+                        erro = 0
+
                     if id in avoid_objects:
                         avoid = True
                         erro = od.decision(coords, avoid)
@@ -72,8 +77,8 @@ if __name__ == "__main__":
                         str_erro = str(erro)
                         print(erro)
 
-                    cv2.putText(noted_frame, situation, (text_x, text_y + 30), font, 1, (255, 0, 0), 2, cv2.LINE_AA)
-                    cv2.putText(noted_frame, str_erro, (text_x + 20, text_y + 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                    cv2.putText(noted_frame, situation, (text_x, text_y + 60), font, 1, (255, 0, 0), 2, cv2.LINE_AA)
+                    cv2.putText(noted_frame, str_erro, (text_x + 20, text_y + 100), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
             cv2.imshow("detection", noted_frame)
 
