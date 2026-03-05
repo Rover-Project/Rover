@@ -3,7 +3,7 @@
 import cv2
 
 class ObjectDetection:
-    def __init__(self , center_cam: float,):
+    def __init__(self , center_cam: float):
         self.center_cam = center_cam
 
     def decision(self, coords, avoid_object: bool):

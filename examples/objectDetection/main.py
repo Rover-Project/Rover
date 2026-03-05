@@ -26,7 +26,7 @@ model = YOLO("yolov8n.pt")
 
 model.export(format="ncnn")
 
-od = ObjectDetection(picam, model, center_cam)
+od = ObjectDetection(center_cam)
 target_objects = [0, 13, 24, 26, 39, 41, 56, 63, 64, 66, 67, 73]
 
 avoid_objects = [0, 13, 24, 26, 56, 63, 66, 67]
