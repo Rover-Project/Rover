@@ -90,54 +90,43 @@ class Lidar():
         return self.lidar.is_open
     
     def _update_data(self):
-        """
-        Realiza as leituras e atualiza as variaveis de distancia, forca do sinal
-        E temperatura com as informacoes vindas do Lidar
-        
-        Raises:
-            LidarNotStart: RunTimeError pois o Lidar não foi iniciado corretamente
-            LidarNotRespond: O Lidar foi iniciado, mas não envia nenhum dado
-        """
-
-        # Raises podem nao aparecer no terminal vindo de threads
         if not self.is_open():
             print("O lidar nao foi iniciado")
-            return
+            return -1, -1, -1
 
         while self.is_read_running:
-
-            if self.get_in_buffer() > self.max_buffer_reads:
-                self.clean_in_buffer()
-            
-            data = self.lidar.read(9)
-            print(data)
-            
+            # Verifica se há bytes suficientes ANTES de ler
             if self.lidar.in_waiting >= 9:
-    
-                if data[0] == 0x59 and data[1] == 0x59:
-                
-                    # Distância: Byte 2 e 3 (índices 0 e 1 do data)
-                    self.distance = data[2] + data[3] * 256
-                    
-                    # Força do sinal: Byte 4 e 5 (índices 2 e 3 do data)
-                    self.strenght = data[4] + data[5] * 256
-        
-                    # Temperatura: Byte 6 e 7 (índices 4 e 5 do data)
-                    temp_raw = data[6] + data[7] * 256
-                    self.temperature = temp_raw / 8 - 256
-
-                    if self.temperature > 65.0:
-                        print("Temperatura segura excedida! Encerrando...")
-                        self.stop()
-                    
-                    return self.distance, self.strenght, self.temperature
+                # Procura pelo cabeçalho 0x59 0x59 para sincronizar o frame
+                # Isso evita ler dados "quebrados" ou deslocados
+                if self.lidar.read(1) == b'\x59':
+                    if self.lidar.read(1) == b'\x59':
+                        # Se achou os dois 0x59, lê os próximos 7 bytes
+                        data = self.lidar.read(7)
                         
-            else:
-                print("Não foi possível realizar leitura")
-                return -1, -1, -1
-            
-            time.sleep(0.001)
+                        if len(data) < 7:
+                            continue # Backup caso a leitura falhe no meio
 
+                        # Cálculo da Distância (Bytes 2 e 3 do frame total)
+                        self.distance = data[0] + (data[1] << 8)
+                        
+                        # Força do sinal (Bytes 4 e 5)
+                        self.strenght = data[2] + (data[3] << 8)
+            
+                        # Temperatura (Bytes 6 e 7)
+                        temp_raw = data[4] + (data[5] << 8)
+                        self.temperature = temp_raw / 8 - 256
+
+                        if self.temperature > 65.0:
+                            print(f"Temperatura Crítica: {self.temperature}°C! Encerrando...")
+                            self.stop()
+                            break
+            
+            else:
+                # Se não tem 9 bytes ainda, espera um pouco
+                time.sleep(0.005) 
+
+        return self.distance, self.strenght, self.temperature
 
     def get_read(self):
         """
