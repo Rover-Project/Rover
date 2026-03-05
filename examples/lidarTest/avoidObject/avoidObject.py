@@ -66,8 +66,13 @@ def decide(dist: float, no_way: bool):
         global last_attempt
         global min_dist
         global max_dist
+        global left_speed
+        global right_speed
 
-        # --- CASO 1 ---
+        if dist <= 0: 
+            return no_way
+
+        # --- CASO 1 - CAMINHO LIVRE---
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
             print("Caso 1")
@@ -75,10 +80,10 @@ def decide(dist: float, no_way: bool):
             right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
             last_attempt = None
             print("Caminho livre a frente")
-            robot.forward()
+            robot.forward(X_SPEED)
             return False
             
-        # --- CASO 2 --- 
+        # --- CASO 2 - APROXIMAÇÃO --- 
         # O Rover nao esta muito longe do objeto, mas tambem nao esta muito perto
         if dist < min_dist and dist > max_dist:
             print("Caso 2")
@@ -86,24 +91,24 @@ def decide(dist: float, no_way: bool):
 
             correction = pid_x.controller_PID(error_dist)
 
-            if not last_attempt or (last_attempt == "left" and no_way):
-                aux_l = left_speed + correction
-                aux_r = right_speed - correction
+            if last_attempt is None:
                 last_attempt = "right"
             
-            if last_attempt == "right" and no_way:
-                aux_l = left_speed - correction
-                aux_r = right_speed + correction
-                last_attempt = "left"
+            if last_attempt == "right":
+                l_val = X_SPEED + correction
+                r_val = X_SPEED - correction
+            else:
+                l_val = X_SPEED - correction
+                r_val = X_SPEED + correction
 
-            left_speed = max(0, min(90, aux_l))
-            right_speed = max(0, min(90, aux_r))
+            left_speed = max(0, min(90, left_speed))
+            right_speed = max(0, min(90, right_speed))
 
             print(f"Possivel objeto se aproximando em {dist} cm. Reduzindo")
             robot.move(left_speed, right_speed)
             return False
         
-        # --- CASO 3 --- 
+        # --- CASO 3 - OBJETO A FRENTE --- 
         # Distancia maxima entre o Rover e a superficie alcancada (muito perto)
         if dist <= max_dist:
             # Para o Rover e faz ele tomar um pouco de distancia da superfice
@@ -137,7 +142,7 @@ def decide(dist: float, no_way: bool):
                 print("Beco sem saida")
                 return True # Boolean para uma variavel chamada no_ways_to go
             
-            # --- CASO 4 ---
+            # --- CASO 4 - SEM SAIDA ---
         # Logica extrema para fazer o Rover encontrar um caminho
         if no_way:
             robot.stop()
@@ -172,8 +177,8 @@ def avoidObject(avoid_type: str):
 
             dist_history.append(dist)
                 
-            if not dist:
-                print("Nenhuma distancia recebida")
+            if dist <= 0: 
+                print("Nenhuma distância recebida")
 
             else:
                 no_way = decide(dist, no_way)
