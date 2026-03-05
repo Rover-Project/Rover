@@ -9,8 +9,8 @@ import tty
 factory = PiGPIOFactory()
 
 # Pinos GPIO (Altere conforme sua montagem)
-servo_a = Servo(17, pin_factory=factory)
-servo_b = Servo(27, pin_factory=factory)
+servo_a = Servo(10, pin_factory=factory) # 360
+servo_b = Servo(8, pin_factory=factory) # 180
 
 # Valores Iniciais (0.0 é o meio/90 graus)
 pos_a = 0.0
