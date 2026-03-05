@@ -5,7 +5,6 @@ from roverlib.utils.config_manager import Config
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
 from roverlib.plugins.lidar.lidar import Lidar
-from .avoidDecision  import Decision
 import cv2 as openCv
 import time
 from pathlib import Path
