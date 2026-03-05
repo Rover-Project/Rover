@@ -129,6 +129,9 @@ class Lidar():
                     if self.temperature > 65.0:
                         print("Temperatura segura excedida! Encerrando...")
                         self.stop()
+                    
+                    return self.distance, self.strenght, self.temperature
+                        
             else:
                 print("Não foi possível realizar leitura")
                 return -1, -1, -1
