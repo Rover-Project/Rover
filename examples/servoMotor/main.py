@@ -17,7 +17,7 @@ if __name__ == "__main__":
     
     try:
         while True:
-            angle = float(input("Qual angulo deseja?: "))
+            angle = int(input("Qual angulo deseja?: "))
             servo180.set_smooth_angle(last_angle, angle)
             time.sleep(1)
             servo360.set_smooth_angle(last_angle, angle)
