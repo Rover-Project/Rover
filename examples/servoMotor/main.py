@@ -42,6 +42,7 @@ try:
     while True:
         angle = float(input("Qual angulo deseja?: "))
         set_angle180(angle)
+        time.sleep(1)
         set_angle360(angle)
         time.sleep(1)
 
