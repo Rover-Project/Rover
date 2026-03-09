@@ -40,11 +40,10 @@ def set_angle360(angle):
 
 try:
     while True:
-        for angle in [0, 45, 90, 100, 120]:
-            print(f"Movendo para {angle} graus")
-            set_angle180(angle)
-            set_angle360(angle)
-            time.sleep(5)
+        angle = float(input("Qual angulo deseja?: "))
+        set_angle180(angle)
+        set_angle360(angle)
+        time.sleep(1)
 
 except KeyboardInterrupt:
     pwm180.stop()
