@@ -75,7 +75,7 @@ try:
         ax2_temp = ax2.twinx() # Segundo eixo y para a temperatura
         temp_line, = ax2_temp.plot([], [], '-g', label="Temp (ºC)")
 
-        ax2.set_ylim(0, 4000)    
+        ax2.set_ylim(0, 8000)    
         ax2.set_ylabel("Forca")
         
         ax2_temp.set_ylim(-10, 50)
@@ -85,6 +85,7 @@ try:
         ax2_temp.legend(loc="upper right")
         ax2.grid(True)
 
+        # Função de animação. Ajuste o interval para atualização mais ou menos frequente
         ani = FuncAnimation(fig, updateGraph, interval=30, cache_frame_data=False)
 
         plt.show()
