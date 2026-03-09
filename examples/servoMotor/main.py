@@ -44,7 +44,7 @@ try:
             print(f"Movendo para {angle} graus")
             set_angle180(angle)
             set_angle360(angle)
-            time.sleep(1)
+            time.sleep(5)
 
 except KeyboardInterrupt:
     pwm180.stop()
