@@ -13,7 +13,7 @@ except (RuntimeError, ModuleNotFoundError):
     GPIO_AVAILABLE = False
     print("AVISO: RPi.GPIO não detectado. Este módulo requer Raspberry Pi com RPi.GPIO instalado.")
 
-class Servo:
+class Servo180:
 
     def __init__(self, pin, frenquency=50):
         self.pin = pin
