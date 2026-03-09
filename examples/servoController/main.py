@@ -4,9 +4,12 @@ import sys
 import termios
 import tty
 
+pin180 = 23
+pin360 = 24
+
 # Configuração dos Servos
-servo_a = Servo(15) #n360
-servo_b = Servo(14) #n90
+servo_a = Servo(pin180) #n360
+servo_b = Servo(pin360) #n90
 
 pos_a = 0.0
 pos_b = 0.0
