@@ -7,7 +7,7 @@ on:
       
       - 'docs/**'       # o workflow só roda se houver mudança nestes locais:
       - 'mkdocs.yml'    # configuração do site
-      - 'roverLib/**'   # mudança de código (para atualizar as docstrings)
+      - 'roverlib/src/roverlib/**' # mudança de código (para atualizar as docstrings)
       - '.github/workflows/deploy_docs.yml' # o próprio workflow
 
 

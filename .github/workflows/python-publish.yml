@@ -1,0 +1,43 @@
+name: Publish Python Package to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # Permite disparo manual
+
+jobs:
+  build-and-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI
+    runs-on: ubuntu-latest
+    
+    # Exige que configuremos o repositório no https://pypi.org/manage/account/publishing/
+    permissions:
+      id-token: write  # Necessário para Trusted Publishing
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install PyPA build
+      run: >-
+        python -m
+        pip install
+        build
+        --user
+
+    - name: Build a binary wheel and a source tarball
+      # como o nosso pyproject.toml está dentro da pasta roverlib/, o build deve ocorrer nela.
+      working-directory: ./roverlib
+      run: python -m build
+
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: roverlib/dist/
+        # para usar o TestPyPI (opcional), descomentar a linha abaixo:
+        # repository-url: https://test.pypi.org/legacy/

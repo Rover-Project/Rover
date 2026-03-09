@@ -2,33 +2,13 @@
 
 ## Visão Geral
 
-O sistema Rover é uma plataforma robótica modular em Python implementada para Raspberry Pi 5, arquitetada em três camadas funcionais que separam claramente as responsabilidades entre hardware, lógica comportamental e processamento de inteligência visual. Esta separação de responsabilidades (separation of concerns) facilita a manutenção, testes unitários e permite que sistemas de geração automática de código (como LLMs) criem implementações previsíveis e corretas. A biblioteca exporta uma interface simplificada através da classe `Rover`, que orquestra a inicialização e coordenação de todos os módulos subordinados.
+O sistema Rover é uma plataforma robótica modular em Python implementada para Raspberry Pi 5, arquitetada em três camadas funcionais que separam claramente as responsabilidades entre hardware, lógica comportamental e processamento de inteligência visual. Esta separação de responsabilidades (separation of concerns) facilita a manutenção, testes unitários e permite que desenvolvedores e sistemas de alto nível arquitetem lógicas previsíveis e corretas. A biblioteca exporta uma interface simplificada através da classe `Rover`, que orquestra a inicialização e coordenação de todos os módulos subordinados.
 
 ### Estrutura em Camadas
 
 A arquitetura em camadas do Rover segue o padrão de abstração crescente, onde cada camada encapsula um domínio específico e expõe interfaces bem definidas para a camada superior.
 
-```
-┌────────────────────────────────────────────────────┐
-│  Camada 3: Inteligência (Processamento de Imagem)  │
-│  • VisionModule: detecção de linhas, círculos      │
-│  • Algoritmos de visão computacional clássica      │
-│  • Processamento em tempo real (30 FPS)            │
-├────────────────────────────────────────────────────┤
-│  Camada 2: Comportamento (Orquestração)            │
-│  • Rover: classe principal de coordenação          │
-│  • Robot: comandos de movimento de alto nível      │
-│  • Lógicas de controle (line-following com P)      │
-├────────────────────────────────────────────────────┤
-│  Camada 1: Hardware (Drivers de Baixo Nível)       │
-│  • Motor: controle PWM via GPIO                    │
-│  • CameraModule: captura de frames                 │
-│  • Interação direta com Raspberry Pi               │
-└────────────────────────────────────────────────────┘
-```
-
-**[IMAGEM 1 - Prompt para LLM especializada em diagramas arquiteturais]:**
-Criar um diagrama arquitetural em estilo UML mostrando as três camadas do Rover com setas indicando fluxo de dados unidirecional de baixo para cima. Incluir: (1) Camada de Hardware com Motor, CameraModule; (2) Camada de Comportamento com Robot e Rover; (3) Camada de Inteligência com VisionModule. Mostrar inicialização em cascata (top-down) e comunicação de dados (bottom-up).
+![Fluxo de Dados da RoverLib](assets/data-flow-roverlib.png)
 
 ---
 
@@ -38,14 +18,14 @@ Esta camada fornece abstração direta sobre os componentes eletrônicos da Rasp
 
 ### 1.1 Controle de Motores DC
 
-**Arquivo:** [lib_rover/rover_lib/modules/movement/motor.py](../lib_rover/rover_lib/modules/movement/motor.py)
+**Arquivo:** [roverlib/src/roverlib/modules/movement/motor.py](../roverlib/src/roverlib/modules/movement/motor.py)
 
 A classe `Motor` fornece controle de baixo nível para um único motor DC acoplado a uma ponte-H L298N (H-bridge). Gerencia diretamente os sinais GPIO e os sinais PWM (Pulse Width Modulation) que determinam a velocidade de rotação.
 
 #### Inicialização e Configuração
 
 ```python
-from rover_lib.modules.movement.motor import Motor
+from roverlib.modules.movement.motor import Motor
 
 # Criar instância do motor com pinos GPIO
 motor = Motor(pins=(12, 11), pwm_frequency=1000)
@@ -83,14 +63,14 @@ A classe `Motor` lança três exceções especializadas definidas em `exeception
 
 ### 1.2 Captura de Câmera
 
-**Arquivo:** [lib_rover/rover_lib/modules/camera/cameraModule.py](../lib_rover/rover_lib/modules/camera/cameraModule.py)
+**Arquivo:** [roverlib/src/roverlib/modules/camera/cameraModule.py](../roverlib/src/roverlib/modules/camera/cameraModule.py)
 
 A classe `CameraModule` abstrai a captura de frames de câmera, fornecendo suporte automático para hardware Picamera2 (nativo de Raspberry Pi 5) e fallback para mock em plataformas de desenvolvimento que carecem do hardware.
 
 #### Inicialização
 
 ```python
-from rover_lib.modules.camera.cameraModule import CameraModule
+from roverlib.modules.camera.cameraModule import CameraModule
 
 # Criar instância da câmera
 camera = CameraModule(height=480, width=640, analogic=1.5, exposure=30000)
@@ -117,7 +97,7 @@ A variável de flag `is_mock` permite código condicional para comportamentos es
 
 #### Configuração de Câmera
 
-Os parâmetros de captura são carregados do arquivo [lib_rover/rover_lib/configs/config.yaml](../lib_rover/rover_lib/configs/config.yaml):
+Os parâmetros de captura são carregados do arquivo [roverlib/src/roverlib/configs/config.yaml](../roverlib/src/roverlib/configs/config.yaml):
 
 ```yaml
 camera:
@@ -144,14 +124,14 @@ Esta camada implementa abstrações de alto nível que coordenam motores e senso
 
 ### 2.1 Classe Robot
 
-**Arquivo:** [lib_rover/rover_lib/modules/movement/robot.py](../lib_rover/rover_lib/modules/movement/robot.py)
+**Arquivo:** [roverlib/src/roverlib/modules/movement/robot.py](../roverlib/src/roverlib/modules/movement/robot.py)
 
 A classe `Robot` encapsula a coordenação de dois motores (esquerdo e direito) para produzir movimentos de alto nível como avanço, recuo e rotações.
 
 #### Inicialização
 
 ```python
-from rover_lib.modules.movement.robot import Robot
+from roverlib.modules.movement.robot import Robot
 
 # Criar instância com pinos dos motores
 robot = Robot(
@@ -225,7 +205,7 @@ Libera todos os recursos GPIO associados aos motores.
 
 #### Calibração de Motores
 
-O módulo [lib_rover/rover_lib/modules/movement/motorCalibration.py](../lib_rover/rover_lib/modules/movement/motorCalibration.py) implementa compensação de assimetrias mecânicas. Em robôs reais, diferenças nas resistências de atrito, enrolamento de bobina e engrenagens causam que, quando aplicada a mesma velocidade, o robô desvie para um lado.
+O módulo [roverlib/src/roverlib/modules/movement/motorCalibration.py](../roverlib/src/roverlib/modules/movement/motorCalibration.py) implementa compensação de assimetrias mecânicas. Em robôs reais, diferenças nas resistências de atrito, enrolamento de bobina e engrenagens causam que, quando aplicada a mesma velocidade, o robô desvie para um lado.
 
 A classe `MotorCalibration` carrega fatores de compensação do arquivo `config.yaml`:
 
@@ -239,14 +219,14 @@ Valores acima de 1.0 aumentam a velocidade do motor especificado; valores abaixo
 
 ### 2.2 Classe Rover (Orquestrador Principal)
 
-**Arquivo:** [lib_rover/rover_lib/rover.py](../lib_rover/rover_lib/rover.py)
+**Arquivo:** [roverlib/src/roverlib/rover.py](../roverlib/src/roverlib/rover.py)
 
 A classe `Rover` é o ponto de entrada da biblioteca. Inicializa todos os módulos e fornece métodos de alto nível para tarefas robóticas complexas como line-following.
 
 #### Inicialização
 
 ```python
-from rover_lib import Rover
+from roverlib import Rover
 
 # Instanciar o Rover
 rover = Rover(pwm_frequency=1000)
@@ -299,33 +279,7 @@ finally:
 
 ##### Fluxo de Execução
 
-```
-Início: follow_line(base_speed=30, kp=0.7, duration=None)
-  ↓
-Iniciar loop infinito (com marcação temporal):
-  ├─ [1] Capturar frame: frame = camera.capture_frame()
-  ├─ [2] Detectar obstáculos: obstacle_detected, _ = vision.detect_obstacle(frame)
-  │      Se detectado:
-  │        └─ movement.stop()
-  │        └─ continuar (reavaliar próxima iteração)
-  ├─ [3] Processar frame: desvio, frame_proc = vision.process_frame_for_line_following(frame)
-  ├─ [4] Calcular correção: turn_speed = desvio * kp * base_speed
-  ├─ [5] Aplicar velocidades:
-  │      speed_left = base_speed - turn_speed
-  │      speed_right = base_speed + turn_speed
-  ├─ [6] Limitar intervalo: clamp(speed_left, 0, 100) e clamp(speed_right, 0, 100)
-  ├─ [7] Mover: movement.move(speed_left, speed_right)
-  ├─ [8] Aguardar 10ms: sleep(0.01)
-  └─ [Voltar a [1]]
-  
-Condições de Saída:
-  ├─ Duração expirada: if (time.time() - start_time) > duration
-  ├─ KeyboardInterrupt (Ctrl+C)
-  └─ Executa stop_and_cleanup() no bloco finally
-```
-
-**[IMAGEM 2 - Prompt para LLM especializada em diagramas de fluxo]:**
-Criar um fluxograma detalhado do algoritmo de line-following. Mostrar: (1) Captura de frame em loop; (2) Decisão de detecção de obstáculo (ramificação condicional); (3) Processamento para extração de desvio; (4) Aplicação de ganho proporcional; (5) Saturação de velocidades; (6) Escrita aos motores; (7) Aguardo de 10ms. Usar cores distintas para cada etapa e indicar ciclo de retroalimentação.
+![Ilustração do Fluxo de execução do PID](assets/fluxograma-PID.png)
 
 ##### Tratamento de Obstáculos
 
@@ -353,14 +307,14 @@ Esta camada implementa algoritmos de visão computacional clássica para extraç
 
 ### 3.1 Módulo de Visão
 
-**Arquivo:** [lib_rover/rover_lib/modules/vision/visionModule.py](../lib_rover/rover_lib/modules/vision/visionModule.py)
+**Arquivo:** [roverlib/src/roverlib/modules/vision/visionModule.py](../roverlib/src/roverlib/modules/vision/visionModule.py)
 
 O `VisionModule` processa frames capturados pela câmera, detectando linhas, círculos e obstáculos através de algoritmos consolidados de visão computacional.
 
 #### Inicialização
 
 ```python
-from rover_lib.modules.vision.visionModule import VisionModule
+from roverlib.modules.vision.visionModule import VisionModule
 
 # Criar instância com resolução esperada de frames
 vision = VisionModule(resolution=(640, 480))
@@ -404,8 +358,7 @@ print(f"Desvio da linha: {desvio:.2f}")  # Entre -1.0 e 1.0
 # frame_processado contém visualizações para debug (centroide, linha central, valor de desvio)
 ```
 
-**[IMAGEM 3 - Prompt para LLM especializada em processamento de imagem]:**
-Criar uma visualização comparativa mostrando: (1) Frame original em BGR com linha branca; (2) Frame convertido para HSV; (3) Máscara binária após cv2.inRange(); (4) Resultado final com centroide marcado em verde, centro de referência em azul, e desvio calculado em amarelo. Usar escala de cores apropriada (BGR original, HSV em representação técnica, máscara em preto e branco, resultado em cores RGB).
+![Exemplo de Detecção de Linha](assets/line-detection.png)
 
 #### Detecção de Círculos
 
@@ -588,7 +541,7 @@ A sequência a seguir ilustra como dados fluem através das três camadas durant
 
 ### Arquivo de Configuração
 
-**Arquivo:** [lib_rover/rover_lib/configs/config.yaml](../lib_rover/rover_lib/configs/config.yaml)
+**Arquivo:** [roverlib/src/roverlib/configs/config.yaml](../roverlib/src/roverlib/configs/config.yaml)
 
 Centraliza todos os parâmetros de hardware e calibração. Carregado automaticamente pela classe `Config` no módulo `utils.config_manager`.
 
@@ -653,7 +606,7 @@ A arquitetura em camadas permite que sistemas de geração de código (Large Lan
 
 ```python
 # Exemplo: Script gerado por LLM para tarefa de navegação
-from rover_lib import Rover
+from roverlib import Rover
 import time
 
 rover = Rover()
@@ -687,9 +640,3 @@ A estrutura bem definida e nomes descritivos facilitam geração automática com
 
 ---
 
-## Próximos Passos
-
-- Consulte [API Detalhada](api/rover.md) para referência completa de métodos e assinaturas.
-- Explore [Exemplos de Implementação](../examples/) para scripts funcionais em diversos cenários.
-- Veja [Módulos de Hardware](api/drivers.md) para integração de componentes adicionais.
-- Para desenvolvimento em ambiente sem Raspberry Pi, utilize o modo mock da `CameraModule`.
