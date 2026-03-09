@@ -1,120 +1,205 @@
 from roverlib.modules.vision.visionModule import VisionModule
-from roverlib.plugins.camera.webcam import Webcam
-from roverlib.plugins.camera.camera import Camera
-import cv2 as openCv
 from roverlib.modules.processing.processing_image import ProcessingImage
+from roverlib.utils.config_manager import Config
+from roverlib.plugins.camera.cameraInterface import CameraInterface
+from pathlib import Path
+from argparse import ArgumentParser, Namespace
+import cv2 as openCv
+import numpy 
 
-def circleVoting(hough, contorno):
-    """Relaciona a detecção de dois metodos diferente"""
+
+def set_args(args: list[dict]=[{"name":"", "type": None, "help": ""}], discrip:str="") -> Namespace:
+    """
+    Mapeia os argumentos de linha de comando passados como parâmetro.
+    Args:
+        args (_type_, optional): Lista de argumentos que deve ser mapeada. 
+        Os dicts devem ter os seguintes campos "name", "type" e "help". 
+        Valores padrões: [{"name":"", "type": None, "help": ""}].
+        discrip (str, optional): Discrição dos argumentos. Por padrão "".
+
+    Returns:
+        Namespace: Objeto com os atributos parametrizados.
+    """
     
-    if hough is None and contorno is None: # nada detectado
-        return None
+    arguments = ArgumentParser(
+        description=discrip 
+    )
 
-    if hough is None: # Somente um metodo detectou
-        return contorno
+    for argument in args:
+        arguments.add_argument(
+            argument["name"],
+            type=argument["type"],
+            help=argument["help"]
+        )
 
-    if contorno is None: # Somente um metodo detectou
-        return hough
+    return arguments.parse_args()
 
-    x1, y1, r1 = hough
-    x2, y2, r2 = contorno
+def voting(hough: numpy.ndarray, contour: numpy.ndarray, thers_xy: int = 20, thers_r: float = 0.3) -> numpy.ndarray:
+    """
+    Função de votação, para os dois métodos de detectção do círculo.
+
+    Args:
+        hough (tuple[int, int, int]): x, y e r da detecção da transformada de Hough
+        contorno (tuple[int, int, int]): x, y e r  da detecção do método de contornos
+        thers_xy (int, optional): Limiar de diferença para as coordenadas x e y. Por padrão 20.
+        thers_r (float, optional): Limiar de diferença entre os raios. Por padrão 0.3.
+
+    Returns:
+        numpy.ndarray: Retorna uma média da coordenadas caso a discordância for menos que os limiares. Caso contrário retorna o método mais confiavel. 
+    """
     
-    x1, y1, r1 = int(x1), int(y1), int(r1)
-    x2, y2, r2 = int(x2), int(y2), int(r2)
-
-    # votação:
-    if abs(x1 - x2) < 20 and abs(y1 - y2) < 20:
-        if abs(r1 - r2) < (r1 * 0.30):
-            return ((x1 + x2)//2, (y1 + y2)//2, int((r1 + r2) / 2))
+    # votação
+    if abs(numpy.sum(hough[:2] - contour[:2])) < thers_xy:
+        if abs(hough[2] - contour[2]) < (hough[2] * thers_r):
+            return (hough + contour) // 2 
 
     # Se a discordancia for alta, retorna o metodo mais seguro
-    return contorno
+    return contour
     
-def inInterval(last, current, LIMIAR):
-    # a e b são tuplas/listas (x, y, r)
-    if current is None:
+def inInterval(v1: numpy.ndarray, v2: numpy.ndarray, thers: float) -> bool:
+    """
+    Verifica se a diferença de dois vetores é menor que que o limiar.
+
+    Args:
+        v1 (numpy.ndarray): Primeiro array. 
+        v2 (numpy.ndarray): Segundo array.
+        thers (int): limiar de diferença.
+
+    Returns:
+        bool: True se a diferença for menor que o limiar.
+    """
+    
+    if abs(numpy.sum(v1 - v2)) > thers:
         return False
-    for i in range(3):
-        if abs(last[i] - current[i]) > LIMIAR:
-            return False
+    
     return True
 
-def smoothDetect():
-    HEIGHT = 640
-    WIDTH = 640
+def cam_config(type: str="") -> CameraInterface | None:
+    """
+    Configura a câmera
+    Args:
+        type (str, optional): Tipo da câmera desejada fixa ou autofocus. Por padrão vazior que indica a webcam.
+    Returns:
+        cameraInterface | None: Objeto que implementa uma interface de cãmera.
+    """
     
-    try:
-        camera = Camera(HEIGHT, WIDTH)
+    type_of_camera = set_args(
+        [
+            {
+                "name":"camera",
+                "type": str,
+                "help": "O tipo de câmera que deve ser usada. Podem ser a webcam, fixa ou autofocus"
+            }
+        ]
+    ).camera.lower()
+    
+    config = Config(
+        Path(__file__).parent.parent / "config.yaml"
+    )
+    cam_config = config.get("camera")
+    
+    try: 
+        from roverlib.plugins.camera.camera import Camera
+        from roverlib.plugins.camera.autoFocus import AfCamera
+    
+        if type_of_camera == "autofocus":
+            camera = AfCamera(
+                height=cam_config["resolution"]["h"], 
+                width=cam_config["resolution"]["w"], 
+                fps=cam_config["fps"],
+            )
+        
+        else:
+            camera = camera = Camera(
+                height=cam_config["resolution"]["h"], 
+                width=cam_config["resolution"]["w"], 
+                fps=cam_config["fps"],
+            )
+        
         camera.start()
+        camera.set_brightness(cam_config["brigh"]) 
+        camera.set_contrast(cam_config["contrast"])
+        camera.set_saturation(cam_config["saturation"])
+        
+        return camera
+        
     except:
-        camera = Webcam(HEIGHT, WIDTH)
+        
+        try:
+            from roverlib.plugins.camera.webcam import Webcam    
 
+            camera = Webcam(
+                height=cam_config["resolution"]["h"], 
+                width=cam_config["resolution"]["w"], 
+            )    
+            camera.start()
+            return camera
+        
+        except Exception as error:
+            print(f"Erro na configuração da câmera: {error}")
+            return None
+
+def smoothDetect():
     circleHistory = None  # média acumulada
-    cont = 0
     LIMIAR = 20  # tolerância para considerar mesma bola
     NO_DET_LIMIT = 20  # número máximo de frames sem detecção
     noDetCounter = 0
     
-    while True:
-        frame = camera.get_frame()
-        
-        if frame is not None:
+    camera = cam_config()
+    
+    if camera is not None:
+        while True:
+            frame = camera.get_frame() # type: ignore
             
-            frame = openCv.resize(
-                frame, 
-                (HEIGHT, WIDTH),
-                interpolation=openCv.INTER_CUBIC
-            )
+            if frame is not None:
+                mask = ProcessingImage.color_dual_segmentation(frame, gamma=1.9)
+                hough, _ = VisionModule.houghCircleDetect(mask)
+                contour = VisionModule.circleCannyDetect(mask)
+                
+                hough = (numpy.array(hough) if hough is not None else None)
+                contour = (numpy.array(contour) if contour is not None else None)
 
-            mask = ProcessingImage.color_dual_segmentation(frame, gamma=1.9)
-            hough, _ = VisionModule.houghCircleDetect(mask)
-            contorno = VisionModule.circleCannyDetect(mask)
-
-            # escolhe a melhor detecção entre hough e contorno
-            if hough is not None and contorno is not None:
-                det = circleVoting(hough, contorno)
-            elif hough is not None:
-                det = hough
-            elif contorno is not None:
-                det = contorno
-            else:
-                det = None
-
-            if det is not None:
-                noDetCounter = 0  # reset contador de frames sem detecção
-
-                if circleHistory is None or not inInterval(det, circleHistory, LIMIAR):
-                    circleHistory = list(det)  # converte tupla para lista
-                    cont = 1
+                # escolhe a melhor detecção entre hough e Canny
+                if hough is not None and contour is not None:
+                    det = voting(
+                        hough, 
+                        contour
+                    )    
+                elif hough is not None:
+                    det = hough
                 else:
-                    # acumula valores
-                    circleHistory[0] += det[0]
-                    circleHistory[1] += det[1]
-                    circleHistory[2] += det[2]
-                    cont += 1
-            else:
-                noDetCounter += 1
-                # se muitos frames sem detecção, zera histórico
-                if noDetCounter >= NO_DET_LIMIT:
-                    circleHistory = None
-                    cont = 0
+                    det = contour
 
-            txt = "Nenhum circulo detectado"
-            if circleHistory and cont > 0:
-                # calcula média real
-                x = circleHistory[0] // cont
-                y = circleHistory[1] // cont
-                r = circleHistory[2] // cont
-                openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
-                openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
-                txt = f"X={x}  Y={y}  R={r}"
+                if det is not None:
+                    noDetCounter = 0  # reset contador de frames sem detecção
 
-            openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            openCv.imshow("Deteccao Final", frame)
-            openCv.imshow("Mascara", mask)
+                    if circleHistory is None or not inInterval(det, circleHistory, LIMIAR):
+                        circleHistory = det.copy()  # converte tupla para lista
+                    else:
+                        # acumula valores
+                        circleHistory = (det + circleHistory) // 2 # Talves dê problema, mas vamo na fé
+                        
+                else:
+                    noDetCounter += 1
+                    # se muitos frames sem detecção, zera histórico
+                    if noDetCounter >= NO_DET_LIMIT:
+                        circleHistory = None
 
-            if openCv.waitKey(1) & 0xFF == ord('q'):
-                break
+                txt = "Nenhum circulo detectado"
+                if circleHistory is not None:
+                    x, y, r = circleHistory
+                    
+                    # Desenha esferas 
+                    openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
+                    openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
+                    txt = f"X={x}  Y={y}  R={r}"
 
-    camera.cleanup()
-    openCv.destroyAllWindows()
+                openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                openCv.imshow("Deteccao Final", frame)
+                openCv.imshow("Mascara", mask)
+
+                if openCv.waitKey(10) & 0xFF == ord('q'):
+                    break
+
+        camera.cleanup() # type:ignore
+        openCv.destroyAllWindows()
