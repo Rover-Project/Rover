@@ -20,7 +20,7 @@ class Servo360:
         self.pin = pin
         self.frenquency = frenquency
         
-        # duty para parar (cada servo pode variar um pouco)
+        # duty para parar
         self.stop_duty = stop_duty
         
         # quanto o duty varia para velocidade máxima

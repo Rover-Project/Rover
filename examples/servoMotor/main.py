@@ -40,6 +40,7 @@ if __name__ == "__main__":
                 time_rot = min(time_rot, 0.5)
                 servo360.mover_h(0.5)
                 time.sleep(time_rot)
+                servo360.stop()
                 
             else:
                 print("Valor invalido")
