@@ -36,7 +36,9 @@ if __name__ == "__main__":
                 
             elif servo_index == 1:
                 time_rot = float(input("Tempo de rotação: "))
-                servo360.mover_h(0.3)
+                
+                time_rot = max(time_rot, 0.5)
+                servo360.mover_h(0.5)
                 time.sleep(time_rot)
                 
             else:
