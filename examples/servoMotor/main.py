@@ -36,11 +36,18 @@ if __name__ == "__main__":
                 
             elif servo_index == 1:
                 time_rot = float(input("Tempo de rotação: "))
+                rot = int(input("Rotação horário = 0; Anti-horário = 1"))
                 
-                time_rot = min(time_rot, 4)
-                servo360.mover_h(0.5)
-                time.sleep(time_rot)
-                servo360.stop()
+                if rot == 0: 
+                    time_rot = min(time_rot, 4)
+                    servo360.set_speed(0.5)
+                    time.sleep(time_rot)
+                    servo360.stop()
+                elif rot == 1:
+                    time_rot = min(time_rot, 4)
+                    servo360.set_speed(-0.5)
+                    time.sleep(time_rot)
+                    servo360.stop()
                 
             else:
                 print("Valor invalido")
