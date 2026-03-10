@@ -1,11 +1,21 @@
 from roverlib.plugins.servoMotor.servo180 import Servo180
-from roverlib.plugins.servoMotor.servo360 import Servo360
+from roverlib.utils.config_manager import Config
+from pathlib import Path
+#from roverlib.plugins.servoMotor.servo360 import Servo360
 
 import time
 
 if __name__ == "__main__":
-    pin180 = 23
-
+    
+    config = Config(
+        Path(__file__).parent / "config.yaml"
+    )
+    
+    config_motor = config.get("motor")
+    
+    pin180 = config_motor["servo180"]
+    pin360 = config_motor["servo360"]
+    
     servo180 = Servo180(pin180)
     servo180.start()
 
