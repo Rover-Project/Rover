@@ -48,23 +48,16 @@ class Servo360:
 
         self.pwm.ChangeDutyCycle(duty)
 
+    def mover_h(self, speed:float):
+        self.set_speed(abs(speed))
+    
+    def mover_ant(self, speed:float):
+        self.set_speed(-abs(speed))
+
     def stop(self):
         """Para o servo"""
         self.pwm.ChangeDutyCycle(self.stop_duty)
-
-    def set_smooth_speed(self, init, end, step=0.05, time_step=0.05):
-        """
-        aceleração gradual
-        """
-
-        if init < end:
-            speeds = [i * step for i in range(int(init/step), int(end/step))]
-        else:
-            speeds = [i * step for i in range(int(init/step), int(end/step), -1)]
-
-        for speed in speeds:
-            self.set_speed(speed)
-            time.sleep(time_step)
+    
 
     def cleanup(self):
         self.pwm.stop()

@@ -1,7 +1,7 @@
 from roverlib.plugins.servoMotor.servo180 import Servo180
 from roverlib.utils.config_manager import Config
 from pathlib import Path
-#from roverlib.plugins.servoMotor.servo360 import Servo360
+from roverlib.plugins.servoMotor.servo360 import Servo360
 
 import time
 
@@ -18,15 +18,30 @@ if __name__ == "__main__":
     
     servo180 = Servo180(pin180)
     servo180.start()
+    
+    servo360 = Servo360(pin360)
+    servo360.start()
 
     servo180.set_angle(0)
     last_angle = 0
     
     try:
         while True:
-            angle = int(input("Qual angulo deseja?: "))
-            servo180.set_angle(angle)
-            time.sleep(1)
-
+            servo_index = int(input("Qual servo: "))
+            
+            if servo_index == 0: 
+                angle = int(input("Ângulo: "))
+                servo180.set_angle(angle)
+                time.sleep(1)
+                
+            elif servo_index == 1:
+                time_rot = float(input("Tempo de rotação: "))
+                servo360.mover_h(0.3)
+                time.sleep(time_rot)
+                
+            else:
+                print("Valor invalido")
+                
+                
     except KeyboardInterrupt:
         servo180.stop()
