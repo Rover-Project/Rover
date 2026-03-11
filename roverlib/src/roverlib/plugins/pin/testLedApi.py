@@ -1,56 +1,27 @@
-from pin import Pin, PinMode
-import threading
+from pin import GPIOPin
+from pin import PinMode
+
 import time
-import sys
 
-running = True
 
-# Thread para capturar teclado
-def keyboard_listener():
-    global running
+led = GPIOPin(15, PinMode.OUTPUT)
+
+try:
+
     while True:
-        c = sys.stdin.read(1)
-        if c.lower() == 'q':
-            running = False
-            break
 
-def main():
-    global running
+        print("ON")
 
-    led = Pin(15, PinMode.OUTPUT)
+        led.on()
 
-    print("Pressione 'q' para parar...\n")
+        time.sleep(1)
 
-    # inicia thread do teclado
-    t = threading.Thread(target=keyboard_listener, daemon=True)
-    t.start()
+        print("OFF")
 
-    try:
-        while running:
-            print("LED ON")
-            led.write(1)
-            time.sleep(1)
+        led.off()
 
-            print("LED OFF")
-            led.write(0)
-            time.sleep(1)
+        time.sleep(1)
 
-    except KeyboardInterrupt:
-        print("\nInterrompido com CTRL+C")
+except KeyboardInterrupt:
 
-    finally:
-        print("Desligando LED e liberando GPIO...")
-
-        # garante que o pino fica em LOW antes de sair
-        try:
-            led.write(0)
-        except:
-            pass
-
-        # força destruição do objeto (chama destructor C++)
-        del led
-
-        print("Encerrado com sucesso ✔")
-
-if __name__ == "__main__":
-    main()
+    print("Encerrando...")

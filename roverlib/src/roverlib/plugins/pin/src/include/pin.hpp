@@ -4,12 +4,14 @@
 #include <string>
 
 enum PinMode {
-    INPUT,
-    OUTPUT
+    INPUT = 0,
+    OUTPUT = 1
 };
 
 class Pin {
+
 private:
+
     int pinNumber;
     int kernelPin;
     PinMode mode;
@@ -20,6 +22,7 @@ private:
     std::string readFile(const std::string& path);
 
 public:
+
     Pin(int pin, PinMode mode);
     ~Pin();
 
