@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # Carrega configuração da gpio
     config = Config(Path(__file__).parent / "config.yaml")
     
-    pins_motors = config.get("gpio")
+    pins_motors = config.get("gpio")["motor"]
     letf = pins_motors["left"]
     right = pins_motors["right"]
     
