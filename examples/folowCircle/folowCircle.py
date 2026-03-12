@@ -84,11 +84,11 @@ def folowCircle():
     motor_config = config.get("gpio")["motor"]
     
     robot = Robot(
-        left=motor_config["left"], 
-        right=motor_config["right"],
+        left=motor_config["right"], 
+        right=motor_config["left"],
         calibration=Calibration(
-            right=motor_config["calibration"]["left"],
-            left=motor_config["calibration"]["right"]
+            right=motor_config["calibration"]["right"],
+            left=motor_config["calibration"]["left"]
         )
     )
     
