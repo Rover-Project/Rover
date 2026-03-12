@@ -157,7 +157,7 @@ def folowCircle():
             error_x = x - x_center # Velocidade para centralizar a bola
             error_r = r - max_r # Velocidade para correr atrás da bola
             
-            if r >= 200:
+            if r >= 150:
                 right = 0
                 left = 0
             else:
