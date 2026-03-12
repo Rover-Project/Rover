@@ -1,10 +1,10 @@
-from pin import GPIOPin
+from pin import Pin
 from pin import PinMode
 
 import time
 
 
-led = GPIOPin(15, PinMode.OUTPUT)
+led = Pin(15, PinMode.DIGITAL_OUT)
 
 try:
 
@@ -25,3 +25,4 @@ try:
 except KeyboardInterrupt:
 
     print("Encerrando...")
+    led.release()

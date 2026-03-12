@@ -1,20 +1,24 @@
-from .bin.pin import Pin, PinMode
+from .bin import pin as native
+
+PinMode = native.PinMode
 
 
-class GPIOPin:
+class Pin:
 
-    def __init__(self, pin, mode):
-
-        self.pin = Pin(pin, mode)
+    def __init__(self, number, mode):
+        self._pin = native.Pin(number, mode)
 
     def on(self):
-
-        self.pin.write(1)
+        self._pin.write(1)
 
     def off(self):
-
-        self.pin.write(0)
+        self._pin.write(0)
 
     def read(self):
+        return self._pin.read()
 
-        return self.pin.read()
+    def pwm(self, duty):
+        self._pin.pwmWrite(duty)
+
+    def release(self):
+        self._pin.release()
