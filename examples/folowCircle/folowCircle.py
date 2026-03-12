@@ -87,8 +87,8 @@ def folowCircle():
         left=motor_config["left"], 
         right=motor_config["right"],
         calibration=Calibration(
-            right=motor_config["calibration"]["right"],
-            left=motor_config["calibration"]["left"]
+            right=motor_config["calibration"]["left"],
+            left=motor_config["calibration"]["right"]
         )
     )
     
