@@ -1,8 +1,5 @@
 camera:
   fps: 30
-  resolution:
-    h: 640
-    w: 640
-  brigh: 0.25 # Brilho
-  contrast: 1 # Contraste 
-  saturation: 1 # Saturação
+  brigh: 0.25
+  saturation: 1
+  contrast: 1

@@ -8,9 +8,9 @@ if __name__ == "__main__":
     # Carrega configuração da gpio
     config = Config(Path(__file__).parent / "config.yaml")
     
-    pins_motors = config.get("gpio")
-    letf = (int(pins_motors["motor_esquerdo"]["in1"]), int(pins_motors["motor_esquerdo"]["in2"]))
-    right = (int(pins_motors["motor_direito"]["in3"]), int(pins_motors["motor_direito"]["in4"]))
+    pins_motors = config.get("gpio")["motor"]
+    letf = pins_motors["left"]
+    right = pins_motors["right"]
     
     # Cria a instancia para controle dos motores
     motor_controller = Motor(
