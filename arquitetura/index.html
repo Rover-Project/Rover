@@ -1,0 +1,2490 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://rover-project.github.io/Rover/arquitetura/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../api/drivers/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Arquitetura do Sistema Rover - RoverLib Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#arquitetura-do-sistema-rover" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href=".." title="RoverLib Documentation" class="md-header__button md-logo" aria-label="RoverLib Documentation" data-md-component="logo">
+      
+  <img src="../assets/logo-Rover.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RoverLib Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Arquitetura do Sistema Rover
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Rover-Project/Rover" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Rover-Project/Rover
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Bem-vindo à RoverLib
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura do Sistema Rover
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/drivers/" class="md-tabs__link">
+          
+  
+  
+  Api
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="RoverLib Documentation" class="md-nav__button md-logo" aria-label="RoverLib Documentation" data-md-component="logo">
+      
+  <img src="../assets/logo-Rover.png" alt="logo">
+
+    </a>
+    RoverLib Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Rover-Project/Rover" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Rover-Project/Rover
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bem-vindo à RoverLib
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura do Sistema Rover
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura do Sistema Rover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#visao-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visão Geral
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Visão Geral">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estrutura-em-camadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estrutura em Camadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-1-drivers-de-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 1: Drivers de Hardware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 1: Drivers de Hardware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-controle-de-motores-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Controle de Motores DC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Controle de Motores DC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao-e-configuracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização e Configuração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-e-comportamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros e Comportamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestao-de-ciclo-de-vida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestão de Ciclo de Vida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tratamento-de-erros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tratamento de Erros
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-captura-de-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Captura de Câmera
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2 Captura de Câmera">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-automatica-de-plataforma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção Automática de Plataforma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuracao-de-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuração de Câmera
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-de-retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato de Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-2-comportamento-orquestracao-e-movimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 2: Comportamento (Orquestração e Movimento)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 2: Comportamento (Orquestração e Movimento)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-classe-robot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Classe Robot
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Classe Robot">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-movimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métodos de Movimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calibracao-de-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibração de Motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-classe-rover-orquestrador-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Classe Rover (Orquestrador Principal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Classe Rover (Orquestrador Principal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodo-principal-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Método Principal: Line-Following
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Método Principal: Line-Following">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fluxo-de-execucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluxo de Execução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tratamento-de-obstaculos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tratamento de Obstáculos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodo-de-finalizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Método de Finalização
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-3-inteligencia-processamento-de-imagem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 3: Inteligência (Processamento de Imagem)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 3: Inteligência (Processamento de Imagem)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-modulo-de-visao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Módulo de Visão
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Módulo de Visão">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-linhas-para-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Linhas para Line-Following
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Linhas para Line-Following">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo de Uso
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-circulos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Círculos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Círculos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-circulos-alternativa-contornos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Círculos Alternativa (Contornos)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Círculos Alternativa (Contornos)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-obstaculos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Obstáculos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Obstáculos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retorno_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluxo-de-dados-integrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluxo de Dados Integrado
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fluxo de Dados Integrado">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagrama-de-fluxo-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Fluxo (Line-Following)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuracao-do-sistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuração do Sistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuração do Sistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arquivo-de-configuracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arquivo de Configuração
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-e-limitacoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance e Limitações
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance e Limitações">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caracteristicas-de-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Características de Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restricoes-conhecidas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrições Conhecidas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integracao-com-llms-code-as-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integração com LLMs (Code as Policies)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Api
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drivers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#visao-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visão Geral
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Visão Geral">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estrutura-em-camadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estrutura em Camadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-1-drivers-de-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 1: Drivers de Hardware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 1: Drivers de Hardware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-controle-de-motores-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Controle de Motores DC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Controle de Motores DC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao-e-configuracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização e Configuração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-e-comportamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros e Comportamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestao-de-ciclo-de-vida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestão de Ciclo de Vida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tratamento-de-erros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tratamento de Erros
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-captura-de-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Captura de Câmera
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2 Captura de Câmera">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-automatica-de-plataforma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção Automática de Plataforma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuracao-de-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuração de Câmera
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-de-retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato de Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-2-comportamento-orquestracao-e-movimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 2: Comportamento (Orquestração e Movimento)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 2: Comportamento (Orquestração e Movimento)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-classe-robot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Classe Robot
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Classe Robot">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-movimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métodos de Movimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calibracao-de-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibração de Motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-classe-rover-orquestrador-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Classe Rover (Orquestrador Principal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Classe Rover (Orquestrador Principal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodo-principal-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Método Principal: Line-Following
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Método Principal: Line-Following">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fluxo-de-execucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluxo de Execução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tratamento-de-obstaculos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tratamento de Obstáculos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metodo-de-finalizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Método de Finalização
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#camada-3-inteligencia-processamento-de-imagem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camada 3: Inteligência (Processamento de Imagem)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Camada 3: Inteligência (Processamento de Imagem)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-modulo-de-visao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Módulo de Visão
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Módulo de Visão">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inicializacao_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inicialização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-linhas-para-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Linhas para Line-Following
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Linhas para Line-Following">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo de Uso
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-circulos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Círculos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Círculos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-circulos-alternativa-contornos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Círculos Alternativa (Contornos)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Círculos Alternativa (Contornos)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#algoritmo_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algoritmo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deteccao-de-obstaculos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detecção de Obstáculos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detecção de Obstáculos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parâmetros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retorno_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplo_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluxo-de-dados-integrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluxo de Dados Integrado
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fluxo de Dados Integrado">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagrama-de-fluxo-line-following" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Fluxo (Line-Following)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuracao-do-sistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuração do Sistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuração do Sistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arquivo-de-configuracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arquivo de Configuração
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-e-limitacoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance e Limitações
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance e Limitações">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caracteristicas-de-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Características de Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restricoes-conhecidas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrições Conhecidas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integracao-com-llms-code-as-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integração com LLMs (Code as Policies)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="arquitetura-do-sistema-rover">Arquitetura do Sistema Rover</h1>
+<h2 id="visao-geral">Visão Geral</h2>
+<p>O sistema Rover é uma plataforma robótica modular em Python implementada para Raspberry Pi 5, arquitetada em três camadas funcionais que separam claramente as responsabilidades entre hardware, lógica comportamental e processamento de inteligência visual. Esta separação de responsabilidades (separation of concerns) facilita a manutenção, testes unitários e permite que desenvolvedores e sistemas de alto nível arquitetem lógicas previsíveis e corretas. A biblioteca exporta uma interface simplificada através da classe <code>Rover</code>, que orquestra a inicialização e coordenação de todos os módulos subordinados.</p>
+<h3 id="estrutura-em-camadas">Estrutura em Camadas</h3>
+<p>A arquitetura em camadas do Rover segue o padrão de abstração crescente, onde cada camada encapsula um domínio específico e expõe interfaces bem definidas para a camada superior.</p>
+<p><img alt="Fluxo de Dados da RoverLib" src="../assets/data-flow-roverlib.png" /></p>
+<hr />
+<h2 id="camada-1-drivers-de-hardware">Camada 1: Drivers de Hardware</h2>
+<p>Esta camada fornece abstração direta sobre os componentes eletrônicos da Raspberry Pi, encapsulando a complexidade dos protocolos GPIO, PWM e captura de câmera.</p>
+<h3 id="11-controle-de-motores-dc">1.1 Controle de Motores DC</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/modules/movement/motor.py">roverlib/src/roverlib/modules/movement/motor.py</a></p>
+<p>A classe <code>Motor</code> fornece controle de baixo nível para um único motor DC acoplado a uma ponte-H L298N (H-bridge). Gerencia diretamente os sinais GPIO e os sinais PWM (Pulse Width Modulation) que determinam a velocidade de rotação.</p>
+<h4 id="inicializacao-e-configuracao">Inicialização e Configuração</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib.modules.movement.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Criar instância do motor com pinos GPIO</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">pins</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="n">pwm_frequency</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Configurar os pinos GPIO e iniciar PWM</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">motor</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Executar movimento</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">motor</span><span class="o">.</span><span class="n">set_movement</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;FORWARD&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="parametros-e-comportamento">Parâmetros e Comportamento</h4>
+<ul>
+<li>
+<p><strong><code>pins</code> (tupla de inteiros):</strong> Dois pinos GPIO que controlam as entradas IN1 e IN2 da ponte-H. A ponte-H recebe um par de sinais lógicos que determinam a polaridade da tensão aplicada ao motor (favorecendo rotação em um sentido ou outro).</p>
+</li>
+<li>
+<p><strong><code>pwm_frequency</code> (inteiro, padrão: 1000 Hz):</strong> Frequência de modulação por largura de pulso. Valores típicos variam entre 500 Hz e 2000 Hz. Frequências maiores reduzem ruído audível mas aumentam consumo de CPU.</p>
+</li>
+<li>
+<p><strong><code>speed</code> (float, intervalo 0–100):</strong> Percentual do ciclo de trabalho (duty cycle) do sinal PWM. Valor 0 representa motor parado; valor 100 representa máxima velocidade. A relação entre duty cycle e velocidade linear é aproximadamente proporcional.</p>
+</li>
+<li>
+<p><strong><code>direction</code> (string):</strong> Especifica o sentido de rotação. Valores aceitos: <code>"FORWARD"</code> e <code>"BACKWARD"</code> (case-insensitive).</p>
+</li>
+</ul>
+<h4 id="gestao-de-ciclo-de-vida">Gestão de Ciclo de Vida</h4>
+<p>O método <code>initialize()</code> deve ser invocado antes de qualquer chamada a <code>set_movement()</code>. A inicialização configura os pinos em modo de saída (GPIO.OUT), cria os objetos PWM nas frequências especificadas e inicia o duty cycle em 0%. Seu estado é rastreado pela flag interna <code>_initialized</code>.</p>
+<p>Ao término da aplicação, o método <code>cleanup()</code> deve ser invocado para liberar recursos GPIO e evitar corrupção de estado do sistema operacional.</p>
+<h4 id="tratamento-de-erros">Tratamento de Erros</h4>
+<p>A classe <code>Motor</code> lança três exceções especializadas definidas em <code>execeptions/motorExeceptions.py</code>:</p>
+<ul>
+<li><strong><code>MotorCreationError</code>:</strong> Levantada se <code>RPi.GPIO</code> não estiver disponível (não executando em Raspberry Pi).</li>
+<li><strong><code>UninitializedMotorError</code>:</strong> Levantada se <code>set_movement()</code> for invocado antes de <code>initialize()</code>.</li>
+<li><strong><code>DirectionInvalidMotorError</code>:</strong> Levantada se um valor inválido for passado para o parâmetro <code>direction</code>.</li>
+</ul>
+<h3 id="12-captura-de-camera">1.2 Captura de Câmera</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/modules/camera/cameraModule.py">roverlib/src/roverlib/modules/camera/cameraModule.py</a></p>
+<p>A classe <code>CameraModule</code> abstrai a captura de frames de câmera, fornecendo suporte automático para hardware Picamera2 (nativo de Raspberry Pi 5) e fallback para mock em plataformas de desenvolvimento que carecem do hardware.</p>
+<h4 id="inicializacao">Inicialização</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib.modules.camera.cameraModule</span><span class="w"> </span><span class="kn">import</span> <span class="n">CameraModule</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Criar instância da câmera</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">camera</span> <span class="o">=</span> <span class="n">CameraModule</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">480</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">analogic</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">exposure</span><span class="o">=</span><span class="mi">30000</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Capturar um frame</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">get_frame</span><span class="p">()</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Obter resolução de preview</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">resolution</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">get_preview_resolution</span><span class="p">()</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1"># Liberar recursos</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">camera</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</code></pre></div>
+<h4 id="deteccao-automatica-de-plataforma">Detecção Automática de Plataforma</h4>
+<p>O módulo implementa um padrão de detecção dinâmica:</p>
+<ol>
+<li>
+<p><strong>Na Raspberry Pi 5:</strong> Importa <code>picamera2</code> com sucesso. O modo de configuração é <code>preview</code> em RGB888, com resolução configurável e suporte a controle de ganho analógico e tempo de exposição.</p>
+</li>
+<li>
+<p><strong>Em plataformas sem Picamera2:</strong> Uma classe mock é instanciada, que retorna frames de teste (gradiente cinza) com dimensões configuráveis. Útil para desenvolvimento e testes em estações de trabalho.</p>
+</li>
+</ol>
+<p>A variável de flag <code>is_mock</code> permite código condicional para comportamentos específicos de plataforma.</p>
+<h4 id="configuracao-de-camera">Configuração de Câmera</h4>
+<p>Os parâmetros de captura são carregados do arquivo <a href="../roverlib/src/roverlib/configs/config.yaml">roverlib/src/roverlib/configs/config.yaml</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">camera</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">fps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w">                          </span><span class="c1"># Taxa de captura em frames por segundo</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3280</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2464</span><span class="p p-Indicator">]</span><span class="w">         </span><span class="c1"># Resolução total do sensor</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">preview_resolution</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">640</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">480</span><span class="p p-Indicator">]</span><span class="w">   </span><span class="c1"># Resolução de processamento</span>
+</code></pre></div>
+<p>Os parâmetros <code>analogic</code> e <code>exposure</code> ajustam características de iluminação:</p>
+<ul>
+<li>
+<p><strong><code>analogic</code> (float, típico 1.0–4.0):</strong> Amplificação analógica do sensor. Valores menores escurecem a imagem; valores maiores a iluminam (com aumento de ruído).</p>
+</li>
+<li>
+<p><strong><code>exposure</code> (inteiro em microssegundos):</strong> Tempo de exposição do sensor. Valores menores produzem imagens mais escuras; valores maiores capturam mais luz.</p>
+</li>
+</ul>
+<h4 id="formato-de-retorno">Formato de Retorno</h4>
+<p>O método <code>get_frame()</code> retorna um array NumPy em formato BGR (Blue-Green-Red), compatível com OpenCV. A conversão automática de RGB (capturado pela câmera) para BGR é realizada internamente.</p>
+<hr />
+<h2 id="camada-2-comportamento-orquestracao-e-movimento">Camada 2: Comportamento (Orquestração e Movimento)</h2>
+<p>Esta camada implementa abstrações de alto nível que coordenam motores e sensores para realizar tarefas compostas, como seguir linhas ou executar movimentos estruturados.</p>
+<h3 id="21-classe-robot">2.1 Classe Robot</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/modules/movement/robot.py">roverlib/src/roverlib/modules/movement/robot.py</a></p>
+<p>A classe <code>Robot</code> encapsula a coordenação de dois motores (esquerdo e direito) para produzir movimentos de alto nível como avanço, recuo e rotações.</p>
+<h4 id="inicializacao_1">Inicialização</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib.modules.movement.robot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Robot</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Criar instância com pinos dos motores</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">left</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span>      <span class="c1"># Pinos do motor esquerdo (direção, PWM)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">right</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span>     <span class="c1"># Pinos do motor direito (direção, PWM)</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">pwm_frequency</span><span class="o">=</span><span class="mi">1000</span>  <span class="c1"># Frequência em Hz</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Agora os motores estão configurados e prontos</span>
+</code></pre></div>
+<h4 id="metodos-de-movimento">Métodos de Movimento</h4>
+<p>Todos os métodos de movimento aceitam parâmetros opcionais de duração que, quando definidos, fazem o robô executar o movimento por um tempo determinado antes de parar automaticamente.</p>
+<p><strong><code>forward(speed=50, duration=None) → bool</code></strong></p>
+<p>Move o robô para frente aplicando a velocidade especificada em ambos os motores com polaridade idêntica.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Movimento indefinido</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">robot</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Movimento de 2 segundos</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">robot</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>backward(speed=50, duration=None) → bool</code></strong></p>
+<p>Move o robô para trás invertendo a polaridade em ambos os motores.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">robot</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>turn_left(speed=50, duration=None) → bool</code></strong></p>
+<p>Gira o robô no sentido anti-horário. O motor esquerdo é parado enquanto o direito avança, produzindo rotação in situ.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">robot</span><span class="o">.</span><span class="n">turn_left</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>turn_right(speed=50, duration=None) → bool</code></strong></p>
+<p>Gira o robô no sentido horário. O motor direito é parado enquanto o esquerdo avança.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">robot</span><span class="o">.</span><span class="n">turn_right</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>move(speed_left, speed_right) → None</code></strong></p>
+<p>Aplica velocidades independentes a cada motor, permitindo movimentos curvos e manobras complexas.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Curva suave para esquerda</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">robot</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">speed_left</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">speed_right</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Aproximação de rotação diferencial</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">robot</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">speed_left</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">speed_right</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>stop() → None</code></strong></p>
+<p>Para ambos os motores imediatamente.</p>
+<p><strong><code>cleanup() → None</code></strong></p>
+<p>Libera todos os recursos GPIO associados aos motores.</p>
+<h4 id="calibracao-de-motores">Calibração de Motores</h4>
+<p>O módulo <a href="../roverlib/src/roverlib/modules/movement/motorCalibration.py">roverlib/src/roverlib/modules/movement/motorCalibration.py</a> implementa compensação de assimetrias mecânicas. Em robôs reais, diferenças nas resistências de atrito, enrolamento de bobina e engrenagens causam que, quando aplicada a mesma velocidade, o robô desvie para um lado.</p>
+<p>A classe <code>MotorCalibration</code> carrega fatores de compensação do arquivo <code>config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">motor_calibration</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">limiar_motor_esquerdo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">  </span><span class="c1"># Fator multiplicativo de velocidade</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">limiar_motor_direito</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">   </span><span class="c1"># Fator multiplicativo de velocidade</span>
+</code></pre></div>
+<p>Valores acima de 1.0 aumentam a velocidade do motor especificado; valores abaixo reduzem.</p>
+<h3 id="22-classe-rover-orquestrador-principal">2.2 Classe Rover (Orquestrador Principal)</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/rover.py">roverlib/src/roverlib/rover.py</a></p>
+<p>A classe <code>Rover</code> é o ponto de entrada da biblioteca. Inicializa todos os módulos e fornece métodos de alto nível para tarefas robóticas complexas como line-following.</p>
+<h4 id="inicializacao_2">Inicialização</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rover</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Instanciar o Rover</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">rover</span> <span class="o">=</span> <span class="n">Rover</span><span class="p">(</span><span class="n">pwm_frequency</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1"># A instância agora possui três atributos públicos:</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># - rover.movement (instância de Robot)</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1"># - rover.camera (instância de CameraModule)</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="c1"># - rover.vision (instância de VisionModule)</span>
+</code></pre></div>
+<p>Durante a inicialização:</p>
+<ol>
+<li><code>Config.get("gpio")</code> carrega a configuração de pinos do arquivo <code>config.yaml</code>.</li>
+<li>Instâncias de <code>Robot</code>, <code>CameraModule</code> e <code>VisionModule</code> são criadas.</li>
+<li>Mensagens de diagnóstico são impressas no console.</li>
+</ol>
+<h4 id="metodo-principal-line-following">Método Principal: Line-Following</h4>
+<p><strong><code>follow_line(base_speed=30, kp=0.7, max_turn_speed=25, duration=None) → None</code></strong></p>
+<p>Este método implementa um algoritmo de seguimento de linha usando controle proporcional (P). O robô executa um loop de tempo real que:</p>
+<ol>
+<li>Captura frame da câmera</li>
+<li>Detecta obstáculos (prioridade máxima)</li>
+<li>Processa o frame para extrair desvio da linha</li>
+<li>Aplica controle proporcional para corrigir trajetória</li>
+<li>Aguarda 10 ms antes da próxima iteração</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">rover</span> <span class="o">=</span> <span class="n">Rover</span><span class="p">()</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="c1"># Seguir linha indefinidamente</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">follow_line</span><span class="p">(</span><span class="n">base_speed</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">kp</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interrupção do usuário.&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">stop_and_cleanup</span><span class="p">()</span>
+</code></pre></div>
+<h5 id="parametros">Parâmetros</h5>
+<ul>
+<li>
+<p><strong><code>base_speed</code> (inteiro, 0–100):</strong> Velocidade de cruzeiro em percentual. Aplicada simetricamente a ambos os motores quando nenhuma correção é necessária.</p>
+</li>
+<li>
+<p><strong><code>kp</code> (float):</strong> Ganho proporcional do controlador. Determina a magnitude da correção. Valores típicos: 0.5–1.0. Valores maiores produzem resposta mais agressiva (oscilar).</p>
+</li>
+<li>
+<p><strong><code>max_turn_speed</code> (inteiro):</strong> Limite máximo de velocidade de correção de curva. Evita que o robô execute manobras muito bruscas.</p>
+</li>
+<li>
+<p><strong><code>duration</code> (float, opcional):</strong> Duração máxima de execução em segundos. Se <code>None</code>, executa indefinidamente até interrupção por teclado.</p>
+</li>
+</ul>
+<h5 id="fluxo-de-execucao">Fluxo de Execução</h5>
+<p><img alt="Ilustração do Fluxo de execução do PID" src="../assets/fluxograma-PID.png" /></p>
+<h5 id="tratamento-de-obstaculos">Tratamento de Obstáculos</h5>
+<p>Obstáculos detectados (cor vermelha por padrão) interrompem o movimento imediatamente. O algoritmo retorna ao início do loop para reavaliar após pequeno atraso (0.5 s) para estabilização.</p>
+<h5 id="metodo-de-finalizacao">Método de Finalização</h5>
+<p><strong><code>stop_and_cleanup() → None</code></strong></p>
+<p>Para ambos os motores, libera recursos GPIO, fecha streams de câmera e imprime mensagem de confirmação. Deve sempre ser invocado ao término, tipicamente em bloco <code>finally</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">rover</span> <span class="o">=</span> <span class="n">Rover</span><span class="p">()</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">follow_line</span><span class="p">(</span><span class="n">base_speed</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">stop_and_cleanup</span><span class="p">()</span>  <span class="c1"># Sempre executado</span>
+</code></pre></div>
+<hr />
+<h2 id="camada-3-inteligencia-processamento-de-imagem">Camada 3: Inteligência (Processamento de Imagem)</h2>
+<p>Esta camada implementa algoritmos de visão computacional clássica para extração de features e detecção de formas.</p>
+<h3 id="31-modulo-de-visao">3.1 Módulo de Visão</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/modules/vision/visionModule.py">roverlib/src/roverlib/modules/vision/visionModule.py</a></p>
+<p>O <code>VisionModule</code> processa frames capturados pela câmera, detectando linhas, círculos e obstáculos através de algoritmos consolidados de visão computacional.</p>
+<h4 id="inicializacao_3">Inicialização</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib.modules.vision.visionModule</span><span class="w"> </span><span class="kn">import</span> <span class="n">VisionModule</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1"># Criar instância com resolução esperada de frames</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">vision</span> <span class="o">=</span> <span class="n">VisionModule</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">))</span>
+</code></pre></div>
+<p>A resolução deve corresponder à resolução de frames que serão processados. Utilizada internamente para cálculos de normalização e centroide.</p>
+<h4 id="deteccao-de-linhas-para-line-following">Detecção de Linhas para Line-Following</h4>
+<p><strong><code>process_frame_for_line_following(frame) → tuple[float, np.ndarray]</code></strong></p>
+<p>Processa um frame para detectar uma linha branca (ou clara) contra fundo mais escuro, calculando o desvio do centroide da linha em relação ao centro horizontal do frame.</p>
+<h5 id="algoritmo">Algoritmo</h5>
+<ol>
+<li>
+<p><strong>Conversão de Espaço de Cor:</strong> Converte de BGR para HSV (Hue, Saturation, Value). O espaço HSV é mais robusto para detecção de cores em variações de iluminação.</p>
+</li>
+<li>
+<p><strong>Máscara de Cor:</strong> Aplica <code>cv2.inRange()</code> com limites HSV para isolamento da cor branca:</p>
+</li>
+<li>Lower: <code>[0, 0, 200]</code> (baixa saturação, alto valor)</li>
+<li>
+<p>Upper: <code>[180, 25, 255]</code> (baixa saturação, alto valor)</p>
+</li>
+<li>
+<p><strong>Região de Interesse (ROI):</strong> Anula pixels acima de 80% da altura (ROI a partir de <code>0.8 * height</code>), focando na detecção perto do robô.</p>
+</li>
+<li>
+<p><strong>Cálculo de Centroide:</strong> Utiliza momentos de imagem (<code>cv2.moments()</code>) para calcular o centroide $(x_c, y_c)$ da máscara:
+   $$M = \int\int I(x,y) \, dx \, dy$$
+   $$x_c = \frac{M_{10}}{M_{00}}, \quad y_c = \frac{M_{01}}{M_{00}}$$</p>
+</li>
+<li>
+<p><strong>Normalização de Desvio:</strong> Calcula o deslocamento em relação ao centro:
+   $$\text{desvio} = \frac{x_c - \frac{\text{width}}{2}}{\frac{\text{width}}{2}}$$</p>
+</li>
+</ol>
+<p>Resultado: valor entre -1.0 (totalmente esquerda) e 1.0 (totalmente direita).</p>
+<h5 id="exemplo-de-uso">Exemplo de Uso</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">capture_frame</span><span class="p">()</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">desvio</span><span class="p">,</span> <span class="n">frame_processado</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">process_frame_for_line_following</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Desvio da linha: </span><span class="si">{</span><span class="n">desvio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Entre -1.0 e 1.0</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># frame_processado contém visualizações para debug (centroide, linha central, valor de desvio)</span>
+</code></pre></div>
+<p><img alt="Exemplo de Detecção de Linha" src="../assets/line-detection.png" /></p>
+<h4 id="deteccao-de-circulos">Detecção de Círculos</h4>
+<p><strong><code>houghCircleDetect(img, dp=1.3, minDist=50, canny=100, accumulation=40, minRadius=5, maxRadius=300) → tuple[tuple, np.ndarray]</code></strong></p>
+<p>Localiza círculos em uma imagem usando Transformada de Hough circular. Este é um método clássico e robusto para detecção de formas circulares.</p>
+<h5 id="algoritmo_1">Algoritmo</h5>
+<ol>
+<li>
+<p><strong>Detecção de Bordas:</strong> Aplica filtro de arestas (Canny) via <code>ProcessingImage.edge_filter()</code>.</p>
+</li>
+<li>
+<p><strong>Máscaras Morfológicas:</strong> Aplica operação de fechamento (MORPH_CLOSE) com kernel elíptico para preencher pequenos vãos e fortalecer bordas elípticas.</p>
+</li>
+<li>
+<p><strong>Transformada de Hough:</strong> Utiliza <code>cv2.HoughCircles()</code> com parâmetros:</p>
+</li>
+<li><code>dp</code>: Razão de resolução do acumulador (1.3 = reduzida para rapidez).</li>
+<li><code>minDist</code>: Distância mínima entre centros de círculos (evita duplicatas).</li>
+<li><code>param1</code> (canny): Limiar superior para Canny (usado na detecção de bordas interna).</li>
+<li><code>param2</code> (accumulation): Limiar do acumulador de Hough.</li>
+<li>
+<p><code>minRadius</code> e <code>maxRadius</code>: Limites de raio esperado.</p>
+</li>
+<li>
+<p><strong>Seleção do Maior Círculo:</strong> Ordena círculos por raio decrescente e retorna o primeiro (maior).</p>
+</li>
+</ol>
+<h5 id="parametros_1">Parâmetros</h5>
+<ul>
+<li>
+<p><strong><code>dp</code> (float):</strong> Razão inversa de acumulação de resolução. Valores menores (p.ex., 1.0) preservam resolução mas aumentam custo computacional. Padrão 1.3 oferece bom balanço.</p>
+</li>
+<li>
+<p><strong><code>minDist</code> (inteiro):</strong> Distância mínima entre centros (em pixels). Para câmera 640×480, tipicamente 40–60.</p>
+</li>
+<li>
+<p><strong><code>canny</code> (inteiro):</strong> Limiar para Canny. Valores maiores exigem bordas mais proeminentes.</p>
+</li>
+<li>
+<p><strong><code>accumulation</code> (inteiro):</strong> Votação mínima no acumulador de Hough. Valores maiores reduzem falsos positivos.</p>
+</li>
+<li>
+<p><strong><code>minRadius</code> e <code>maxRadius</code> (inteiros):</strong> Intervalo de raios esperados.</p>
+</li>
+</ul>
+<h5 id="retorno">Retorno</h5>
+<p>Tupla <code>(círculo, máscara_bordas)</code>:
+- <strong>círculo:</strong> Tupla <code>(x, y, raio)</code> do círculo detectado, ou <code>None</code> se nenhum encontrado.
+- <strong>máscara_bordas:</strong> Array NumPy com bordas detectadas, útil para visualização.</p>
+<h5 id="exemplo">Exemplo</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">capture_frame</span><span class="p">()</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">circulo</span><span class="p">,</span> <span class="n">bordas</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">houghCircleDetect</span><span class="p">(</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">frame</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">dp</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">minDist</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">canny</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">accumulation</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="n">minRadius</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="n">maxRadius</span><span class="o">=</span><span class="mi">300</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">)</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="k">if</span> <span class="n">circulo</span><span class="p">:</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">circulo</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Círculo detectado: centro=(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">), raio=</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nenhum círculo detectado.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="deteccao-de-circulos-alternativa-contornos">Detecção de Círculos Alternativa (Contornos)</h4>
+<p><strong><code>circleCannyDetect(img, MINRADIUS=3, MINAREA=300, canny=(70, 150)) → tuple | None</code></strong></p>
+<p>Detecta círculos alternativamente via contornos e coeficiente de circularidade, útil para robustez em condições onde a Transformada de Hough falha.</p>
+<h5 id="algoritmo_2">Algoritmo</h5>
+<ol>
+<li>
+<p><strong>Detecção de Arestas:</strong> Aplica Canny com limiares especificados.</p>
+</li>
+<li>
+<p><strong>Extração de Contornos:</strong> <code>cv2.findContours()</code> localiza todos os contornos.</p>
+</li>
+<li>
+<p><strong>Filtragem por Área:</strong> Descarta contornos com área menor que <code>MINAREA</code>.</p>
+</li>
+<li>
+<p><strong>Cálculo de Circularidade:</strong> Para cada contorno:</p>
+</li>
+<li>Encontra o círculo envolvente mínimo via <code>cv2.minEnclosingCircle()</code>.</li>
+<li>Calcula razão de erro:
+     $$\text{erro} = \frac{|\text{área}<em>{contorno} - \text{área}</em>{círculo}|}{\text{área}_{círculo}}$$</li>
+<li>
+<p>Contornos com <code>erro &lt; 0.35</code> são considerados circulares.</p>
+</li>
+<li>
+<p><strong>Seleção do Melhor:</strong> Retorna o círculo com menor erro.</p>
+</li>
+</ol>
+<h5 id="exemplo_1">Exemplo</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">capture_frame</span><span class="p">()</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">circulo</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">circleCannyDetect</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">MINRADIUS</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">MINAREA</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="k">if</span> <span class="n">circulo</span><span class="p">:</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">circulo</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Círculo encontrado: (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">), raio=</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="deteccao-de-obstaculos">Detecção de Obstáculos</h4>
+<p><strong><code>detect_obstacle(frame, min_area_threshold=5000, color_range=None) → tuple[bool, np.ndarray]</code></strong></p>
+<p>Detecta a presença de obstáculos (tipicamente vermelhos) na frente do robô baseado em cor e área.</p>
+<h5 id="parametros_2">Parâmetros</h5>
+<ul>
+<li><strong><code>frame</code>:</strong> Array NumPy em BGR.</li>
+<li><strong><code>min_area_threshold</code>:</strong> Área mínima em pixels para considerar um objeto como obstáculo.</li>
+<li><strong><code>color_range</code>:</strong> Tupla <code>(lower_hsv, upper_hsv)</code> para intervalo de cores. Padrão: vermelho.</li>
+</ul>
+<h5 id="retorno_1">Retorno</h5>
+<p>Tupla <code>(detectado, máscara)</code>:
+- <strong>detectado:</strong> Boolean indicando presença de obstáculo.
+- <strong>máscara:</strong> Array com máscara binária do obstáculo.</p>
+<h5 id="exemplo_2">Exemplo</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">capture_frame</span><span class="p">()</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">obstáculo_detectado</span><span class="p">,</span> <span class="n">máscara</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">detect_obstacle</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">min_area_threshold</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="k">if</span> <span class="n">obstáculo_detectado</span><span class="p">:</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Obstáculo na frente!&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="fluxo-de-dados-integrado">Fluxo de Dados Integrado</h2>
+<h3 id="diagrama-de-fluxo-line-following">Diagrama de Fluxo (Line-Following)</h3>
+<p>A sequência a seguir ilustra como dados fluem através das três camadas durante uma iteração de line-following:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>┌─────────────────────────────────────────────────────────┐
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>│ Iteração N do Loop de Controle (10 ms)                  │
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>└─────────────────────────────────────────────────────────┘
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>                          ↓
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>        │ 1. Captura de Frame (Câmera)        │
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>        │ camera.capture_frame() → frame      │
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>                          ↓
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>        │ 2. Detecção de Obstáculos (Visão)   │
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>        │ vision.detect_obstacle(frame)       │
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>        │ Se detectado → movement.stop()      │
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>                          ↓
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>        │ 3. Processamento de Linha (Visão)   │
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>        │ vision.process_frame_for_...()      │
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>        │ Retorna desvio normalizado           │
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>                          ↓
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>        │ 4. Controle Proporcional (Comp.)    │
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>        │ turn_speed = desvio × kp × base_spd │
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>        │ speed_left, speed_right = calculado │
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a>                          ↓
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a>        │ 5. Comando de Movimento (Robot)     │
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a>        │ movement.move(speed_left,           │
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a>        │              speed_right)           │
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a>                          ↓
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a>        ┌─────────────────────────────────────┐
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a>        │ 6. Controle de Motores (Motor)      │
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a>        │ motor.set_movement(speed,           │
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a>        │                   direction)        │
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a>        │ Escreve nos pinos GPIO/PWM          │
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a>        └─────────────────────────────────────┘
+<a id="__codelineno-18-40" name="__codelineno-18-40" href="#__codelineno-18-40"></a>                          ↓
+<a id="__codelineno-18-41" name="__codelineno-18-41" href="#__codelineno-18-41"></a>                   sleep(0.01)
+<a id="__codelineno-18-42" name="__codelineno-18-42" href="#__codelineno-18-42"></a>                          ↓
+<a id="__codelineno-18-43" name="__codelineno-18-43" href="#__codelineno-18-43"></a>                  Próxima Iteração
+</code></pre></div>
+<hr />
+<h2 id="configuracao-do-sistema">Configuração do Sistema</h2>
+<h3 id="arquivo-de-configuracao">Arquivo de Configuração</h3>
+<p><strong>Arquivo:</strong> <a href="../roverlib/src/roverlib/configs/config.yaml">roverlib/src/roverlib/configs/config.yaml</a></p>
+<p>Centraliza todos os parâmetros de hardware e calibração. Carregado automaticamente pela classe <code>Config</code> no módulo <code>utils.config_manager</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">gpio</span><span class="p">:</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">motor_esquerdo</span><span class="p">:</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">in1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span><span class="w">         </span><span class="c1"># Pino de direção</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">in2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">11</span><span class="w">         </span><span class="c1"># Pino de PWM</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nt">motor_direito</span><span class="p">:</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nt">in3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span><span class="w">         </span><span class="c1"># Pino de direção</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="nt">in4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span><span class="w">         </span><span class="c1"># Pino de PWM</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="nt">camera</span><span class="p">:</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="nt">fps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w">                              </span><span class="c1"># Taxa de captura</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3280</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2464</span><span class="p p-Indicator">]</span><span class="w">             </span><span class="c1"># Resolução máxima do sensor</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="nt">preview_resolution</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">640</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">480</span><span class="p p-Indicator">]</span><span class="w">       </span><span class="c1"># Resolução de processamento</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="nt">motor_calibration</span><span class="p">:</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">  </span><span class="nt">limiar_motor_esquerdo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">           </span><span class="c1"># Fator de ganho</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">  </span><span class="nt">limiar_motor_direito</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">            </span><span class="c1"># Fator de ganho</span>
+</code></pre></div>
+<p><strong>Notas de Configuração:</strong></p>
+<ul>
+<li>
+<p><strong>Resolução de Preview:</strong> Deve corresponder aos valores esperados por <code>VisionModule</code>. Maiores resoluções permitem maior acurácia em detecção mas aumentam latência computacional. Para RPi 5, 640×480 é recomendado.</p>
+</li>
+<li>
+<p><strong>FPS da Câmera:</strong> Taxa de captura em quadros por segundo. Valor 30 é padrão para Raspberry Pi 5 com iluminação adequada.</p>
+</li>
+<li>
+<p><strong>Calibração de Motores:</strong> Fator multiplicativo de compensação. Execute <a href="../scripts_tests/motor/">scripts_tests/motor/</a> para calibração manual se o robô desviar sistematicamente durante movimento reto.</p>
+</li>
+</ul>
+<hr />
+<h2 id="performance-e-limitacoes">Performance e Limitações</h2>
+<h3 id="caracteristicas-de-tempo-real">Características de Tempo Real</h3>
+<ul>
+<li>
+<p><strong>Período de Loop de Controle:</strong> 10 ms (100 Hz), permitindo resposta rápida a desvios de trajetória.</p>
+</li>
+<li>
+<p><strong>Taxa de Captura:</strong> 30 FPS em Raspberry Pi 5 com iluminação adequada.</p>
+</li>
+<li>
+<p><strong>Latência Total:</strong> Aproximadamente 50–100 ms de captura até efetuação de movimento (somando latência de câmera, processamento e GPIO).</p>
+</li>
+<li>
+<p><strong>Processamento:</strong> Inteiramente em CPU (sem aceleração GPU). Adequado para Raspberry Pi 5 em RPM baixas.</p>
+</li>
+</ul>
+<h3 id="restricoes-conhecidas">Restrições Conhecidas</h3>
+<ol>
+<li>
+<p><strong>Carga Computacional:</strong> Algoritmos de visão executam em sequência. Reduzir resolução de preview ou complexidade de detecção se FPS cair abaixo de 20.</p>
+</li>
+<li>
+<p><strong>Calibração de Motores:</strong> Crítica para movimento reto. Diferenças de fabricação causam desvios. Utilizar <code>motorCalibration.py</code> ou ajustar manualmente <code>config.yaml</code>.</p>
+</li>
+<li>
+<p><strong>Sensibilidade de Câmera:</strong> Parâmetros de <code>analogic</code> e <code>exposure</code> devem ser ajustados para condições de iluminação ambiente. Excesso de brilho causa saturação; deficiência causa ruído.</p>
+</li>
+<li>
+<p><strong>Robustez da Detecção de Linha:</strong> O algoritmo HSV simples é sensível a mudanças de iluminação. Em ambientes muito variáveis, considerar técnicas mais avançadas (p.ex., Canny adaptativo).</p>
+</li>
+<li>
+<p><strong>Alcance de Visão:</strong> Detecção confiável apenas em distâncias de 10–100 cm da câmera (campo de visão típico).</p>
+</li>
+</ol>
+<hr />
+<h2 id="integracao-com-llms-code-as-policies">Integração com LLMs (Code as Policies)</h2>
+<p>A arquitetura em camadas permite que sistemas de geração de código (Large Language Models) criem scripts robustos através de composição de métodos:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Exemplo: Script gerado por LLM para tarefa de navegação</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rover</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">rover</span> <span class="o">=</span> <span class="n">Rover</span><span class="p">()</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    <span class="c1"># Fase 1: Avançar 3 segundos</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">movement</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="c1"># Fase 2: Buscar círculo vermelho</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>  <span class="c1"># Até 10 tentativas</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">rover</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">capture_frame</span><span class="p">()</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>        <span class="n">circulo</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rover</span><span class="o">.</span><span class="n">vision</span><span class="o">.</span><span class="n">houghCircleDetect</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>        <span class="k">if</span> <span class="n">circulo</span><span class="p">:</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">circulo</span>
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objeto circular encontrado em (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>            <span class="k">break</span>
+<a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>
+<a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a>        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a>
+<a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a>    <span class="c1"># Fase 3: Seguir linha por 5 segundos</span>
+<a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">follow_line</span><span class="p">(</span><span class="n">base_speed</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">kp</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a>
+<a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a><span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+<a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interrompido pelo usuário.&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-28" name="__codelineno-20-28" href="#__codelineno-20-28"></a><span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-20-29" name="__codelineno-20-29" href="#__codelineno-20-29"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">stop_and_cleanup</span><span class="p">()</span>
+</code></pre></div>
+<p>A estrutura bem definida e nomes descritivos facilitam geração automática com baixa taxa de erros.</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

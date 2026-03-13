@@ -1,0 +1,1009 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://rover-project.github.io/Rover/">
+      
+      
+      
+        <link rel="next" href="arquitetura/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>RoverLib Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#bem-vindo-a-roverlib" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="." title="RoverLib Documentation" class="md-header__button md-logo" aria-label="RoverLib Documentation" data-md-component="logo">
+      
+  <img src="assets/logo-Rover.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RoverLib Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Bem-vindo à RoverLib
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Rover-Project/Rover" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Rover-Project/Rover
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Bem-vindo à RoverLib
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="arquitetura/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura do Sistema Rover
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="api/drivers/" class="md-tabs__link">
+          
+  
+  
+  Api
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="RoverLib Documentation" class="md-nav__button md-logo" aria-label="RoverLib Documentation" data-md-component="logo">
+      
+  <img src="assets/logo-Rover.png" alt="logo">
+
+    </a>
+    RoverLib Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Rover-Project/Rover" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Rover-Project/Rover
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bem-vindo à RoverLib
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bem-vindo à RoverLib
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#conceito-fundamental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conceito Fundamental
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conceito Fundamental">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemplo-de-fluxo-operacional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo de Fluxo Operacional
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caracteristicas-tecnicas-principais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Características Técnicas Principais
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instalacao-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instalação Rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutoriais-e-exemplos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tutoriais e Exemplos Funcionais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tutoriais e Exemplos Funcionais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-deteccao-de-circulos-com-transformada-de-hough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Detecção de Círculos com Transformada de Hough
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-interface-grafica-para-controle-manual-de-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Interface Gráfica para Controle Manual de Motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-deteccao-de-obstaculos-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Detecção de Obstáculos em Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estrutura-de-modulos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estrutura de Módulos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentacao-especifica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentação Específica
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#publicacao-de-documentacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publicação de Documentação
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suporte-e-contribuicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suporte e Contribuições
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura do Sistema Rover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Api
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drivers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#conceito-fundamental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conceito Fundamental
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conceito Fundamental">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemplo-de-fluxo-operacional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplo de Fluxo Operacional
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caracteristicas-tecnicas-principais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Características Técnicas Principais
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instalacao-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instalação Rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutoriais-e-exemplos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tutoriais e Exemplos Funcionais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tutoriais e Exemplos Funcionais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-deteccao-de-circulos-com-transformada-de-hough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Detecção de Círculos com Transformada de Hough
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-interface-grafica-para-controle-manual-de-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Interface Gráfica para Controle Manual de Motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-deteccao-de-obstaculos-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Detecção de Obstáculos em Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estrutura-de-modulos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estrutura de Módulos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentacao-especifica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentação Específica
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#publicacao-de-documentacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publicação de Documentação
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suporte-e-contribuicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suporte e Contribuições
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="bem-vindo-a-roverlib">Bem-vindo à RoverLib</h1>
+<p>A <strong>RoverLib</strong> é uma biblioteca modular em Python para <strong>Raspberry Pi 5</strong>, projetada especificamente para viabilizar arquiteturas de robótica. A plataforma abstrai a complexidade de drivers de hardware em uma API de alto nível altamente coesa e compreensível, ideal para rápida prototipagem e desenvolvimento de comportamentos complexos.</p>
+<h2 id="conceito-fundamental">Conceito Fundamental</h2>
+<p>A <strong>RoverLib</strong> foca em uma abordagem modular, onde os desenvolvedores podem compor instâncias que lidam de forma transparente com os hardwares de baixo nível (Câmera, Motores, GPIO) através de comandos simples e limpos. Isto reduz a necessidade de expertise em programação de sistemas embarcados para focar no fluxo do processo.</p>
+<h3 id="exemplo-de-fluxo-operacional">Exemplo de Fluxo Operacional</h3>
+<p><strong>Descrição de Movimento Básico:</strong></p>
+<p><strong>Código Python executável:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">roverlib.modules.movement.robot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Robot</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="c1"># Inicializa componentes de hardware (usa mocks virtuais no PC)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">rover</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">27</span><span class="p">),</span> <span class="n">right</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">))</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="c1"># Executa movimento com duração temporal</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="c1"># Libera recursos</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">rover</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h2 id="caracteristicas-tecnicas-principais">Características Técnicas Principais</h2>
+<ul>
+<li>
+<p><strong>Arquitetura em Camadas:</strong> Separação clara entre camada de drivers (hardware), lógica de comportamento (robot) e inteligência (visão computacional e decisão de LLM).</p>
+</li>
+<li>
+<p><strong>Visão Computacional Híbrida:</strong> Algoritmos clássicos otimizados (Transformada de Hough, detecção de arestas Canny, processamento HSV) operando a 30 FPS na unidade central da RPi 5.</p>
+</li>
+<li>
+<p><strong>Loop de Controle de Tempo Real:</strong> Ciclo de amostragem de 10 ms para tarefas críticas como <em>Line Following</em>, permitindo resposta rápida a obstáculos e desvios de trajetória.</p>
+</li>
+<li>
+<p><strong>Compatibilidade Multiplataforma:</strong> Fallback automático para câmera mock em plataformas sem <code>picamera2</code>, facilitando desenvolvimento e testes em PC.</p>
+</li>
+<li>
+<p><strong>Modularidade:</strong> Componentes desacoplados permitem integração seletiva de subsistemas (movimento, câmera, visão) conforme necessidade.</p>
+</li>
+</ul>
+<hr />
+<h2 id="instalacao-rapida">Instalação Rápida</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Instala diretamente do PyPI (ambiente virtual recomendado)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>roverlib<span class="o">[</span>cli<span class="o">]</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Cria um novo projeto via CLI</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>rover<span class="w"> </span>new<span class="w"> </span>meu_projeto
+</code></pre></div>
+<p>Para configuração avançada em Raspberry Pi (habilitação de câmera, ajustes GPIO), consulte <a href="instalacao.md">Instalação Detalhada</a>.</p>
+<hr />
+<h2 id="tutoriais-e-exemplos-funcionais">Tutoriais e Exemplos Funcionais</h2>
+<h3 id="1-deteccao-de-circulos-com-transformada-de-hough">1. Detecção de Círculos com Transformada de Hough</h3>
+<p>O exemplo <code>circleDetect</code> demonstra aplicação de algoritmos de visão computacional clássica para localização de objetos circulares em tempo real. O sistema utiliza suavização Gaussiana, filtro de arestas Canny e Transformada de Hough circular.</p>
+<p><strong>Execução:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>Rover/examples/circleDetect
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>main.py
+</code></pre></div>
+<p><strong>Requisitos:</strong> Câmera conectada (RPi 5) ou webcam integrada (PC). O sistema detecta automaticamente o tipo de câmera disponível e faz fallback se necessário.</p>
+<p><strong>Saída esperada:</strong> Exibição em tempo real de frames processados com círculos detectados marcados (centro, raio). A terminal imprime coordenadas e raios dos círculos localizados.</p>
+<p><strong>Parâmetros de interesse:</strong> O algoritmo de Hough aceita ajustes de sensibilidade (raio mínimo/máximo, distância entre centros) para otimização conforme cena.</p>
+<hr />
+<h3 id="2-interface-grafica-para-controle-manual-de-motores">2. Interface Gráfica para Controle Manual de Motores</h3>
+<p>O módulo <code>roverTkControl</code> oferece interface gráfica (Tkinter) para testes de hardware, permitindo controle bidirecional de motores, ajuste fino de velocidade e validação de ponte-H (L298N).</p>
+<p><strong>Execução:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>Rover/examples/roverTkControl
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>main.py
+</code></pre></div>
+<p><strong>Funcionalidade:</strong> Botões de direção (frente, trás, esquerda, direita), slider de velocidade (0–100), e visualização de estado atual. Ideal para validação de calibração de motores antes de execução de algoritmos autônomos.</p>
+<p><strong>Notas operacionais:</strong> Garanta que os pinos GPIO sejam configurados corretamente em <code>configs/config.yaml</code> antes de execução.</p>
+<hr />
+<h3 id="3-deteccao-de-obstaculos-em-tempo-real">3. Detecção de Obstáculos em Tempo Real</h3>
+<p>Script em <code>scripts_tests/object_detection/HoughTransform/realTime/grayScale.py</code> implementa detecção contínua de círculos com visualização OpenCV interativa.</p>
+<p><strong>Execução:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>Rover/scripts_tests/object_detection/HoughTransform/realTime/grayScale.py
+</code></pre></div>
+<p><strong>Parâmetros padrão:</strong>
+- <code>h=680</code>, <code>w=480</code>: Dimensões de captura
+- <code>minDist=40</code>: Distância mínima entre centros de círculos
+- <code>minRadius=10</code>, <code>maxRadius=120</code>: Limites de raio de detecção</p>
+<p><strong>Controle:</strong> Pressione <code>q</code> para encerrar a execução.</p>
+<hr />
+<h2 id="estrutura-de-modulos">Estrutura de Módulos</h2>
+<p>A plataforma organiza-se em três camadas funcionais:</p>
+<ol>
+<li><strong>Drivers de Hardware:</strong> Abstrações para motores DC, câmera (Picamera2), sensores de distância.</li>
+<li><strong>Lógica Comportamental (Classe Robot):</strong> Movimentos de alto nível (avançar, recuar, girar), line-following.</li>
+<li><strong>Inteligência (Visão Computacional):</strong> Processamento de imagem, detecção de formas, análise ambiental.</li>
+</ol>
+<p>Consulte <a href="arquitetura/">Arquitetura Detalhada</a> para diagramas de fluxo de dados e integração de componentes.</p>
+<hr />
+<h2 id="documentacao-especifica">Documentação Específica</h2>
+<ul>
+<li><a href="instalacao.md">Instalação e Configuração de Ambiente</a> — Passos para Raspberry Pi e desenvolvimento em PC.</li>
+<li><a href="arquitetura/">Arquitetura de Sistema</a> — Diagramas, fluxos de dados, decisões de design.</li>
+<li><a href="api/rover.md">API da Classe Rover</a> — Referência completa de métodos, parâmetros e comportamentos.</li>
+<li><a href="api/drivers/">Módulos de Hardware</a> — Documentação de Robot, CameraModule, VisionModule.</li>
+<li><a href="exemplos.md">Exemplos de Uso</a> — Tutoriais passo-a-passo para tarefas comuns.</li>
+</ul>
+<hr />
+<h2 id="publicacao-de-documentacao">Publicação de Documentação</h2>
+<p>Esta documentação é gerada automaticamente via <code>mkdocs</code> quando há mudanças em <code>docs/</code>, <code>mkdocs.yml</code> ou código em <code>roverLib/</code>. Consulte <a href="deploy.md">Deploy de Documentação</a> para instruções de publicação manual.</p>
+<hr />
+<h2 id="suporte-e-contribuicoes">Suporte e Contribuições</h2>
+<p>Para relatar problemas, sugestões ou contribuições, acesse o repositório do projeto no GitHub.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.tabs.link"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
