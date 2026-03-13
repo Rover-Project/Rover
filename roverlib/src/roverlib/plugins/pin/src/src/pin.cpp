@@ -28,6 +28,18 @@ bool Pin::isPWMPin(int pin)
     return (pin == 12 || pin == 13 || pin == 18 || pin == 19);
 }
 
+/* NOVO: mapeamento GPIO -> canal PWM */
+int Pin::gpioToPWMChannel(int pin)
+{
+    if(pin == 12 || pin == 18)
+        return 0;
+
+    if(pin == 13 || pin == 19)
+        return 1;
+
+    throw std::runtime_error("GPIO nao suporta PWM");
+}
+
 void Pin::writeFile(const std::string& path, const std::string& value)
 {
     std::ofstream file(path);
@@ -65,7 +77,8 @@ Pin::Pin(int pin, PinMode mode)
         if(!isPWMPin(pin))
             throw std::runtime_error("Este pino nao suporta PWM");
 
-        pwmChannel = pin;
+        /* CORREÇÃO IMPORTANTE */
+        pwmChannel = gpioToPWMChannel(pin);
 
         pwmPath = "/sys/class/pwm/pwmchip0/pwm" + std::to_string(pwmChannel);
 
@@ -113,7 +126,13 @@ void Pin::release()
     if(mode == PWM)
     {
         if(pathExists(pwmPath))
-            writeFile("/sys/class/pwm/pwmchip0/unexport", std::to_string(pwmChannel));
+        {
+            /* desliga antes de liberar */
+            writeFile(pwmPath + "/enable", "0");
+
+            writeFile("/sys/class/pwm/pwmchip0/unexport",
+                      std::to_string(pwmChannel));
+        }
 
         active = false;
         return;

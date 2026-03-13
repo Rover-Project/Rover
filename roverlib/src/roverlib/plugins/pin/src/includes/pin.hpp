@@ -5,9 +5,9 @@
 
 enum PinMode
 {
-    DIGITAL_IN = 0,
-    DIGITAL_OUT = 1,
-    PWM = 2
+    DIGITAL_IN,
+    DIGITAL_OUT,
+    PWM
 };
 
 class Pin
@@ -19,30 +19,30 @@ private:
     int pwmChannel;
 
     PinMode mode;
-
+    bool active;
     std::string gpioPath;
     std::string pwmPath;
 
-    bool active;
-
-    void validatePin(int pin);
-    bool isPWMPin(int pin);
+    int pwmPeriod = 20000000;
 
     void writeFile(const std::string& path, const std::string& value);
     std::string readFile(const std::string& path);
-    bool pathExists(const std::string& path);
+
+    int bcmToKernel(int bcm);
+    int gpioToPwmChannel(int gpio);
 
 public:
 
     Pin(int pin, PinMode mode);
-    ~Pin();
 
     void write(int value);
     int read();
 
-    void pwmWrite(float duty);
+    void pwmWrite(int dutyPercent);
 
     void release();
+
+    ~Pin();
 };
 
 #endif
