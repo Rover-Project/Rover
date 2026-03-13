@@ -2,7 +2,7 @@ from pin import Pin
 from pin import PinMode
 import time
 
-led = Pin(0, PinMode.PWM)
+led = Pin(12, PinMode.PWM)
 
 try:
     while True:
