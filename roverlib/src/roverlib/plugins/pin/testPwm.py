@@ -2,20 +2,22 @@ from pin import Pin
 from pin import PinMode
 import time
 
-led = Pin(18, PinMode.PWM)
+led = Pin(0, PinMode.PWM)
 
 try:
-
     while True:
 
-        for duty in range(0, 101, 5):
-            led.pwm(duty / 100)
-            time.sleep(0.1)
+        print("PWM 10%")
+        led.pwm(10)
+        time.sleep(2)
 
-        for duty in range(100, -1, -5):
-            led.pwm(duty / 100)
-            time.sleep(0.1)
+        print("PWM 50%")
+        led.pwm(50)
+        time.sleep(2)
 
-finally:
+        print("PWM 90%")
+        led.pwm(90)
+        time.sleep(2)
 
+except KeyboardInterrupt:
     led.release()
