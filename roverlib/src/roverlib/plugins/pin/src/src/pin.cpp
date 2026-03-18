@@ -88,7 +88,14 @@ Pin::Pin(int pin, PinMode mode)
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 
+        
+        writeFile(pwmPath + "/enable", "0");
+
+        /* configura periodo */
         writeFile(pwmPath + "/period", "20000000");
+
+        /* duty inicial 0 */
+        writeFile(pwmPath + "/duty_cycle", "0");
 
         active = true;
 
@@ -185,6 +192,9 @@ void Pin::pwmWrite(float duty)
     int period = 20000000;
 
     int dutyCycle = period * duty;
+
+    /* garante que está desabilitado antes de alterar */
+    writeFile(pwmPath + "/enable", "0");
 
     writeFile(pwmPath + "/duty_cycle", std::to_string(dutyCycle));
 
