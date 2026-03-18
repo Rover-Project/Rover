@@ -2,7 +2,7 @@ import time
 from pin import Pin, PinMode
 
 # Inicializa o GPIO 18 (Pino físico 12)
-led = Pin(18, PinMode.PWM)
+led = Pin(12, PinMode.PWM)
 
 try:
     print("Iniciando ciclo de brilho...")
