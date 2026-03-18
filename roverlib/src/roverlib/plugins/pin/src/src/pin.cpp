@@ -87,16 +87,30 @@ Pin::Pin(int pin, PinMode mode) {
 void Pin::pwmWrite(float duty) {
     if(!active || mode != PWM) throw std::runtime_error("Erro no PWM");
     
-    if(duty < 0.0) duty = 0.0;
-    if(duty > 1.0) duty = 1.0;
+    // Proteção de limites
+    if(duty < 0.0f) duty = 0.0f;
+    if(duty > 1.0f) duty = 1.0f;
 
+    // Usando 1ms de período (1.000.000 ns)
     long period = 1000000;
     long dutyNs = static_cast<long>(period * duty);
 
-    // Na Pi 5, o kernel prefere que você desative antes de mudar o duty pesado
+    // LOGICA DE ATIVAÇÃO PI 5:
+    // 1. Desliga o sinal para limpar o buffer do RP1
     writeFile(pwmPath + "/enable", "0");
+    
+    // 2. Garante a polaridade normal (evita o estado 'lo' persistente)
+    if(pathExists(pwmPath + "/polarity")) {
+        writeFile(pwmPath + "/polarity", "normal");
+    }
+
+    // 3. Escreve o novo Duty Cycle
     writeFile(pwmPath + "/duty_cycle", std::to_string(dutyNs));
-    writeFile(pwmPath + "/enable", "1");
+
+    // 4. Liga apenas se o duty for maior que 0
+    if(duty > 0.0f) {
+        writeFile(pwmPath + "/enable", "1");
+    }
 }
 
 void Pin::release() {
