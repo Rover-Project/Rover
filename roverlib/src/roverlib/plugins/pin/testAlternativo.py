@@ -2,7 +2,7 @@ from gpiozero import PWMLED
 from time import sleep
 
 # Exemplo: LED no pino GPIO 12 (Pino 32 físico)
-led = PWMLED(12)
+led = PWMLED(18)
 
 while True:
     led.value = 0.1
