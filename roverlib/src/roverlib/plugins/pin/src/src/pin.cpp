@@ -1,5 +1,4 @@
 #include "../includes/pin.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -7,196 +6,120 @@
 #include <filesystem>
 #include <stdexcept>
 
-int bcmToKernel(int bcm)
-{
-    return bcm + 571;
+// Função auxiliar para rodar comandos de sistema (pinctrl)
+void Pin::setupHardwareMux(int pin, PinMode mode) {
+    std::string command;
+    if (mode == PWM) {
+        command = "pinctrl set " + std::to_string(pin) + " a3";
+    } else {
+        command = "pinctrl set " + std::to_string(pin) + " op";
+    }
+    system(command.c_str());
 }
 
-bool Pin::pathExists(const std::string& path)
-{
+bool Pin::pathExists(const std::string& path) {
     return std::filesystem::exists(path);
 }
 
-void Pin::validatePin(int pin)
-{
+void Pin::validatePin(int pin) {
     if(pin < 0 || pin > 27)
-        throw std::runtime_error("GPIO invalido: use valores entre 0 e 27");
+        throw std::runtime_error("GPIO invalido: 0-27");
 }
 
-bool Pin::isPWMPin(int pin)
-{
+bool Pin::isPWMPin(int pin) {
     return (pin == 12 || pin == 13 || pin == 18 || pin == 19);
 }
 
-/* NOVO: mapeamento GPIO -> canal PWM */
-int Pin::gpioToPWMChannel(int pin)
-{
-    if(pin == 12 || pin == 18)
-        return 0;
-
-    if(pin == 13 || pin == 19)
-        return 1;
-
+int Pin::gpioToPWMChannel(int pin) {
+    if(pin == 12 || pin == 18) return 0;
+    if(pin == 13 || pin == 19) return 1;
     throw std::runtime_error("GPIO nao suporta PWM");
 }
 
-void Pin::writeFile(const std::string& path, const std::string& value)
-{
+void Pin::writeFile(const std::string& path, const std::string& value) {
     std::ofstream file(path);
-
     if(!file.is_open())
-        throw std::runtime_error("Nao foi possivel acessar: " + path);
-
+        throw std::runtime_error("Erro de I/O (verifique sudo): " + path);
     file << value;
+    file.flush();
 }
 
-std::string Pin::readFile(const std::string& path)
-{
-    std::ifstream file(path);
-    std::string value;
-
-    if(!file.is_open())
-        throw std::runtime_error("Nao foi possivel ler: " + path);
-
-    file >> value;
-
-    return value;
-}
-
-Pin::Pin(int pin, PinMode mode)
-{
+Pin::Pin(int pin, PinMode mode) {
     validatePin(pin);
-
-    pinNumber = pin;
+    this->pinNumber = pin;
     this->mode = mode;
+    this->active = false;
 
-    active = false;
+    // Configura o multiplexador do chip RP1 da Pi 5
+    setupHardwareMux(pin, mode);
 
-    if(mode == PWM)
-    {
-        if(!isPWMPin(pin))
-            throw std::runtime_error("Este pino nao suporta PWM");
-
-        /* CORREÇÃO IMPORTANTE */
+    if(mode == PWM) {
         pwmChannel = gpioToPWMChannel(pin);
-
         pwmPath = "/sys/class/pwm/pwmchip0/pwm" + std::to_string(pwmChannel);
 
-        if(!pathExists(pwmPath))
-        {
+        if(!pathExists(pwmPath)) {
             writeFile("/sys/class/pwm/pwmchip0/export", std::to_string(pwmChannel));
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
 
-        
+        // ORDEM CRÍTICA PARA EVITAR I/O ERROR:
         writeFile(pwmPath + "/enable", "0");
-
-        /* configura periodo */
-        writeFile(pwmPath + "/period", "20000000");
-
-        /* duty inicial 0 */
+        writeFile(pwmPath + "/period", "1000000"); // 1ms (1kHz)
         writeFile(pwmPath + "/duty_cycle", "0");
-
+        
         active = true;
-
         return;
     }
 
-    kernelPin = bcmToKernel(pin);
-
+    // Lógica Digital Normal (BCM para Kernel 6.x)
+    int kernelPin = pin + 571; 
     gpioPath = "/sys/class/gpio/gpio" + std::to_string(kernelPin);
 
-    if(!pathExists(gpioPath))
-    {
+    if(!pathExists(gpioPath)) {
         writeFile("/sys/class/gpio/export", std::to_string(kernelPin));
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
-    if(mode == DIGITAL_OUT)
-        writeFile(gpioPath + "/direction", "out");
-    else
-        writeFile(gpioPath + "/direction", "in");
-
+    writeFile(gpioPath + "/direction", (mode == DIGITAL_OUT) ? "out" : "in");
     active = true;
 }
 
-Pin::~Pin()
-{
-    release();
-}
+void Pin::pwmWrite(float duty) {
+    if(!active || mode != PWM) throw std::runtime_error("Erro no PWM");
+    
+    // Proteção de limites
+    if(duty < 0.0f) duty = 0.0f;
+    if(duty > 1.0f) duty = 1.0f;
 
-void Pin::release()
-{
-    if(!active)
-        return;
+    // Usando 1ms de período (1.000.000 ns)
+    long period = 1000000;
+    long dutyNs = static_cast<long>(period * duty);
 
-    if(mode == PWM)
-    {
-        if(pathExists(pwmPath))
-        {
-            /* desliga antes de liberar */
-            writeFile(pwmPath + "/enable", "0");
-
-            writeFile("/sys/class/pwm/pwmchip0/unexport",
-                      std::to_string(pwmChannel));
-        }
-
-        active = false;
-        return;
+    // LOGICA DE ATIVAÇÃO PI 5:
+    // 1. Desliga o sinal para limpar o buffer do RP1
+    writeFile(pwmPath + "/enable", "0");
+    
+    // 2. Garante a polaridade normal (evita o estado 'lo' persistente)
+    if(pathExists(pwmPath + "/polarity")) {
+        writeFile(pwmPath + "/polarity", "normal");
     }
 
-    if(pathExists(gpioPath))
-        writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
+    // 3. Escreve o novo Duty Cycle
+    writeFile(pwmPath + "/duty_cycle", std::to_string(dutyNs));
 
+    // 4. Liga apenas se o duty for maior que 0
+    if(duty > 0.0f) {
+        writeFile(pwmPath + "/enable", "1");
+    }
+}
+
+void Pin::release() {
+    if(!active) return;
+    if(mode == PWM) {
+        writeFile(pwmPath + "/enable", "0");
+        writeFile("/sys/class/pwm/pwmchip0/unexport", std::to_string(pwmChannel));
+    }
     active = false;
 }
 
-void Pin::write(int value)
-{
-    if(!active)
-        throw std::runtime_error("GPIO nao inicializado");
-
-    if(mode != DIGITAL_OUT)
-        throw std::runtime_error("Tentativa de escrita em pino nao OUTPUT");
-
-    if(value != 0 && value != 1)
-        throw std::runtime_error("Valor invalido (use 0 ou 1)");
-
-    writeFile(gpioPath + "/value", std::to_string(value));
-}
-
-int Pin::read()
-{
-    if(!active)
-        throw std::runtime_error("GPIO nao inicializado");
-
-    if(mode != DIGITAL_IN)
-        throw std::runtime_error("Tentativa de leitura em pino nao INPUT");
-
-    std::string val = readFile(gpioPath + "/value");
-
-    return std::stoi(val);
-}
-
-void Pin::pwmWrite(float duty)
-{
-    if(!active)
-        throw std::runtime_error("PWM nao inicializado");
-
-    if(mode != PWM)
-        throw std::runtime_error("Pino nao configurado como PWM");
-
-    if(duty < 0.0 || duty > 1.0)
-        throw std::runtime_error("Duty cycle deve estar entre 0 e 1");
-
-    int period = 20000000;
-
-    int dutyCycle = period * duty;
-
-    /* garante que está desabilitado antes de alterar */
-    writeFile(pwmPath + "/enable", "0");
-
-    writeFile(pwmPath + "/duty_cycle", std::to_string(dutyCycle));
-
-    writeFile(pwmPath + "/enable", "1");
-}
+Pin::~Pin() { release(); }

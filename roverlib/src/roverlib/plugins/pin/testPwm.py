@@ -1,24 +1,17 @@
-from pin import Pin
-from pin import PinMode
 import time
+from pin import Pin, PinMode
 
-led = Pin(18, PinMode.PWM)
+# Inicializa o GPIO 18 (Pino físico 12)
+led = Pin(12, PinMode.PWM)
 
 try:
+    print("Iniciando ciclo de brilho...")
     while True:
-
-        print("PWM 10%")
-        led.pwm(0.1)
-        
-
-        print("PWM 50%")
-        led.pwm(0.5)
-        
-
-        print("PWM 90%")
-        led.pwm(0.9)
-        
+        for brilho in [0.1, 0.5, 0.9]:
+            print(f"Brilho: {brilho*100}%")
+            led.pwm(brilho)
+            time.sleep(2)
 
 except KeyboardInterrupt:
-    print('Encerrando...')
+    print('\nEncerrando e liberando hardware...')
     led.release()
