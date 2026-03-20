@@ -136,10 +136,8 @@ void Pin::release()
 
         active = false;
         return;
-    }
-
+    }else
     // --- CORREÇÃO PARA MODO DIGITAL ---
-    if(pathExists(gpioPath))
     {
         /* 1. Força o valor para 0 (OFF) antes de remover o pino */
         writeFile(gpioPath + "/value", "0");
