@@ -138,8 +138,15 @@ void Pin::release()
         return;
     }
 
+    // --- CORREÇÃO PARA MODO DIGITAL ---
     if(pathExists(gpioPath))
+    {
+        /* 1. Força o valor para 0 (OFF) antes de remover o pino */
+        writeFile(gpioPath + "/value", "0");
+
+        /* 2. Agora sim, libera o pino do kernel */
         writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
+    }
 
     active = false;
 }
