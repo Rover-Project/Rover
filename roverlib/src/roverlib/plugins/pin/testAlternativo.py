@@ -5,9 +5,9 @@ from time import sleep
 led = PWMLED(12)
 
 while True:
-    led.value = 0.1  # Define 50% de brilho (Duty Cycle)
+    led.value = 0.1  
     sleep(1)
-    led.value = 0.3  # 100% de brilho
+    led.value = 0.3  
     sleep(1)
     led.value = 0.5
     sleep(1)
