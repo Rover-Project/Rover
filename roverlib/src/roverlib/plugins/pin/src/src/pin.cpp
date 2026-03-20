@@ -48,6 +48,8 @@ void Pin::writeFile(const std::string& path, const std::string& value)
         throw std::runtime_error("Nao foi possivel acessar: " + path);
 
     file << value;
+    file.flush(); // FORÇA a escrita no disco/hardware imediatamente
+    file.close(); // Garante o fechamento antes de sair da função
 }
 
 std::string Pin::readFile(const std::string& path)
@@ -136,12 +138,14 @@ void Pin::release()
 
         active = false;
         return;
-    }else
+    }
+
     // --- CORREÇÃO PARA MODO DIGITAL ---
+    if(pathExists(gpioPath))
     {
         /* 1. Força o valor para 0 (OFF) antes de remover o pino */
         writeFile(gpioPath + "/value", "0");
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         /* 2. Agora sim, libera o pino do kernel */
         writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
     }
