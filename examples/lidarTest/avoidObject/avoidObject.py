@@ -120,7 +120,7 @@ def decide(dist: float, no_way: bool):
             robot.backward(duration=2.3)
             time.sleep(0.1)
 
-            robot.turn_degrees(90)
+            robot.turn_degrees(0.25)
             time.sleep(0.2)
             robot.stop()
 
@@ -131,7 +131,7 @@ def decide(dist: float, no_way: bool):
                 return False
             
             else:
-                robot.turn_degrees(-180)
+                robot.turn_degrees(-0.5)
                 time.sleep(0.2)
                 robot.stop()
 
@@ -150,7 +150,7 @@ def decide(dist: float, no_way: bool):
         if no_way:
             robot.stop()
             robot.backward(duration=2)
-            robot.turn_degrees(180)
+            robot.turn_degrees(0.5)
             return False
         
         print("Não decidiu nada")
