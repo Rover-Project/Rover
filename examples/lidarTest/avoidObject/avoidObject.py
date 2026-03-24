@@ -12,8 +12,8 @@ from pathlib import Path
 HEIGHT = 640 # Altura da imagem 
 WIDTH = 640 # Largura da imagem
 x_center = WIDTH / 2
-max_dist = 40 # Distancia maxima para o Rover nao parar (em cm)
-min_dist = 150 # Distancia minima para tomada de atitude (em cm)
+max_dist = 150 # Distancia maxima para o Rover nao parar (em cm)
+min_dist = 200 # Distancia minima para tomada de atitude (em cm)
 dist_history = []
 dist_limit = 30
 X_SPEED = 50 # Velocidade para controle direcional no eixo X
