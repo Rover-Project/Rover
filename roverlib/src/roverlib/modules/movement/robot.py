@@ -154,7 +154,7 @@ class Robot:
             self.stop()
 
     # Considerando que o Rover leva x segundos para girar 360 graus em uma velocidade estabelecida
-    def turn_degrees(self, degress: float, time_to_turn = 7, turn_speed=70): # Valores ainda nao testados
+    def turn_degrees(self, degress: float, time_to_turn = 12, turn_speed=55): # Valores ainda nao testados
         """
         Gira o robô por uma quantidade específica de graus baseada em tempo.
         Positivo para Direita, Negativo para Esquerda.

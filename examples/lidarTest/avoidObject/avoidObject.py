@@ -12,8 +12,8 @@ from pathlib import Path
 HEIGHT = 640 # Altura da imagem 
 WIDTH = 640 # Largura da imagem
 x_center = WIDTH / 2
-max_dist = 40 # Distancia maxima para o Rover parar (em cm)
-min_dist = 75 # Distancia minima para tomada de atitude (em cm)
+max_dist = 30 # Distancia maxima para o Rover parar (em cm)
+min_dist = 100 # Distancia minima para tomada de atitude (em cm)
 dist_history = []
 dist_limit = 30
 X_SPEED = 50 # Velocidade para controle direcional no eixo X
@@ -77,11 +77,12 @@ def decide(dist: float, no_way: bool):
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
             print("Caso 1")
-            #left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
-            #right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
-            #last_attempt = None
+            left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
+            right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
+            last_attempt = None
             print("Caminho livre a frente")
             robot.forward(X_SPEED)
+            #robot.move(70,70)
             return False
             
         # --- CASO 2 - APROXIMAÇÃO --- 
