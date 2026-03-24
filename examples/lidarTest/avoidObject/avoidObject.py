@@ -91,7 +91,7 @@ def decide(dist: float, no_way: bool):
             print("Caso 2")
             error_dist = max_dist - dist
             print(error_dist)
-            
+
             correction = pid_x.controller_PID(error_dist)
 
             if last_attempt is None:
@@ -121,7 +121,7 @@ def decide(dist: float, no_way: bool):
             robot.backward(duration=2.3)
             time.sleep(0.1)
 
-            robot.turn_degrees(0.25)
+            robot.turn_degrees(0.15)
             time.sleep(0.2)
             robot.stop()
 
@@ -132,7 +132,7 @@ def decide(dist: float, no_way: bool):
                 return False
             
             else:
-                robot.turn_degrees(-0.5)
+                robot.turn_degrees(-0.35)
                 time.sleep(0.2)
                 robot.stop()
 
@@ -150,8 +150,24 @@ def decide(dist: float, no_way: bool):
         # Logica extrema para fazer o Rover encontrar um caminho
         if no_way:
             robot.stop()
-            robot.backward(duration=2)
-            robot.turn_degrees(0.5)
+            robot.turn_degrees(0.15)
+            robot.forward(duration=2)
+
+            new_dist, _, _ = lidar.get_read()
+            if new_dist > dist and new_dist > max_dist:
+                print("Caminho livre à Direita")
+                robot.forward()
+                return False
+
+            else:
+                robot.turn_degrees(-0.35)
+                new_dist, _, _ = lidar.get_read()
+                if new_dist > dist and new_dist > max_dist:
+                    print("Caminho livre a Esquerda")
+                    robot.forward()
+                    return False
+            
+            robot.turn_degrees(0.35)
             return False
         
         print("Não decidiu nada")
