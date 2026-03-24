@@ -90,7 +90,8 @@ def decide(dist: float, no_way: bool):
         if dist < min_dist and dist > max_dist:
             print("Caso 2")
             error_dist = max_dist - dist
-
+            print(error_dist)
+            
             correction = pid_x.controller_PID(error_dist)
 
             if last_attempt is None:
