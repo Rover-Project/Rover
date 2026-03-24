@@ -77,9 +77,9 @@ def decide(dist: float, no_way: bool):
         # Rover esta muito longe de qualquer objeto (segue em frente)
         if dist > min_dist:
             print("Caso 1")
-            left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
-            right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
-            last_attempt = None
+            #left_speed = X_SPEED # Reinicia previamente a velocidade dos motores esquerdo e direito
+            #right_speed = X_SPEED # Antes de entrar no CASO 2 novamente
+            #last_attempt = None
             print("Caminho livre a frente")
             robot.forward(X_SPEED)
             return False
