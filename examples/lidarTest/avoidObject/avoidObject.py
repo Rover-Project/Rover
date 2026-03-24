@@ -68,6 +68,7 @@ def decide(dist: float, no_way: bool):
         global max_dist
         global left_speed
         global right_speed
+        global X_SPEED
 
         if dist <= 0: 
             return no_way
