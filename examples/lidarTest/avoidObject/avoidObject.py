@@ -116,7 +116,7 @@ def decide(dist: float, no_way: bool):
             # Para o Rover e faz ele tomar um pouco de distancia da superfice
             print("Caso 3")
             robot.stop()
-            time.sleep(4)
+            time.sleep(2)
             robot.backward(duration=2.3)
             time.sleep(0.1)
 

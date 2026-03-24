@@ -160,7 +160,7 @@ class Robot:
         Positivo para Direita, Negativo para Esquerda.
         """
         turn_duration = abs(degress) * (360 / time_to_turn)
-
+        print(turn_duration)
         if degress > 0:
             self.turn_right(speed=turn_speed, duration=turn_duration)
         else:
