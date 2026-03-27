@@ -4,7 +4,7 @@ from pin import PinMode
 import time
 
 
-led = Pin(12, PinMode.DIGITAL_OUT)
+led = Pin(17, PinMode.DIGITAL_OUT)
 
 try:
 
