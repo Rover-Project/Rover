@@ -124,8 +124,16 @@ void Pin::release()
 {
     if(!active)
         return;
+    
+    // Parar a thread de software PWM se existir
+    if (runSoftPwm) {
+        runSoftPwm = false;
+        if (softPwmThread.joinable()) {
+            softPwmThread.join();
+        }
+    }
 
-    if(mode == PWM)
+    if(mode == PWM && isPWMPin(pinNumber))
     {
         if(pathExists(pwmPath))
         {
@@ -180,22 +188,47 @@ int Pin::read()
     return std::stoi(val);
 }
 
-void Pin::pwmWrite(float duty)
-{
-    if(!active)
-        throw std::runtime_error("PWM nao inicializado");
+void Pin::softPwmWorker() {
+    // Frequência de 50Hz (período de 20ms = 20000 microssegundos)
+    const int period = 20000; 
 
-    if(mode != PWM)
-        throw std::runtime_error("Pino nao configurado como PWM");
+    while (runSoftPwm) {
+        float duty = currentDuty.load();
+        int onTime = static_cast<int>(period * duty);
+        int offTime = period - onTime;
 
-    if(duty < 0.0 || duty > 1.0)
-        throw std::runtime_error("Duty cycle deve estar entre 0 e 1");
+        if (onTime > 0) {
+            writeFile(gpioPath + "/value", "1");
+            std::this_thread::sleep_for(std::chrono::microseconds(onTime));
+        }
 
-    int period = 20000000;
+        if (offTime > 0) {
+            writeFile(gpioPath + "/value", "0");
+            std::this_thread::sleep_for(std::chrono::microseconds(offTime));
+        }
+    }
+}
 
-    int dutyCycle = period * duty;
 
-    writeFile(pwmPath + "/duty_cycle", std::to_string(dutyCycle));
+void Pin::pwmWrite(float duty) {
+    if (!active) throw std::runtime_error("GPIO nao inicializado");
+    if (duty < 0.0 || duty > 1.0) throw std::runtime_error("Duty deve ser entre 0 e 1");
 
-    writeFile(pwmPath + "/enable", "1");
+    if (isPWMPin(pinNumber)) {
+        // MODO HARDWARE (Código que você já tinha)
+        int period = 20000000;
+        int dutyCycle = period * duty;
+        writeFile(pwmPath + "/duty_cycle", std::to_string(dutyCycle));
+        writeFile(pwmPath + "/enable", "1");
+    } else {
+        // MODO SOFTWARE (Para qualquer outro pino)
+        currentDuty.store(duty);
+        
+        if (!runSoftPwm) {
+            runSoftPwm = true;
+            // Garante que o pino está como saída
+            writeFile(gpioPath + "/direction", "out");
+            softPwmThread = std::thread(&Pin::softPwmWorker, this);
+        }
+    }
 }
