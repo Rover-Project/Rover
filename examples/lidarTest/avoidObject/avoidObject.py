@@ -14,8 +14,8 @@ WIDTH = 640 # Largura da imagem
 x_center = WIDTH / 2
 max_dist = 30 # Distancia maxima para o Rover parar (em cm)
 min_dist = 100 # Distancia minima para tomada de atitude (em cm)
-dist_history = []
-dist_limit = 30
+dist_history = [] # Lista com as ultimas distancias para verificacao
+dist_history_limit = 30 # Limite de distancias armazenadas na lista
 X_SPEED = 60 # Velocidade para controle direcional no eixo X
 SEARCH_SPEED = 70 # Velocidade de busca
 left_speed = X_SPEED # Velocidade do motor esquerdo
@@ -104,8 +104,8 @@ def decide(dist: float, no_way: bool):
                 l_val = X_SPEED - correction
                 r_val = X_SPEED + correction
 
-            left_speed = max(0, min(90, left_speed))
-            right_speed = max(0, min(90, right_speed))
+            left_speed = max(0, min(90, l_val))
+            right_speed = max(0, min(90, r_val))
 
             print(f"Possivel objeto se aproximando em {dist} cm. Reduzindo")
             robot.move(left_speed, right_speed)
@@ -117,8 +117,8 @@ def decide(dist: float, no_way: bool):
             # Para o Rover e faz ele tomar um pouco de distancia da superfice
             print("Caso 3")
             robot.stop()
-            time.sleep(2)
-            robot.backward(duration=2.3)
+            time.sleep(1.7)
+            robot.backward(duration=3)
             time.sleep(0.1)
 
             robot.turn_degrees(0.15)
@@ -187,12 +187,13 @@ def avoidObject(avoid_type: str):
             dist, stren, temp = lidar.get_read()
             print(dist)
             
-            if len(dist_history) > dist_limit:
+            if len(dist_history) > dist_history_limit:
                 dist_history.pop(0)
 
                 average_dist = sum(dist_history) / len(dist_history)
                 # Se a distância média é baixa e a variação é mínima, ele provavelmente bateu
-                if average_dist < max_dist and abs(average_dist - dist) < 1.0:
+
+                if average_dist == dist:
                     no_way = True
 
             dist_history.append(dist)
