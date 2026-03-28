@@ -108,4 +108,11 @@ if __name__ == '__main__':
     
 # curl -LsSf https://astral.sh/uv/install.sh | sh
 
+rover@raspberrypi:~/Rover $ uv add mediapipe opencv-python
+Resolved 20 packages in 2.13s
+error: Distribution `mediapipe==0.10.33 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
+
+hint: You're on Linux (`manylinux_2_41_aarch64`), but `mediapipe` (v0.10.33) only has wheels for the following platforms: `manylinux_2_28_x86_64`, `macosx_11_0_arm64`, `win_amd64`; consider adding "sys_platform == 'linux' and platform_machine == 'aarch64'" to `tool.uv.required-environments` to ensure uv resolves to a version with compatible wheels
+
+
 # wget -O gesture_recognizer.task -q https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task
