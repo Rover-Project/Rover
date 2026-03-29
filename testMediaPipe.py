@@ -1,118 +1,102 @@
 import cv2
 import time
+import subprocess
+import numpy as np
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.framework.formats import landmark_pb2
 
-# Utilitários de desenho do MediaPipe
+# Utilitários de desenho
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 
-# Variável global para armazenar temporariamente o último resultado da detecção
 latest_result = None
 
 def save_result(result: vision.GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
-    """
-    Função de callback chamada de forma assíncrona pelo MediaPipe sempre que 
-    termina de processar um frame.
-    """
     global latest_result
     latest_result = result
 
 def main():
-    # Inicializa a captura de vídeo da câmera (0 é geralmente a câmera padrão)
-    # Se você tiver múltiplas câmeras, pode precisar alterar para 1, 2, etc.
-    cap = cv2.VideoCapture(0)
+    width, height = 640, 480
     
-    # Reduzir a resolução para aumentar o FPS na Raspberry Pi 5 (Opcional)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # O codec nativo para vídeo bruto no rpicam-vid é yuv420
+    cmd = [
+        'rpicam-vid', '-t', '0',
+        '--codec', 'yuv420',
+        '--width', str(width),
+        '--height', str(height),
+        '--framerate', '30',
+        '--nopreview',
+        '-o', '-'
+    ]
+    
+    # Deixando o stderr livre para vermos se a câmera reclama de algo no terminal
+    camera_process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
-    # Configurações base apontando para o arquivo do modelo baixado
     base_options = python.BaseOptions(model_asset_path='gesture_recognizer.task')
-    
-    # Configurações do reconhecedor de gestos para tempo real
     options = vision.GestureRecognizerOptions(
         base_options=base_options,
         running_mode=vision.RunningMode.LIVE_STREAM,
         result_callback=save_result,
-        num_hands=1 # Aumente se quiser detectar mais de uma mão simultaneamente
+        num_hands=1 
     )
 
-    # Cria a instância do Gesture Recognizer
     with vision.GestureRecognizer.create_from_options(options) as recognizer:
-        print("Iniciando a câmera. Pressione 'q' para sair.")
+        print("Bypass de câmera iniciado. Lendo fluxo YUV420. Pressione 'q' para sair.")
         
-        while cap.isOpened():
-            success, frame = cap.read()
-            if not success:
-                print("Falha ao capturar a câmera. Ignorando frame...")
-                continue
-
-            # O OpenCV captura em BGR, mas o MediaPipe espera imagens em RGB
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # O tamanho de um frame YUV420 na memória é Largura x Altura x 1.5
+        frame_bytes_size = int(width * height * 1.5)
+        
+        while True:
+            # Lê exatamente 1 frame do fluxo de dados
+            raw_frame = camera_process.stdout.read(frame_bytes_size)
             
-            # Converte para o objeto Image nativo do MediaPipe
-            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+            if len(raw_frame) != frame_bytes_size:
+                print(f"Fim do fluxo! Bytes recebidos: {len(raw_frame)}. Verifique se há erros da câmera acima.")
+                break
 
-            # Gera um timestamp em milissegundos para o frame atual
+            # Converte YUV420 puro para uma matriz e depois para RGB (3 canais)
+            yuv_frame = np.frombuffer(raw_frame, dtype=np.uint8).reshape((int(height * 1.5), width))
+            frame_rgb = cv2.cvtColor(yuv_frame, cv2.COLOR_YUV2RGB_I420)
+            
+            # Envia para o MediaPipe
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
             frame_timestamp_ms = int(time.time() * 1000)
-
-            # Envia a imagem para reconhecimento assíncrono.
-            # O resultado não retorna aqui, ele será jogado na função `save_result`.
             recognizer.recognize_async(mp_image, frame_timestamp_ms)
 
-            # Se já tivemos algum resultado processado pelo callback, desenhamos no frame
+            # Para desenhar a janela do OpenCV, precisamos de BGR
+            frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+
             if latest_result:
-                # 1. Escrever o nome do Gesto e a confiança
                 if latest_result.gestures:
                     top_gesture = latest_result.gestures[0][0]
                     texto_gesto = f"Gesto: {top_gesture.category_name} ({top_gesture.score:.2f})"
-                    
-                    cv2.putText(frame, texto_gesto, (10, 50), 
+                    cv2.putText(frame_bgr, texto_gesto, (10, 50), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
                 
-                # 2. Desenhar os pontos (landmarks) da mão
                 if latest_result.hand_landmarks:
                     for hand_landmarks in latest_result.hand_landmarks:
-                        # Converte do formato novo da Tasks API para o formato esperado pelos drawing_utils antigos
                         hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
                         hand_landmarks_proto.landmark.extend([
                             landmark_pb2.NormalizedLandmark(x=lm.x, y=lm.y, z=lm.z) 
                             for lm in hand_landmarks
                         ])
-                        
                         mp_drawing.draw_landmarks(
-                            frame,
+                            frame_bgr,
                             hand_landmarks_proto,
                             mp_hands.HAND_CONNECTIONS,
                             mp_drawing_styles.get_default_hand_landmarks_style(),
                             mp_drawing_styles.get_default_hand_connections_style())
 
-            # Mostra o frame em uma janela do OpenCV
-            cv2.imshow('Raspberry Pi 5 - Reconhecimento de Gestos', frame)
+            cv2.imshow('Rover - Reconhecimento de Gestos (Nativo Pi 5)', frame_bgr)
 
-            # Aguarda a tecla 'q' ser pressionada para quebrar o loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-    # Libera os recursos do hardware
-    cap.release()
+    camera_process.terminate()
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()
-    
-    
-# curl -LsSf https://astral.sh/uv/install.sh | sh
-
-rover@raspberrypi:~/Rover $ uv add mediapipe opencv-python
-Resolved 20 packages in 2.13s
-error: Distribution `mediapipe==0.10.33 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
-
-hint: You're on Linux (`manylinux_2_41_aarch64`), but `mediapipe` (v0.10.33) only has wheels for the following platforms: `manylinux_2_28_x86_64`, `macosx_11_0_arm64`, `win_amd64`; consider adding "sys_platform == 'linux' and platform_machine == 'aarch64'" to `tool.uv.required-environments` to ensure uv resolves to a version with compatible wheels
-
-
-# wget -O gesture_recognizer.task -q https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task
