@@ -1,6 +1,6 @@
 import _path  # noqa — corrige sys.path antes de qualquer import
 import time
-from pin.pin import Pin, PinMode
+from pin import Pin, PinMode
 
 with Pin(17, PinMode.DIGITAL_OUT) as led:
     print("[1] LED ON por 2 s")
