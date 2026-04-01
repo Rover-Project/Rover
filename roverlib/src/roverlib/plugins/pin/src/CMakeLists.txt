@@ -13,21 +13,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -pthread")
 
 # ── pybind11 ──────────────────────────────────────────────────────────────── #
-# Tenta encontrar pybind11 instalado via pip ou sistema.
-# Caso não encontre, use: pip install pybind11
+# Suprimir aviso de política CMP0148 (módulos FindPython legados)
+set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 REQUIRED)
 
 # ── Módulo Python ─────────────────────────────────────────────────────────── #
+# CMAKE_SOURCE_DIR = pin/src/  (onde este CMakeLists.txt está)
+# Os arquivos fonte ficam em:
+#   pin/src/src/pin.cpp
+#   pin/src/binds.cpp
 pybind11_add_module(pin
-    src/src/pin.cpp
-    src/binds.cpp
+    ${CMAKE_SOURCE_DIR}/src/pin.cpp
+    ${CMAKE_SOURCE_DIR}/binds.cpp
 )
 
-# Headers da biblioteca
-target_include_directories(pin PRIVATE src/includes)
+# Headers ficam em pin/src/includes/
+target_include_directories(pin PRIVATE ${CMAKE_SOURCE_DIR}/includes)
 
 # ── Destino de saída ──────────────────────────────────────────────────────── #
-# O .so gerado vai direto para pin/bin/, onde pin.py o importa
+# O .so gerado vai para pin/bin/, de onde pin.py o importa
 set_target_properties(pin PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin"
 )
