@@ -1,4 +1,3 @@
-import _path  # noqa
 from pin import Pin, PinMode
 
 def main():
