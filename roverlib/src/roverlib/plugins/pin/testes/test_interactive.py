@@ -1,5 +1,5 @@
 import _path  # noqa
-from pin.pin import Pin, PinMode
+from pin import Pin, PinMode
 
 def main():
     pino = int(input("GPIO BCM [18]: ") or "18")

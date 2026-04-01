@@ -1,6 +1,6 @@
 import _path  # noqa
 import time
-from pin.pin import Pin, PinMode
+from pin import Pin, PinMode
 
 FREQ = 1000
 
