@@ -31,7 +31,7 @@ _BIN_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "bin")
 if _BIN_DIR not in _sys.path:
     _sys.path.insert(0, _BIN_DIR)
 
-import pin as _native  # importa o pin.so compilado
+import _pin_native as _native  # importa o _pin_native.so compilado
 
 # Re-exporta o enum para que o usuário possa fazer `from pin.pin import PinMode`
 PinMode = _native.PinMode

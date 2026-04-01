@@ -22,16 +22,14 @@ find_package(pybind11 REQUIRED)
 # Os arquivos fonte ficam em:
 #   pin/src/src/pin.cpp
 #   pin/src/binds.cpp
-pybind11_add_module(pin
+pybind11_add_module(_pin_native
     ${CMAKE_SOURCE_DIR}/src/pin.cpp
     ${CMAKE_SOURCE_DIR}/binds.cpp
 )
 
 # Headers ficam em pin/src/includes/
-target_include_directories(pin PRIVATE ${CMAKE_SOURCE_DIR}/includes)
+target_include_directories(_pin_native PRIVATE ${CMAKE_SOURCE_DIR}/includes)
 
-# ── Destino de saída ──────────────────────────────────────────────────────── #
-# O .so gerado vai para pin/bin/, de onde pin.py o importa
-set_target_properties(pin PROPERTIES
+set_target_properties(_pin_native PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin"
 )

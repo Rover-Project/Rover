@@ -3,7 +3,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(pin, m)
+PYBIND11_MODULE(_pin_native, m)
 {
     m.doc() = "Módulo nativo de controle GPIO para Raspberry Pi (roverlib).";
 
