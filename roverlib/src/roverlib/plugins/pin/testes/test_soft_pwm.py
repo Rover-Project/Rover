@@ -1,3 +1,4 @@
+import _path  # noqa
 import time
 from pin import Pin, PinMode
 

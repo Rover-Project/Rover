@@ -1,4 +1,4 @@
-
+import _path  
 import time
 from pin import Pin, PinMode
 

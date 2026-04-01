@@ -1,4 +1,4 @@
-import _path  # noqa — corrige sys.path antes de qualquer import
+import _path  
 import time
 from pin import Pin, PinMode
 
