@@ -1,8 +1,4 @@
-# test_digital.py
-# LED no GPIO 17  (pino físico 11)
-# Anodo (+) → resistor 220Ω → GPIO17
-# Catodo (−) → GND (pino físico 9)
-
+import _path  # noqa — corrige sys.path antes de qualquer import
 import time
 from pin.pin import Pin, PinMode
 

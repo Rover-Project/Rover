@@ -22,7 +22,16 @@ servo.release()
 
 from __future__ import annotations
 
-from .bin import pin as _native
+import sys as _sys
+import os as _os
+
+# Adiciona pin/bin/ ao path para que o pin.so seja encontrado
+# independente de onde o script de teste está sendo executado
+_BIN_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "bin")
+if _BIN_DIR not in _sys.path:
+    _sys.path.insert(0, _BIN_DIR)
+
+import pin as _native  # importa o pin.so compilado
 
 # Re-exporta o enum para que o usuário possa fazer `from pin.pin import PinMode`
 PinMode = _native.PinMode

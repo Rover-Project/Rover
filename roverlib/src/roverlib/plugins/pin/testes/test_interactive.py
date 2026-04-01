@@ -1,7 +1,4 @@
-# test_interactive.py
-# Controle o LED digitando duty e frequência em tempo real.
-# Útil para calibrar servos e ESCs depois.
-
+import _path  # noqa
 from pin.pin import Pin, PinMode
 
 def main():
@@ -18,7 +15,8 @@ def main():
     try:
         while True:
             entrada = input("> ").strip()
-            if entrada == "q": break
+            if entrada == "q":
+                break
             partes = entrada.split()
             if len(partes) == 2:
                 d, f = float(partes[0]), float(partes[1])

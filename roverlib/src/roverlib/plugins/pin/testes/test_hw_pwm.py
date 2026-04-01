@@ -1,11 +1,8 @@
-# test_hw_pwm.py
-# Mova o LED para GPIO 18 (pino físico 12)
-# Hardware PWM — sem jitter, gerado pelo próprio chip
-
+import _path  # noqa
 import time
 from pin.pin import Pin, PinMode
 
-FREQ = 1000  # Hz — hardware aguenta até ~100 kHz
+FREQ = 1000
 
 with Pin(18, PinMode.PWM) as led:
     print(f"Pino: {led.number}  Modo: {led.mode}  Freq: {FREQ} Hz")
