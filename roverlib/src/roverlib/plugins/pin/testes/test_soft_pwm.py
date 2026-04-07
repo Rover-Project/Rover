@@ -4,7 +4,7 @@ from pin import Pin, PinMode
 
 FREQ = 200
 
-with Pin(17, PinMode.DIGITAL_OUT) as led:
+with Pin(2, PinMode.DIGITAL_OUT) as led:
     print("[1] Fade in  (0% → 100%)")
     for d in [i/20 for i in range(21)]:
         led.pwm(d, FREQ)
