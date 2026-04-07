@@ -1,78 +1,52 @@
 """
-    Driver de baixo nível para controle de um motor DC via Ponte-H L298N.
-    Utiliza o plugin pin (C++/pybind11) no lugar do RPi.GPIO.
+    Controle de alto nível dos motores do rover.
+    Substitui gpiozero.Robot pelo plugin pin (C++/pybind11).
 """
 
-from .motorInterface import MotorInterface
-from .exceptions import UninitializedMotorError, DirectionInvalidMotorError
-
-try:
-    from roverlib.plugins.pin.pin import Pin, PinMode
-    PIN_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
-    PIN_AVAILABLE = False
-    print("AVISO: plugin pin não detectado. Este módulo requer Raspberry Pi com o plugin compilado.")
+from .motorDriver import MotorDriver
 
 
-class MotorDriver(MotorInterface):
+class Motor:
     """
-    Controla um único motor DC via Ponte-H L298N usando o plugin pin.
+    Controla os dois motores do rover (esquerdo e direito) via ponte-H L298N.
+    Interface idêntica à versão anterior com gpiozero.Robot.
     """
 
-    def __init__(self, pins: tuple[int, int], pwm_frequency=1000):
-        if not PIN_AVAILABLE:
-            raise ImportError(
-                "O plugin pin não está disponível. "
-                "Compile o módulo C++ e execute na Raspberry Pi."
-            )
-        self.pwm_frequency = pwm_frequency
-        self.in1, self.in2 = pins
-        self._initialized = False
-        self._pin1: Pin | None = None
-        self._pin2: Pin | None = None
+    def __init__(self, left_pins, right_pins, initial_speed=5, pwm_frequency=1000):
+        self._left  = MotorDriver(pins=tuple(left_pins),  pwm_frequency=pwm_frequency)
+        self._right = MotorDriver(pins=tuple(right_pins), pwm_frequency=pwm_frequency)
+        self._left.initialize()
+        self._right.initialize()
+        self._speed = initial_speed
 
-    def initialize(self):
-        """Configura os pinos GPIO e inicia os sinais PWM."""
-        if self._initialized:
-            return
-        self._pin1 = Pin(self.in1, PinMode.DIGITAL_OUT)
-        self._pin2 = Pin(self.in2, PinMode.DIGITAL_OUT)
-        self._pin1.pwm(0.0, self.pwm_frequency)
-        self._pin2.pwm(0.0, self.pwm_frequency)
-        self._initialized = True
-        print(f"MotorDriver inicializado. Pinos: ({self.in1}, {self.in2})  Frequência PWM: {self.pwm_frequency} Hz")
+    @property
+    def speed(self):
+        return self._speed
 
-    def set_movement(self, speed: float, direction="FORWARD"):
-        if not self._initialized:
-            raise UninitializedMotorError("Motor não inicializado. Chame initialize() primeiro.")
+    @speed.setter
+    def speed(self, new_speed):
+        self._speed = max(0.0, min(100.0, new_speed))
 
-        direction = direction.upper()
-        duty = min(abs(speed), 100.0) / 100.0
+    def forward(self):
+        self._left.set_movement(self._speed,  "FORWARD")
+        self._right.set_movement(self._speed, "FORWARD")
 
-        if direction == "FORWARD":
-            self._pin1.pwm(duty, self.pwm_frequency)
-            self._pin2.pwm(0.0,  self.pwm_frequency)
-        elif direction == "BACKWARD":
-            self._pin1.pwm(0.0,  self.pwm_frequency)
-            self._pin2.pwm(duty, self.pwm_frequency)
-        elif direction == "STOP":
-            self._pin1.pwm(0.0, self.pwm_frequency)
-            self._pin2.pwm(0.0, self.pwm_frequency)
-        else:
-            raise DirectionInvalidMotorError(
-                "Direção inválida. Use: 'FORWARD', 'BACKWARD' ou 'STOP'."
-            )
+    def backward(self):
+        self._left.set_movement(self._speed,  "BACKWARD")
+        self._right.set_movement(self._speed, "BACKWARD")
+
+    def left(self):
+        self._left.set_movement(self._speed,  "BACKWARD")
+        self._right.set_movement(self._speed, "FORWARD")
+
+    def right(self):
+        self._left.set_movement(self._speed,  "FORWARD")
+        self._right.set_movement(self._speed, "BACKWARD")
 
     def stop(self):
-        self.set_movement(speed=0, direction="STOP")
+        self._left.stop()
+        self._right.stop()
 
     def cleanup(self):
-        if not self._initialized:
-            return
-        self.stop()
-        self._pin1.release()
-        self._pin2.release()
-        self._pin1 = None
-        self._pin2 = None
-        self._initialized = False
-        print("MotorDriver: recursos liberados.")
+        self._left.cleanup()
+        self._right.cleanup()
