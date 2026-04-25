@@ -2,7 +2,7 @@
 Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
-from roverlib.plugins.motor.motor import MotorDriver
+from roverlib.plugins.motor.motorDriver import MotorDriver
 from .motorCalibration import Calibration
 import time
 
