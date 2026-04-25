@@ -19,7 +19,7 @@ class MotorDriver(MotorInterface):
     Controla um único motor DC via Ponte-H L298N usando o plugin pin.
     """
 
-    def __init__(self, pins: tuple[int, int], pwm_frequency=1000):
+    def __init__(self, pins: tuple[int, int], pwm_frequency=100):
         if not PIN_AVAILABLE:
             raise ImportError(
                 "O plugin pin não está disponível. "
