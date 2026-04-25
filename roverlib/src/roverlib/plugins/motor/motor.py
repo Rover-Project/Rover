@@ -14,6 +14,9 @@ class Motor:
 
     def __init__(self, left_pins: tuple, right_pins: tuple, initial_speed: int =5, pwm: int = 1000):
         self._left  = MotorDriver(pins=left_pins, pwm_frequency=pwm)
+        
+        print("Deu certo!\n\n")
+        
         self._right = MotorDriver(pins=right_pins, pwm_frequency=pwm)
         self._left.initialize()
         self._right.initialize()
