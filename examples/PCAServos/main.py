@@ -3,67 +3,103 @@ import board
 import busio
 from adafruit_pca9685 import PCA9685
 
-# Inicialização I2C
+from roverlib.plugins.camera.autoFocus import AfCamera
+import cv2 as openCv
+
+# Inicialização PCA9685
 i2c = busio.I2C(board.SCL, board.SDA)
-
-# Inicializa PCA9685
 pca = PCA9685(i2c)
-pca.frequency = 50  # 50Hz para servo
+pca.frequency = 50
 
-# Converte velocidade em duty_cycle 
+# Controle dos servos
 def set_servo_speed(channel, speed):
-    # Ajuste fino 
     min_pulse = 2000
     max_pulse = 8000
     neutral = 5000
 
     pulse = int(neutral + speed * (max_pulse - min_pulse) / 2)
-
-    # Garante que não ultrapasse limites
     pulse = max(min_pulse, min(max_pulse, pulse))
 
     pca.channels[channel].duty_cycle = pulse
 
-def parar(ch):
-    set_servo_speed(ch, 0)
+# Motores (canal 0 = esquerdo, 1 = direito)
+def stop():
+    set_servo_speed(0, 0)
+    set_servo_speed(1, 0)
 
-def frente(ch):
-    set_servo_speed(ch, 0.5)
+def forward(speed):
+    s = speed / 100
+    set_servo_speed(0, s)
+    set_servo_speed(1, s)
 
-def tras(ch):
-    set_servo_speed(ch, -0.5)
+def backward(speed):
+    s = speed / 100
+    set_servo_speed(0, -s)
+    set_servo_speed(1, -s)
 
-def parar_todos():
-    for i in range(16):
-        set_servo_speed(i, 0)
+def turn_left(speed):
+    s = speed / 100
+    set_servo_speed(0, -s)
+    set_servo_speed(1, s)
 
-try:
-    while True:
-        ch = int(input("Canal do servo (0-15): "))
-        cmd = input("Digite comando (f=frente / t=tras / p=parar / s=sair): ").lower()
+def turn_right(speed):
+    s = speed / 100
+    set_servo_speed(0, s)
+    set_servo_speed(1, -s)
 
-        if cmd == "f":
-            frente(ch)
-            time.sleep(0.5)
-            parar(ch)
+# Programa principal
+if __name__ == "__main__":
+    HEIGHT = 640
+    WIDTH = 640
+    speed = 50  # 0–100
 
-        elif cmd == "t":
-            tras(ch)
-            time.sleep(0.5)
-            parar(ch)
+    # Inicializa câmera
+    try:
+        camera = AfCamera(HEIGHT, WIDTH)
+        camera.start()
+    except:
+        raise RuntimeError("Erro ao abrir câmera")
 
-        elif cmd == "p":
-            parar(ch)
+    try:
+        while True:
+            frame = camera.get_frame()
 
-        elif cmd == "s":
-            break
+            if frame is not None:
+                openCv.imshow("Rover", frame)
 
-        else:
-            print("Comando inválido")
+                key = openCv.waitKey(10) & 0xFF
 
-except KeyboardInterrupt:
-    print("Encerrando")
+                if key == ord("w"):
+                    forward(speed)
 
-finally:
-    parar_todos()
-    pca.deinit()
+                elif key == ord("s"):
+                    backward(speed)
+
+                elif key == ord("a"):
+                    turn_left(speed)
+
+                elif key == ord("d"):
+                    turn_right(speed)
+
+                elif key == ord("e"):
+                    speed = min(100, speed + 10)
+
+                elif key == ord("r"):
+                    speed = max(0, speed - 10)
+
+                elif key == ord("q"):
+                    break
+
+                else:
+                    stop()
+
+                print(f"Velocidade: {speed}")
+
+    except KeyboardInterrupt:
+        print("Encerrando.")
+
+    finally:
+        stop()
+        pca.deinit()
+        camera.cleanup()
+        openCv.destroyAllWindows()
