@@ -23,8 +23,8 @@ class Robot:
         """
         
         # Crias instâncias para controlas os motores
-        self.left_motor = Motor(left_pins=left, pwm=pwm_frequency)
-        self.right_motor = Motor(right_pins=right, pwm=pwm_frequency)
+        self.left_motor = Motor(left, pwm_frequency)
+        self.right_motor = Motor(right, pwm_frequency)
         self.calibration = calibration 
         
         # Inicias os motores
