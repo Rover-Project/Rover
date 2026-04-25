@@ -81,7 +81,8 @@ if __name__ == "__main__":
                     break
 
                 else:
-                    stop()
+                    stop(servoHorizontal)
+                    stop(servoVertival)
 
                 print(f"Velocidade: {speed}")
 
@@ -89,7 +90,8 @@ if __name__ == "__main__":
         print("Encerrando.")
 
     finally:
-        stop()
+        stop(servoVertival)
+        stop(servoHorizontal)
         pca.deinit()
         camera.cleanup()
         openCv.destroyAllWindows()
