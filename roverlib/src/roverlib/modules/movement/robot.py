@@ -12,7 +12,7 @@ class Robot:
     Fornece métodos intuitivos para controlar o movimento.
     """
     
-    def __init__(self, right:tuple[int, int], left: tuple[int, int], calibration: Calibration=Calibration(1, 1), pwm_frequency=1000):
+    def __init__(self, right:tuple[int, int], left: tuple[int, int], calibration: Calibration=Calibration(1, 1), pwm_frequency: int = 1000):
         """
         Inicia os drivers para os motores.
         Args:
@@ -23,8 +23,8 @@ class Robot:
         """
         
         # Crias instâncias para controlas os motores
-        self.left_motor = Motor(left, pwm_frequency)
-        self.right_motor = Motor(right, pwm_frequency)
+        self.left_motor = Motor(left_pins=left, pwm=pwm_frequency)
+        self.right_motor = Motor(right_pins=right, pwm=pwm_frequency)
         self.calibration = calibration 
         
         # Inicias os motores

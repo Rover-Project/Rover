@@ -25,6 +25,7 @@ class MotorDriver(MotorInterface):
                 "O plugin pin não está disponível. "
                 "Compile o módulo C++ e execute na Raspberry Pi."
             )
+        
         self.pwm_frequency = pwm_frequency
         self.in1, self.in2 = pins
         self._initialized = False

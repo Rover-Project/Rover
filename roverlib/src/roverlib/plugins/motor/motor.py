@@ -12,9 +12,9 @@ class Motor:
     Interface idêntica à versão anterior com gpiozero.Robot.
     """
 
-    def __init__(self, left_pins, right_pins, initial_speed=5, pwm_frequency=1000):
-        self._left  = MotorDriver(pins=tuple(left_pins),  pwm_frequency=pwm_frequency)
-        self._right = MotorDriver(pins=tuple(right_pins), pwm_frequency=pwm_frequency)
+    def __init__(self, left_pins: tuple, right_pins: tuple, initial_speed: int =5, pwm: int = 1000):
+        self._left  = MotorDriver(pins=left_pins,  pwm_frequency=pwm)
+        self._right = MotorDriver(pins=right_pins, pwm_frequency=pwm)
         self._left.initialize()
         self._right.initialize()
         self._speed = initial_speed
