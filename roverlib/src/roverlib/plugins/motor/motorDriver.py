@@ -28,8 +28,8 @@ class MotorDriver(MotorInterface):
         
         self.pwm_frequency = pwm_frequency
         print(pins)
-        self.in1 = pins[0] 
-        self.in2 = pins[1]
+        #self.in1 = pins[0] 
+        #self.in2 = pins[1]
         self._initialized = False
         self._pin1: Pin | None = None
         self._pin2: Pin | None = None
