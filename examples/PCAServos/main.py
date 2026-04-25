@@ -27,11 +27,11 @@ def stop(ch: int):
 
 def forward(ch: int, speed):
     s = speed / 100
-    set_servo_speed(ch, s)
+    set_servo_speed(ch, -s)
 
 def backward(ch: int, speed):
     s = speed / 100
-    set_servo_speed(ch, -s)
+    set_servo_speed(ch, s)
 
 # Programa principal
 if __name__ == "__main__":
