@@ -13,7 +13,7 @@ class Motor:
     """
 
     def __init__(self, left_pins: tuple, right_pins: tuple, initial_speed: int =5, pwm: int = 1000):
-        self._left  = MotorDriver(pins=[2,3], pwm_frequency=pwm)        
+        self._left  = MotorDriver(pins=left_pins, pwm_frequency=pwm)        
         self._right = MotorDriver(pins=[1,2], pwm_frequency=pwm)
         self._left.initialize()
         self._right.initialize()
