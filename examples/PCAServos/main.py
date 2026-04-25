@@ -1,24 +1,44 @@
 import time
-from board import SCL, SDA
+import board
 import busio
 from adafruit_pca9685 import PCA9685
 
-i2c = busio.I2C(SCL, SDA)
-pca = PCA9685(i2c, address=0x40)
-pca.frequency = 1000  # e.g., LEDs at 1 kHz (servos would be 50)
-# Each channel has a 16-bit duty_cycle: 0x0000..0xFFFF
+# Inicializa I2C
+i2c = busio.I2C(board.SCL, board.SDA)
 
-ch = pca.channels[0]
-for dc in (0x0000, 0x4000, 0x8000, 0xC000, 0xFFFF):
-    ch.duty_cycle = dc
-    time.sleep(0.5)
+# Inicializa PCA9685
+pca = PCA9685(i2c)
+pca.frequency = 50  # 50Hz padrão para servo
 
-# For servos without ServoKit, set 50 Hz and compute pulse steps:
-def set_servo_pulse_us(channel, pulse_us, freq=50):
-    pca.frequency = freq
-    period_us = 1_000_000 // freq       # 20,000 µs at 50 Hz
-    step = int((pulse_us / period_us) * 0x10000)  # 16-bit duty steps
-    pca.channels[channel].duty_cycle = max(0, min(0xFFFF, step))
+# Função para controlar servo contínuo
+def set_servo_speed(channel, speed):
+    """
+    speed: -1.0 (máx reverso) até 1.0 (máx frente)
+    0 = parado
+    """
+    neutral = 375  
+    range_val = 100  
 
-# Example: ~1.0–2.0 ms servo range
-set_servo_pulse_us(0, 1500)  # ~center
+    pulse = int(neutral + speed * range_val)
+    pca.channels[channel].duty_cycle = pulse
+
+try:
+    while True:
+        print("Parado")
+        set_servo_speed(0, 0)
+        set_servo_speed(1, 0)
+        time.sleep(2)
+
+        print("Girando pra frente")
+        set_servo_speed(0, 0.5)
+        set_servo_speed(1, 0.5)
+        time.sleep(3)
+
+        print("Girando pra trás")
+        set_servo_speed(0, -0.5)
+        set_servo_speed(1, -0.5)
+        time.sleep(3)
+
+except KeyboardInterrupt:
+    print("Encerrando")
+    pca.deinit()
