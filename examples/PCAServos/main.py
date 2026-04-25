@@ -10,9 +10,9 @@ i2c = busio.I2C(board.SCL, board.SDA)
 pca = PCA9685(i2c)
 pca.frequency = 50  # 50Hz para servo
 
-# Converte velocidade em duty_cycle correto (0-65535)
+# Converte velocidade em duty_cycle 
 def set_servo_speed(channel, speed):
-    # Ajuste fino (pode variar dependendo do servo)
+    # Ajuste fino 
     min_pulse = 2000
     max_pulse = 8000
     neutral = 5000
