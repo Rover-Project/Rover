@@ -44,12 +44,12 @@ try:
 
         if cmd == "f":
             frente(ch)
-            time.sleep(1)
+            time.sleep(0.5)
             parar(ch)
 
         elif cmd == "t":
             tras(ch)
-            time.sleep(1)
+            time.sleep(0.5)
             parar(ch)
 
         elif cmd == "p":
