@@ -39,8 +39,8 @@ if __name__ == "__main__":
     WIDTH = 1080
     speed = 50  # 0–100
     
-    servoVertival = 0
-    servoHorizontal = 1
+    servoVertival = 1
+    servoHorizontal = 0
 
 
     # Inicializa câmera
