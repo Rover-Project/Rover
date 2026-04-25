@@ -20,7 +20,7 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = AfCameragt(HEIGHT, WIDTH)
+        camera = AfCamera(HEIGHT, WIDTH)
         camera.start()
 
     except:
