@@ -12,7 +12,7 @@ pca = PCA9685(i2c)
 pca.frequency = 50
 
 # Controle dos servos
-def set_servo_speed(channel, speed):
+def set_servo_speed(channel: int, speed):
     min_pulse = 2000
     max_pulse = 8000
     neutral = 5000
@@ -22,36 +22,26 @@ def set_servo_speed(channel, speed):
 
     pca.channels[channel].duty_cycle = pulse
 
-# Motores (canal 0 = esquerdo, 1 = direito)
-def stop():
-    set_servo_speed(0, 0)
-    set_servo_speed(1, 0)
+def stop(ch: int):
+    set_servo_speed(ch, 0)
 
-def forward(speed):
+def forward(ch: int, speed):
     s = speed / 100
-    set_servo_speed(0, s)
-    set_servo_speed(1, s)
+    set_servo_speed(ch, s)
 
-def backward(speed):
+def backward(ch: int, speed):
     s = speed / 100
-    set_servo_speed(0, -s)
-    set_servo_speed(1, -s)
-
-def turn_left(speed):
-    s = speed / 100
-    set_servo_speed(0, -s)
-    set_servo_speed(1, s)
-
-def turn_right(speed):
-    s = speed / 100
-    set_servo_speed(0, s)
-    set_servo_speed(1, -s)
+    set_servo_speed(ch, -s)
 
 # Programa principal
 if __name__ == "__main__":
-    HEIGHT = 640
-    WIDTH = 640
+    HEIGHT = 1080
+    WIDTH = 1080
     speed = 50  # 0–100
+    
+    servoVertival = 0
+    servoHorizontal = 1
+
 
     # Inicializa câmera
     try:
@@ -70,16 +60,16 @@ if __name__ == "__main__":
                 key = openCv.waitKey(10) & 0xFF
 
                 if key == ord("w"):
-                    forward(speed)
+                    forward(servoVertival, speed)
 
                 elif key == ord("s"):
-                    backward(speed)
+                    backward(servoVertival, speed)
 
                 elif key == ord("a"):
-                    turn_left(speed)
+                    forward(servoHorizontal, speed)
 
                 elif key == ord("d"):
-                    turn_right(speed)
+                    backward(servoHorizontal, speed)
 
                 elif key == ord("e"):
                     speed = min(100, speed + 10)
