@@ -2,7 +2,7 @@
 Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
-from roverlib.plugins.motor.motor import Motor
+from roverlib.plugins.motor.motor import MotorDriver
 from .motorCalibration import Calibration
 import time
 
@@ -23,8 +23,8 @@ class Robot:
         """
         
         # Crias instâncias para controlas os motores
-        self.left_motor = Motor(left)
-        self.right_motor = Motor(right)
+        self.left_motor = MotorDriver(left, pwm_frequency)
+        self.right_motor = MotorDriver(right, pwm_frequency)
         self.calibration = calibration 
         
         # Inicias os motores
