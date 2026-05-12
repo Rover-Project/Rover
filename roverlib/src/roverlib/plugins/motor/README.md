@@ -4,6 +4,22 @@ Driver de baixo nível para controle de motores DC via Ponte-H L298N, com suport
 
 ---
 
+## Sumário
+ 
+- [Visão Geral](#visão-geral)
+- [Estrutura do Plugin](#estrutura-do-plugin)
+- [Instalação e Requisitos](#instalação-e-requisitos)
+- [Uso Rápido](#uso-rápido)
+- [Referência da API](#referência-da-api)
+  - [MotorInterface](#motorinterface)
+  - [MotorDriver](#motordriver)
+  - [VirtualMotor](#virtualmotor)
+  - [Exceções](#exceções)
+- [Diagrama de Classes](#diagrama-de-classes)
+- [Direções de Rotação](#direções-de-rotação)
+- [Exemplos](#exemplos)
+---
+
 ## Visão Geral
 
 O plugin motor fornece uma abstração para controle de motores DC conectados a uma **Ponte-H L298N** em uma Raspberry Pi. Ele é composto por:
