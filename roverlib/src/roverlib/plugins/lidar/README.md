@@ -21,7 +21,7 @@ O sensor TF-Luna opera utilizando o protocolo UART. Para a prosperidade, as espe
 
 ### 2. Pinout do Lidar:
 
-![alt text](image.png)
+![alt text](/assets/LiDAR/image.png)
 
 Com o lidar nessa posição, da direita pra esquerda, 1 -> 6.
 
