@@ -17,7 +17,7 @@ except:
     aBusio = False    
 
 try: 
-    from adfruit_pca9685 import PCA9685
+    from adafruit_pca9685 import PCA9685
     aPCA9685 = True
 except:
     aPCA9685 = False
