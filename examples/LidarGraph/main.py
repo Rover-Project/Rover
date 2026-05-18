@@ -1,8 +1,8 @@
-from roverlib.plugins.lidar.exceptions import LidarNotStart#type: ignore
-from roverlib.plugins.lidar.lidar import Lidar #type: ignore
-import serial #type: ignore
-import matplotlib.pyplot as plt #type: ignore
-from matplotlib.animation import FuncAnimation #type: ignore
+from roverlib.plugins.lidar.exceptions import LidarNotStart
+from roverlib.plugins.lidar.lidar import Lidar
+import serial
+import matplotlib.pyplot as plt 
+from matplotlib.animation import FuncAnimation
 import time
 
 x_axisData = [] # informacoes para o eixo x (frames)

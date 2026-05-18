@@ -62,7 +62,7 @@ if __name__ == "__main__":
         
         if frame is not None:    
             openCv.imshow("Rover", frame)
-        
+         
         if key == ord("q"):
             break
         
