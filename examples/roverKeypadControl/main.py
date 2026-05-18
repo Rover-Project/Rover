@@ -35,7 +35,7 @@ if __name__ == "__main__":
             
             openCv.imshow("Rover", frame)
             
-            key = openCv.waitKey(10) & 0xFF # Espera resposta do teclado
+            key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
             
             if key == ord("w"):
                 robot.forward(speed)
