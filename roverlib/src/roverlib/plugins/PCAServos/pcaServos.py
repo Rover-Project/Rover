@@ -50,7 +50,7 @@ class PCAServos(PCAServosInterface):
         pulse = max(min_pulse, min(max_pulse, pulse)) # define o pulso possivel
         
         for channel in channels: # velocidade para cada canal
-            pca.channels[channel].duty_cycle = pulse # define a velocidade 
+            self.pca.channels[channel].duty_cycle = pulse # define a velocidade 
             
     
     def stop(self, channels):
