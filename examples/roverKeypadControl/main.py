@@ -48,8 +48,7 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        #camera = AfCamera(HEIGHT, WIDTH)
-        camera = Camera(HEIGHT, WIDTH)
+        camera = AfCamera(HEIGHT, WIDTH)
         camera.start()
 
     except:
@@ -58,7 +57,7 @@ if __name__ == "__main__":
     while True:
         frame = camera.get_frame()
     
-        key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
+        key = openCv.waitKey(100) & 0xFF # Espera resposta do teclado
         speed = set_move(command=key, speed=speed)
         
         if frame is not None:    
