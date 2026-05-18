@@ -22,8 +22,8 @@ try:
 except:
     aPCA9685 = False
 
-class PACServos(PCAServosInterface):
-    def __init__(self, frequency):
+class PCAServos(PCAServosInterface):
+    def __init__(self, frequency: int = 50):
         
         if not aBusio:
             raise BusionNotFoundModule("O módulo Busio não foi encontrado, verifique se você está no ambiente da Raspberry")
