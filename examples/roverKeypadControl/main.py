@@ -1,9 +1,37 @@
 from roverlib.modules.movement.robot import Robot
 from roverlib.plugins.camera.autoFocus import AfCamera
+from roverlib.plugins.camera.camera import Camera
 from roverlib.utils.config_manager import Config
 from pathlib import Path
 import cv2 as openCv
 
+
+def set_move(command: str = None, speed: float=50):        
+    
+    if command == ord("w"):
+        robot.forward(speed)
+        
+    elif command == ord("a"):
+        robot.turn_left(speed)
+        
+    elif command == ord("d"):
+        robot.turn_right(speed)
+        
+    elif command == ord("s"):
+        robot.backward(speed)
+        
+    elif command == ord("e"):
+        speed = max(0, min(speed + 10, 100))
+    
+    elif command == ord("r"):
+        speed = max(0, min(speed - 10, 100))
+    
+    else:
+        robot.stop()
+
+    print(speed)
+    return speed
+    
 if __name__ == "__main__":
     HEIGHT = 640
     WIDTH = 640
@@ -20,7 +48,8 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = AfCamera(HEIGHT, WIDTH)
+        #camera = AfCamera(HEIGHT, WIDTH)
+        camera = Camera(HEIGHT, WIDTH)
         camera.start()
 
     except:
@@ -28,46 +57,16 @@ if __name__ == "__main__":
     
     while True:
         frame = camera.get_frame()
-        
-        if frame is not None:
-        
-            speed = max(0, min(speed, 100))        
-            
-            openCv.imshow("Rover", frame)
-            
-            key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
-            
-            if key == ord("w"):
-                robot.forward(speed)
-                pass
-            
-            elif key == ord("a"):
-                robot.turn_left(speed)
-                pass
-            
-            elif key == ord("d"):
-                robot.turn_right(speed)
-                pass
-            
-            elif key == ord("s"):
-                robot.backward(speed)
-                pass
-                
-            elif key == ord("e"):
-                speed = max(0, min(speed + 10, 100))
-            
-            elif key == ord("r"):
-                speed = max(0, min(speed - 10, 100))
-            
-            elif key == ord("q"):
-                break
-        
-            else:
-                pass
-                robot.stop()
-            
-            print(speed)
     
+        key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
+        speed = set_move(command=key, speed=speed)
+        
+        if frame is not None:    
+            openCv.imshow("Rover", frame)
+        
+        if key == ord("q"):
+            break
+        
     robot.cleanup()
     camera.cleanup()
     openCv.destroyAllWindows()
