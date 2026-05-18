@@ -35,22 +35,22 @@ if __name__ == "__main__":
                 key = openCv.waitKey(10) & 0xFF
 
                 if key == ord("w"):
-                    servos.forward(channels=tuple(SERVO_V), speed=SPEED)
+                    servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
 
                 elif key == ord("s"):
-                    servos.backward(channels=tuple(SERVO_V), speed=SPEED)
+                    servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
 
                 elif key == ord("a"):
-                    servos.forward(channels=tuple(SERVO_H), speed=SPEED)
+                    servos.forward(channels=tuple([SERVO_H]), speed=SPEED)
 
                 elif key == ord("d"):
-                    servos.backward(channels=tuple(SERVO_H), speed=SPEED)
+                    servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
 
                 elif key == ord("q"):
                     break
 
                 else:
-                    servos.stop(channels=tuple(SERVO_V, SERVO_H))
+                    servos.stop(channels=tuple([SERVO_V, SERVO_H]))
                    
     except KeyboardInterrupt:
         print("Encerrando.")
