@@ -1,7 +1,7 @@
 """
 teste_conexao.py
 ==================
-Teste de fumaça: verifica se a comunicação I2C com o PCA9685 está
+Teste de conexão: verifica se a comunicação I2C com o PCA9685 está
 funcionando, sem mover nenhum servo ainda.
 
 Execute na Raspberry Pi com o PCA9685 conectado:
