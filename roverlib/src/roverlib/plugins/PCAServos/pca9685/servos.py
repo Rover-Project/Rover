@@ -57,31 +57,30 @@ class PCAServos:
 
     Parâmetros
     ----------
+    frequency : float
+        Frequência PWM em Hz. Padrão: 50 Hz (padrão para servos RC).
     address : int
         Endereço I2C do PCA9685. Padrão: 0x40.
     bus : int
         Barramento I2C da Raspberry Pi. Padrão: 1.
-    frequency : float
-        Frequência PWM em Hz. Padrão: 50 Hz (padrão para servos RC).
 
     Exemplo
     -------
-    >>> servos = PCAServos()
-    >>> servos.set_frequency(50)
-    >>> servos.set_pwm(channel=0, on=0, off=307)   # posição neutra
-    >>> servos.set_duty_cycle(channel=1, value=204) # duty cycle baixo
-    >>> servos.close()
+    >>> servos = PCAServos(50)                      # só a frequência
+    >>> servos.set_pwm(channel=0, on=0, off=307)     # posição neutra
+    >>> servos.set_duty_cycle(channel=1, value=204)  # duty cycle baixo
+    >>> servos.cleanup()
 
     Uso como context manager:
-    >>> with PCAServos() as servos:
+    >>> with PCAServos(50) as servos:
     ...     servos.set_pwm(0, 0, 307)
     """
 
     def __init__(
         self,
+        frequency: float = _DEFAULT_FREQ_HZ,
         address: int = 0x40,
         bus: int = 1,
-        frequency: float = _DEFAULT_FREQ_HZ,
     ) -> None:
         self._driver = PCA9685Driver(address=address, bus=bus)
         self.set_frequency(frequency)
@@ -195,12 +194,91 @@ class PCAServos:
         self._driver.reset_all_channels()
 
     # ------------------------------------------------------------------
+    # Movimento contínuo por canal(is) — interface estilo motor
+    # ------------------------------------------------------------------
+    # Estes métodos tratam o(s) canal(is) informado(s) como servos de
+    # rotação contínua (360°), controlados por uma porcentagem de
+    # velocidade (0–100) em vez de throttle (-1.0 a 1.0). São úteis quando
+    # o código que consome o módulo pensa em termos de "mover para frente/
+    # para trás" (rodas, pan/tilt motorizado) em vez de ângulo absoluto.
+
+    @staticmethod
+    def _normalize_channels(channels) -> tuple:
+        """Aceita um único canal (int) ou uma coleção de canais e
+        sempre retorna uma tupla, para uso uniforme nos métodos abaixo."""
+        if isinstance(channels, int):
+            return (channels,)
+        return tuple(channels)
+
+    def forward(self, channels, speed: float = 100.0) -> None:
+        """
+        Move o(s) canal(is) informado(s) no sentido de avanço.
+
+        Internamente, converte a porcentagem de velocidade em throttle
+        positivo (0.0 a 1.0) e aplica via pulso PWM equivalente.
+
+        Parâmetros
+        ----------
+        channels : int | tuple[int, ...]
+            Canal único ou coleção de canais (0–15).
+        speed : float
+            Velocidade de 0 a 100 (%). Padrão: 100 (velocidade máxima).
+        """
+        speed = max(0.0, min(100.0, float(speed)))
+        throttle = speed / 100.0
+        pulse_us = round(
+            _DEFAULT_NEUTRAL + throttle * (_DEFAULT_MAX_PULSE - _DEFAULT_NEUTRAL)
+        )
+        for ch in self._normalize_channels(channels):
+            self.set_pulse_us(ch, pulse_us)
+        logger.debug("forward(channels=%s, speed=%.1f%%)", channels, speed)
+
+    def backward(self, channels, speed: float = 100.0) -> None:
+        """
+        Move o(s) canal(is) informado(s) no sentido reverso.
+
+        Parâmetros
+        ----------
+        channels : int | tuple[int, ...]
+            Canal único ou coleção de canais (0–15).
+        speed : float
+            Velocidade de 0 a 100 (%). Padrão: 100 (velocidade máxima).
+        """
+        speed = max(0.0, min(100.0, float(speed)))
+        throttle = -(speed / 100.0)
+        pulse_us = round(
+            _DEFAULT_NEUTRAL + throttle * (_DEFAULT_NEUTRAL - _DEFAULT_MIN_PULSE)
+        )
+        for ch in self._normalize_channels(channels):
+            self.set_pulse_us(ch, pulse_us)
+        logger.debug("backward(channels=%s, speed=%.1f%%)", channels, speed)
+
+    def stop(self, channels) -> None:
+        """
+        Para o(s) canal(is) informado(s), enviando o pulso neutro
+        (sem desativar o sinal — o servo permanece "vivo", apenas parado).
+
+        Parâmetros
+        ----------
+        channels : int | tuple[int, ...]
+            Canal único ou coleção de canais (0–15).
+        """
+        for ch in self._normalize_channels(channels):
+            self.set_pulse_us(ch, _DEFAULT_NEUTRAL)
+        logger.debug("stop(channels=%s)", channels)
+
+    # ------------------------------------------------------------------
     # Ciclo de vida
     # ------------------------------------------------------------------
 
     def close(self) -> None:
         """Fecha o driver e o barramento I2C."""
         self._driver.close()
+
+    def cleanup(self) -> None:
+        """Alias de close(), para compatibilidade com código que espera
+        esse nome (padrão comum em bibliotecas de GPIO/hardware)."""
+        self.close()
 
     def __enter__(self):
         return self
