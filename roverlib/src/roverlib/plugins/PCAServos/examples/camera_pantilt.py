@@ -40,7 +40,7 @@ except ImportError as e:
 # Passo angular por iteração: quanto menor, mais suave e seguro o movimento.
 # 1° por passo é bastante conservador — bom para evitar solavancos.
 PASSO_GRAUS   = 1       # graus por passo
-DELAY_PASSO   = 0.5    # segundos entre cada passo (20 ms → ~50°/s)
+DELAY_PASSO   = 0.2    # segundos entre cada passo (20 ms → ~50°/s)
 DELAY_DESTINO = 0.4     # pausa ao chegar em cada posição de varredura
 
 
