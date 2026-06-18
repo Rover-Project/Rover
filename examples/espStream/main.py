@@ -2,12 +2,12 @@ import os
 import cv2
 import time
 
-ESP32_IP = "192.168.1.15" 
+ESP32_IP = "192.168.74.123" 
 URL_STREAM = f"http://{ESP32_IP}:81/stream"
 
 # Inicializa a captura de vídeo apontando para a URL da ESP32
 capture = cv2.VideoCapture(URL_STREAM)
-# Configura buffers menores para reduzir o delay (opcional, mas ajuda na Rasp)
+
 capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 if not capture.isOpened():
