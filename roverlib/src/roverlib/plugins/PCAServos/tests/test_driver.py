@@ -317,3 +317,68 @@ class TestContinuousServo:
     def test_repr(self, pca):
         cs = ContinuousServo(pca, channel=3)
         assert "channel=3" in repr(cs)
+
+
+# ---------------------------------------------------------------------------
+# Testes: PCAServos.forward / backward / stop / cleanup
+# ---------------------------------------------------------------------------
+class TestPCAServosMotorStyle:
+    def test_pca_aceita_frequencia_posicional(self):
+        """PCAServos(50) deve funcionar como no código de integração."""
+        p = PCAServos(50)
+        assert p.get_pwm(0) is not None
+
+    def test_forward_canal_unico_velocidade_maxima(self, pca):
+        pca.forward(channels=0, speed=100)
+        on, off = pca.get_pwm(0)
+        # 100% forward → pulso máximo (2500us) → tick ≈ 512
+        assert 510 <= off <= 514
+
+    def test_forward_canal_unico_velocidade_parcial(self, pca):
+        pca.forward(channels=0, speed=50)
+        on, off = pca.get_pwm(0)
+        # 50% forward → meio do caminho entre neutro (307) e máximo (512) ≈ 410
+        assert 405 <= off <= 415
+
+    def test_backward_canal_unico_velocidade_maxima(self, pca):
+        pca.backward(channels=0, speed=100)
+        on, off = pca.get_pwm(0)
+        # 100% backward → pulso mínimo (500us) → tick ≈ 102
+        assert 100 <= off <= 104
+
+    def test_forward_multiplos_canais(self, pca):
+        pca.forward(channels=(0, 1), speed=100)
+        on0, off0 = pca.get_pwm(0)
+        on1, off1 = pca.get_pwm(1)
+        assert 510 <= off0 <= 514
+        assert 510 <= off1 <= 514
+
+    def test_stop_retorna_ao_neutro(self, pca):
+        pca.forward(channels=0, speed=100)
+        pca.stop(channels=0)
+        on, off = pca.get_pwm(0)
+        # neutro (1500us) → tick ≈ 307
+        assert 305 <= off <= 309
+
+    def test_stop_multiplos_canais(self, pca):
+        pca.forward(channels=(0, 1), speed=80)
+        pca.stop(channels=(0, 1))
+        _, off0 = pca.get_pwm(0)
+        _, off1 = pca.get_pwm(1)
+        assert 305 <= off0 <= 309
+        assert 305 <= off1 <= 309
+
+    def test_speed_clampada_acima_de_100(self, pca):
+        pca.forward(channels=0, speed=500)
+        on, off = pca.get_pwm(0)
+        assert 510 <= off <= 514   # clampado para 100%
+
+    def test_speed_clampada_negativa(self, pca):
+        pca.forward(channels=0, speed=-50)
+        on, off = pca.get_pwm(0)
+        # speed negativa é clampada para 0 → fica no neutro
+        assert 305 <= off <= 309
+
+    def test_cleanup_eh_alias_de_close(self):
+        p = PCAServos(50)
+        p.cleanup()   # não deve levantar exceção
