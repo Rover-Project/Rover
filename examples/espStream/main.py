@@ -10,6 +10,11 @@ capture = cv2.VideoCapture(URL_STREAM)
 
 capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
+NOME_JANELA = "Stream ESP32-CAM"
+cv2.namedWindow(NOME_JANELA, cv2.WINDOW_NORMAL)
+
+cv2.resizeWindow(NOME_JANELA, 800, 600)
+
 if not capture.isOpened():
     print("Erro: Não foi possível conectar ao stream. Verifique o IP ou se a ESP32 está ligada.")
     exit()
@@ -21,7 +26,7 @@ while True:
         print("Falha ao receber frame. Tentando reconectar")
         continue
 
-    cv2.imshow("Stream ESP32-CAM", frame)
+    cv2.imshow(NOME_JANELA, frame)
 
     key = cv2.waitKey(1) & 0xFF
 
