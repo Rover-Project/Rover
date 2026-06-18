@@ -24,6 +24,8 @@ while True:
 
     cv2.imshow("Stream ESP32-CAM", frame)
 
+    time.sleep(0.1)
+
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord('q'):
