@@ -2,7 +2,7 @@ import os
 import cv2
 import time
 
-ESP32_IP = "192.168.74.123" 
+ESP32_IP = "192.168.4.1" 
 URL_STREAM = f"http://{ESP32_IP}:81/stream"
 
 # Inicializa a captura de vídeo apontando para a URL da ESP32
