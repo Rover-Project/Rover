@@ -19,12 +19,9 @@ while True:
 
     if not ret:
         print("Falha ao receber frame. Tentando reconectar")
-        time.sleep(1)
         continue
 
     cv2.imshow("Stream ESP32-CAM", frame)
-
-    time.sleep(0.1)
 
     key = cv2.waitKey(1) & 0xFF
 
