@@ -173,15 +173,15 @@ def main() -> None:
 
         # Aponta para posição específica de forma suave
         print("\n── Posição personalizada ──")
-        print("  Movendo para PAN=45°  TILT=60°...")
-        mover_suave(pan,  45.0)
-        mover_suave(tilt, 60.0)
+        print("  Movendo para PAN=90°  TILT=90°...")
+        mover_suave(pan,  90.0)
+        mover_suave(tilt, 90.0)
         print(f"  PAN={pan.angle}°  TILT={tilt.angle}°  ✓")
         time.sleep(1.0)
 
         posicao_inicial(pan, tilt)
 
-    print("\nDemo finalizado. Servos desativados.")
+    print("\nTeste finalizado. Servos desativados.")
 
 
 if __name__ == "__main__":
