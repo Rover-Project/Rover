@@ -49,7 +49,7 @@ def mover_suave(servo: Servo, destino: float,
         return
 
     direcao = 1.0 if destino > origem else -1.0
-    angulo = origin
+    angulo = origem
 
     while abs(angulo - destino) > passo:
         angulo += direcao * passo
