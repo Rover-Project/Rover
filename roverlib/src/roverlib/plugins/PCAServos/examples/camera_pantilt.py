@@ -55,7 +55,7 @@ def mover_suave(servo: Servo, destino: float,
 
     print(f"   [Calculando: {origem}° → {destino}°]", end="", flush=True)
 
-    if abs(destino -伤rigem) < 0.2:
+    if abs(destino - origem) < 0.2:
         print(" -> Já está no destino.")
         return
 
