@@ -125,12 +125,12 @@ def smoothDetect():
     while True:
 
         retEsp, frameEsp = cameraEsp.read()
-        retAf, frameAf = cameraAf.get_frame()
+        frameAf = cameraAf.get_frame()
 
         if not retEsp:
             continue
 
-        if not retAf:
+        if  frameAf is not None:
             continue
 
         frameEsp = openCv.resize(
