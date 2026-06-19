@@ -78,30 +78,32 @@ def main() -> None:
     print("=" * 50)
 
     with PCAServos(address=0x40, bus=1, frequency=50) as pca:
-        # Padronizando os limites de pulso para ambos os servos atingirem 180° reais.
-        # Nota: Se o seu servo tremer nos extremos (0 ou 180), mude para (600, 2400).
         pan  = Servo(pca, channel=0, min_pulse_us=500, max_pulse_us=2500)
         tilt = Servo(pca, channel=1, min_pulse_us=500, max_pulse_us=2500)
 
-        # 1. Centraliza ambos em 90 graus
+        # 1. Centraliza inicial
         print("\n── Centralizando em 90° ──")
         mover_suave(pan, 90.0)
         mover_suave(tilt, 90.0)
         time.sleep(0.5)
 
-        # 2. Testa o movimento total do PAN (0° a 180°)
+        # 2. Varreduras
         varredura_total(pan, "PAN")
         time.sleep(0.5)
 
-        # 3. Testa o movimento total do TILT (0° a 180°)
         varredura_total(tilt, "TILT")
         time.sleep(0.5)
 
-        # 4. Retorna ambos para a posição segura de repouso (90°)
+        # 3. Retorno ao Centro (CORREÇÃO AQUI)
         print("\n── Retornando ao Centro ──")
         mover_suave(pan, 90.0)
         mover_suave(tilt, 90.0)
-        time.sleep(0.5)
+        
+        # ⚠️ ESPERA CRÍTICA: Dá tempo para o motor girar fisicamente até 90°
+        # antes que o 'with' feche e desligue o PCA9685
+        print("  Aguardando finalização do movimento físico...", end="", flush=True)
+        time.sleep(1.5) 
+        print(" ✓")
 
     print("\nTeste finalizado com sucesso.")
 
