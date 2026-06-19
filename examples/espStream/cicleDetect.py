@@ -124,7 +124,7 @@ def smoothDetect():
 
     while True:
 
-        retEsp, frameEsp = cameraEsp.read()
+        _, frameEsp = cameraEsp.read()
         frameAf = cameraAf.get_frame()
 
         
@@ -140,8 +140,8 @@ def smoothDetect():
             interpolation=openCv.INTER_CUBIC
         )
 
-        circleEsp, maskEsp = detectCircle(frameEsp)
-        circleAf, maskAf = detectCircle(frameAf)
+        circleEsp, _ = detectCircle(frameEsp)
+        circleAf, _ = detectCircle(frameAf)
 
         drawCircle(
             frameEsp,
@@ -163,16 +163,6 @@ def smoothDetect():
         openCv.imshow(
             "AF Camera",
             frameAf
-        )
-
-        openCv.imshow(
-            "Mask ESP32",
-            maskEsp
-        )
-
-        openCv.imshow(
-            "Mask AF",
-            maskAf
         )
 
         if openCv.waitKey(1) & 0xFF == ord('q'):
