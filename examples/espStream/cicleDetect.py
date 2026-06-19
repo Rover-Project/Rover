@@ -125,60 +125,60 @@ def smoothDetect():
     while True:
 
         retEsp, frameEsp = cameraEsp.read()
-        frameAf = cameraAf.get_frame()
+        # frameAf = cameraAf.get_frame()
 
-        if not retEsp:
-            continue
+        # if not retEsp:
+        #     continue
 
-        if  frameAf is not None:
-            continue
+        # if  frameAf is not None:
+        #     continue
 
-        frameEsp = openCv.resize(
-            frameEsp,
-            (WIDTH, HEIGHT),
-            interpolation=openCv.INTER_CUBIC
-        )
+        # frameEsp = openCv.resize(
+        #     frameEsp,
+        #     (WIDTH, HEIGHT),
+        #     interpolation=openCv.INTER_CUBIC
+        # )
 
-        frameAf = openCv.resize(
-            frameAf,
-            (WIDTH, HEIGHT),
-            interpolation=openCv.INTER_CUBIC
-        )
+        # frameAf = openCv.resize(
+        #     frameAf,
+        #     (WIDTH, HEIGHT),
+        #     interpolation=openCv.INTER_CUBIC
+        # )
 
-        circleEsp, maskEsp = detectCircle(frameEsp)
-        circleAf, maskAf = detectCircle(frameAf)
+        # circleEsp, maskEsp = detectCircle(frameEsp)
+        # circleAf, maskAf = detectCircle(frameAf)
 
-        drawCircle(
-            frameEsp,
-            circleEsp,
-            "ESP32"
-        )
+        # drawCircle(
+        #     frameEsp,
+        #     circleEsp,
+        #     "ESP32"
+        # )
 
-        drawCircle(
-            frameAf,
-            circleAf,
-            "AF"
-        )
+        # drawCircle(
+        #     frameAf,
+        #     circleAf,
+        #     "AF"
+        # )
 
         openCv.imshow(
             "ESP32 Camera",
             frameEsp
         )
 
-        openCv.imshow(
-            "AF Camera",
-            frameAf
-        )
+        # openCv.imshow(
+        #     "AF Camera",
+        #     frameAf
+        # )
 
-        openCv.imshow(
-            "Mask ESP32",
-            maskEsp
-        )
+        # openCv.imshow(
+        #     "Mask ESP32",
+        #     maskEsp
+        # )
 
-        openCv.imshow(
-            "Mask AF",
-            maskAf
-        )
+        # openCv.imshow(
+        #     "Mask AF",
+        #     maskAf
+        # )
 
         if openCv.waitKey(1) & 0xFF == ord('q'):
             break
