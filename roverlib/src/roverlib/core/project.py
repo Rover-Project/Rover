@@ -8,5 +8,5 @@ def create_project(name: str):
     if target.exists():
         raise FileExistsError(f"Diretório '{name}' já existe.")
 
-    template = resources.files("src.templates").joinpath("basic")
+    template = resources.files("src.templates").joinpath("project")
     shutil.copytree(template, target) # type: ignore
