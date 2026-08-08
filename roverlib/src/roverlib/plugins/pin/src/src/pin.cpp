@@ -8,13 +8,9 @@
 #include <stdexcept>
 #include <cmath>
 
-// ========================================================================== //
-//  Utilitários estáticos                                                     //
-// ========================================================================== //
-
 int Pin::bcmToKernel(int bcm)
 {
-    // Offset padrão para Raspberry Pi 5; ajuste se usar RPi 4 (offset = 512)
+    // Offset padrão para Raspberry Pi 5;
     return bcm + 571;
 }
 
@@ -27,7 +23,8 @@ void Pin::validatePin(int pin)
 {
     if (pin < 0 || pin > 27)
         throw std::runtime_error(
-            "GPIO invalido: " + std::to_string(pin) + ". Use valores entre 0 e 27.");
+            "GPIO invalido: " + std::to_string(pin) + ". Use valores entre 0 e 27."
+    );
 }
 
 bool Pin::isPWMPin(int pin)
@@ -42,10 +39,7 @@ int Pin::gpioToPWMChannel(int pin)
     throw std::runtime_error("GPIO " + std::to_string(pin) + " nao suporta PWM hardware.");
 }
 
-// ========================================================================== //
-//  I/O de arquivos sysfs                                                      //
-// ========================================================================== //
-
+//  I/O de arquivos sysfs                                                      
 void Pin::writeFile(const std::string& path, const std::string& value)
 {
     std::ofstream file(path);
@@ -68,18 +62,13 @@ std::string Pin::readFile(const std::string& path)
     return value;
 }
 
-// ========================================================================== //
-//  Construtor / Destrutor                                                     //
-// ========================================================================== //
-
+//  Construtor / Destrutor                                                  
 Pin::Pin(int pin, PinMode mode) : mode(mode)
 {
     validatePin(pin);
     pinNumber = pin;
 
-    // ---------------------------------------------------------------------- //
-    //  Modo PWM por hardware                                                  //
-    // ---------------------------------------------------------------------- //
+    //  Modo PWM por hardware   
     if (mode == PWM)
     {
         if (!isPWMPin(pin))
@@ -89,7 +78,7 @@ Pin::Pin(int pin, PinMode mode) : mode(mode)
                 "Para outros pinos, use DIGITAL_OUT com pwmWrite().");
 
         pwmChannel = gpioToPWMChannel(pin);
-        pwmPath    = "/sys/class/pwm/pwmchip0/pwm" + std::to_string(pwmChannel);
+        pwmPath = "/sys/class/pwm/pwmchip0/pwm" + std::to_string(pwmChannel);
 
         if (!pathExists(pwmPath))
         {
@@ -97,7 +86,7 @@ Pin::Pin(int pin, PinMode mode) : mode(mode)
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 
-        // Período inicial: 50 Hz → 20 000 000 ns
+        // Período inicial: 50 Hz -> 20 000 000 ns
         long periodNs = static_cast<long>(1e9f / 50.0f);
         writeFile(pwmPath + "/period", std::to_string(periodNs));
 
@@ -105,9 +94,8 @@ Pin::Pin(int pin, PinMode mode) : mode(mode)
         return;
     }
 
-    // ---------------------------------------------------------------------- //
-    //  Modo digital (IN ou OUT) — ou DIGITAL_OUT para soft-PWM               //
-    // ---------------------------------------------------------------------- //
+    
+    //  Modo digital (IN ou OUT) - ou DIGITAL_OUT para soft-PWM              
     kernelPin = bcmToKernel(pin);
     gpioPath  = "/sys/class/gpio/gpio" + std::to_string(kernelPin);
 
@@ -127,10 +115,7 @@ Pin::~Pin()
     release();
 }
 
-// ========================================================================== //
-//  Liberação de recursos                                                      //
-// ========================================================================== //
-
+//  Liberação de recursos                                                      
 void Pin::release()
 {
     if (!active) return;
@@ -148,7 +133,11 @@ void Pin::release()
     else if (pathExists(gpioPath))
     {
         // Garante pino em LOW antes de liberar
-        try { writeFile(gpioPath + "/value", "0"); } catch (...) {}
+        try { 
+            writeFile(gpioPath + "/value", "0"); 
+        } catch (...) {
+
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         writeFile("/sys/class/gpio/unexport", std::to_string(kernelPin));
     }
@@ -156,10 +145,7 @@ void Pin::release()
     active = false;
 }
 
-// ========================================================================== //
-//  Interface Digital                                                          //
-// ========================================================================== //
-
+//  Interface Digital
 void Pin::write(int value)
 {
     if (!active)
@@ -187,10 +173,7 @@ int Pin::read()
     return std::stoi(readFile(gpioPath + "/value"));
 }
 
-// ========================================================================== //
-//  Interface PWM                                                              //
-// ========================================================================== //
-
+//  Interface PWM                                                            
 void Pin::pwmWrite(float duty, float frequencyHz)
 {
     if (!active)
@@ -205,9 +188,7 @@ void Pin::pwmWrite(float duty, float frequencyHz)
     currentDuty.store(duty);
     currentFrequency.store(frequencyHz);
 
-    // ---------------------------------------------------------------------- //
-    //  Hardware PWM                                                           //
-    // ---------------------------------------------------------------------- //
+    //  Hardware PWM                                                         
     if (mode == PWM && isPWMPin(pinNumber))
     {
         long periodNs   = static_cast<long>(1e9f / frequencyHz);
@@ -221,9 +202,7 @@ void Pin::pwmWrite(float duty, float frequencyHz)
         return;
     }
 
-    // ---------------------------------------------------------------------- //
-    //  Software PWM (qualquer pino DIGITAL_OUT)                              //
-    // ---------------------------------------------------------------------- //
+    //  Software PWM (qualquer pino DIGITAL_OUT)                            
     if (mode != DIGITAL_OUT)
         throw std::runtime_error(
             "pwmWrite() requer modo PWM ou DIGITAL_OUT.");
@@ -244,10 +223,7 @@ void Pin::pwmStop()
         writeFile(pwmPath + "/enable", "0");
 }
 
-// ========================================================================== //
-//  Soft-PWM: implementação da thread                                         //
-// ========================================================================== //
-
+//  Soft-PWM: implementação da thread                                         
 void Pin::startSoftPwm()
 {
     runSoftPwm = true;
@@ -298,10 +274,7 @@ void Pin::softPwmWorker()
     }
 }
 
-// ========================================================================== //
-//  Getters                                                                   //
-// ========================================================================== //
-
+//  Getters                                                              
 float   Pin::getDuty()      const { return currentDuty.load();      }
 float   Pin::getFrequency() const { return currentFrequency.load(); }
 PinMode Pin::getMode()      const { return mode;                    }

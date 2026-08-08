@@ -15,12 +15,12 @@ class Lidar():
     def __init__(
         self, 
         # Ordem a ser passada para a função .serial()
-        port: str = '/dev/ttyAMA0', # 1º
-        baudrate: int = 115200, # 2º
-        bytesize = serial.EIGHTBITS, # 3º 
-        parity = serial.PARITY_NONE, # 4º
-        stopbits = serial.STOPBITS_ONE, # 5º
-        timeout: int = 1 # 6º
+        port: str = '/dev/ttyAMA0', 
+        baudrate: int = 115200,
+        bytesize = serial.EIGHTBITS, 
+        parity = serial.PARITY_NONE,
+        stopbits = serial.STOPBITS_ONE,
+        timeout: int = 1
     ):
         """
         Realiza a configuração inicial do Lidar.
@@ -95,7 +95,7 @@ class Lidar():
             return -1, -1, -1
 
         while self.is_read_running:
-            # Verifica se há bytes suficientes ANTES de ler
+            # Verifica se há bytes suficientes antes de ler
             if self.lidar.in_waiting >= 9:
                 # Procura pelo cabeçalho 0x59 0x59 para sincronizar o frame
                 # Isso evita ler dados "quebrados" ou deslocados

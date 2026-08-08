@@ -1,23 +1,5 @@
 """
 pin.py — Camada de abstração Python para controle GPIO (roverlib).
-
-Importa o módulo nativo compilado (pin.so) e expõe uma interface
-Pythônica com nomes em português e validações adicionais.
-
-Uso rápido
-----------
-from pin.pin import Pin, PinMode
-
-led = Pin(17, PinMode.DIGITAL_OUT)
-led.on()
-led.off()
-led.release()
-
-servo = Pin(18, PinMode.PWM)          # hardware PWM
-servo.pwm(0.075)                       # ~1,5 ms → posição central (50 Hz)
-servo.pwm(0.05, frequency=50)          # explícito
-servo.stop_pwm()
-servo.release()
 """
 
 from __future__ import annotations
@@ -68,10 +50,6 @@ class Pin:
     def __init__(self, number: int, mode: PinMode) -> None:
         self._pin = _native.Pin(number, mode)
 
-    # ------------------------------------------------------------------ #
-    #  Interface Digital                                                   #
-    # ------------------------------------------------------------------ #
-
     def on(self) -> None:
         """Coloca o pino em nível alto (HIGH). Requer modo DIGITAL_OUT."""
         self._pin.write(1)
@@ -85,7 +63,6 @@ class Pin:
         Escreve um valor digital no pino.
 
         Parâmetros
-        ----------
         value : int
             ``0`` (LOW) ou ``1`` (HIGH).
         """
@@ -96,40 +73,20 @@ class Pin:
         Lê o valor digital do pino.
 
         Retorna
-        -------
         int
             ``0`` ou ``1``.
         """
         return self._pin.read()
-
-    # ------------------------------------------------------------------ #
-    #  Interface PWM                                                       #
-    # ------------------------------------------------------------------ #
 
     def pwm(self, duty: float, frequency: float = 50.0) -> None:
         """
         Configura e inicia o sinal PWM.
 
         Parâmetros
-        ----------
         duty : float
             Ciclo de trabalho entre ``0.0`` (0 %) e ``1.0`` (100 %).
         frequency : float, opcional
             Frequência em Hz (padrão: ``50.0``).
-
-        Exemplos
-        --------
-        Servo motor (período de 20 ms)::
-
-            servo.pwm(0.05)    # 1 ms  → posição mínima
-            servo.pwm(0.075)   # 1,5 ms → posição central
-            servo.pwm(0.10)    # 2 ms  → posição máxima
-
-        ESC / motor DC::
-
-            motor.pwm(0.0)     # parado
-            motor.pwm(0.5)     # 50 % de potência
-            motor.pwm(1.0)     # potência máxima
         """
         self._pin.pwmWrite(duty, frequency)
 
@@ -137,17 +94,9 @@ class Pin:
         """Para o sinal PWM sem liberar o pino."""
         self._pin.pwmStop()
 
-    # ------------------------------------------------------------------ #
-    #  Liberação                                                           #
-    # ------------------------------------------------------------------ #
-
     def release(self) -> None:
         """Libera o pino do sysfs e encerra quaisquer threads ativas."""
         self._pin.release()
-
-    # ------------------------------------------------------------------ #
-    #  Propriedades informativas                                           #
-    # ------------------------------------------------------------------ #
 
     @property
     def duty(self) -> float:
@@ -174,19 +123,11 @@ class Pin:
         """``True`` se o pino está inicializado e não foi liberado."""
         return self._pin.isActive()
 
-    # ------------------------------------------------------------------ #
-    #  Context manager (with statement)                                    #
-    # ------------------------------------------------------------------ #
-
     def __enter__(self) -> "Pin":
         return self
 
     def __exit__(self, *_) -> None:
         self.release()
-
-    # ------------------------------------------------------------------ #
-    #  Representação                                                       #
-    # ------------------------------------------------------------------ #
 
     def __repr__(self) -> str:
         return repr(self._pin)

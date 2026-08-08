@@ -29,154 +29,134 @@ enum PinMode
  *
  * Numeração: BCM (Broadcom), valores válidos: 0–27.
  */
-class Pin
-{
-public:
-    /**
-     * @brief Constrói e inicializa o pino.
-     * @param pin    Número BCM do pino (0–27).
-     * @param mode   Modo de operação (DIGITAL_IN, DIGITAL_OUT ou PWM).
-     * @throws std::runtime_error se o pino for inválido, não suportar PWM
-     *         quando solicitado, ou se o sysfs não puder ser acessado.
-     */
-    Pin(int pin, PinMode mode);
+class Pin {
+    public:
+        /**
+         * @brief Constrói e inicializa o pino.
+         * @param pin    Número BCM do pino (0–27).
+         * @param mode   Modo de operação (DIGITAL_IN, DIGITAL_OUT ou PWM).
+         * @throws std::runtime_error se o pino for inválido, não suportar PWM
+         *         quando solicitado, ou se o sysfs não puder ser acessado.
+         */
+        Pin(int pin, PinMode mode);
 
-    /**
-     * @brief Destrói o objeto e libera o pino automaticamente.
-     */
-    ~Pin();
+        /**
+         * @brief Destrói o objeto e libera o pino automaticamente.
+         */
+        ~Pin();
 
-    // Impede cópia — um pino não deve ter dois donos
-    Pin(const Pin&)            = delete;
-    Pin& operator=(const Pin&) = delete;
+        // Impede cópia — um pino não deve ter dois donos
+        Pin(const Pin&) = delete;
+        Pin& operator=(const Pin&) = delete;
 
-    /**
-     * @brief Libera o pino do sysfs e encerra threads ativas.
-     *
-     * Seguro para chamar mais de uma vez; chamadas subsequentes são no-ops.
-     */
-    void release();
+        /**
+         * @brief Libera o pino do sysfs e encerra threads ativas.
+         *
+         * Seguro para chamar mais de uma vez; chamadas subsequentes são no-ops.
+         */
+        void release();
 
-    // ------------------------------------------------------------------ //
-    //  Interface Digital                                                  //
-    // ------------------------------------------------------------------ //
+        /**
+         * @brief Escreve um valor digital no pino.
+         * @param value  0 (LOW) ou 1 (HIGH).
+         * @throws std::runtime_error se o pino não estiver no modo DIGITAL_OUT.
+         */
+        void write(int value);
 
-    /**
-     * @brief Escreve um valor digital no pino.
-     * @param value  0 (LOW) ou 1 (HIGH).
-     * @throws std::runtime_error se o pino não estiver no modo DIGITAL_OUT.
-     */
-    void write(int value);
+        /**
+         * @brief Lê o valor digital do pino.
+         * @return 0 ou 1.
+         * @throws std::runtime_error se o pino não estiver no modo DIGITAL_IN.
+         */
+        int read();
 
-    /**
-     * @brief Lê o valor digital do pino.
-     * @return 0 ou 1.
-     * @throws std::runtime_error se o pino não estiver no modo DIGITAL_IN.
-     */
-    int read();
+        /**
+         * @brief Configura e inicia o sinal PWM.
+         *
+         * Para pinos PWM de hardware (12, 13, 18, 19) usa o subsistema
+         * pwmchip0 do kernel. Para os demais pinos (modo DIGITAL_OUT),
+         * usa PWM por software em thread separada.
+         *
+         * @param duty       Ciclo de trabalho, entre 0.0 (0 %) e 1.0 (100 %).
+         * @param frequencyHz Frequência em Hz (padrão: 50 Hz — servos/ESCs).
+         *                   Para PWM de hardware, o período é derivado deste valor.
+         *                   Para PWM de software, define o período da thread.
+         * @throws std::runtime_error se o pino não for PWM ou DIGITAL_OUT,
+         *         ou se os parâmetros estiverem fora do intervalo permitido.
+         */
+        void pwmWrite(float duty, float frequencyHz = 50.0f);
 
-    // ------------------------------------------------------------------ //
-    //  Interface PWM                                                      //
-    // ------------------------------------------------------------------ //
+        /**
+         * @brief Para o sinal PWM sem liberar o pino.
+         *
+         * Em hardware PWM: desabilita o canal (enable = 0).
+         * Em software PWM: encerra a thread e coloca o pino em LOW.
+         */
+        void pwmStop();
 
-    /**
-     * @brief Configura e inicia o sinal PWM.
-     *
-     * Para pinos PWM de hardware (12, 13, 18, 19) usa o subsistema
-     * pwmchip0 do kernel. Para os demais pinos (modo DIGITAL_OUT),
-     * usa PWM por software em thread separada.
-     *
-     * @param duty       Ciclo de trabalho, entre 0.0 (0 %) e 1.0 (100 %).
-     * @param frequencyHz Frequência em Hz (padrão: 50 Hz — servos/ESCs).
-     *                   Para PWM de hardware, o período é derivado deste valor.
-     *                   Para PWM de software, define o período da thread.
-     * @throws std::runtime_error se o pino não for PWM ou DIGITAL_OUT,
-     *         ou se os parâmetros estiverem fora do intervalo permitido.
-     */
-    void pwmWrite(float duty, float frequencyHz = 50.0f);
+        /**
+         * @brief Retorna o duty cycle atual configurado.
+         */
+        float getDuty() const;
 
-    /**
-     * @brief Para o sinal PWM sem liberar o pino.
-     *
-     * Em hardware PWM: desabilita o canal (enable = 0).
-     * Em software PWM: encerra a thread e coloca o pino em LOW.
-     */
-    void pwmStop();
+        /**
+         * @brief Retorna a frequência atual em Hz.
+         */
+        float getFrequency() const;
 
-    /**
-     * @brief Retorna o duty cycle atual configurado.
-     */
-    float getDuty() const;
+        /**
+         * @brief Retorna o modo de operação do pino.
+         */
+        PinMode getMode() const;
 
-    /**
-     * @brief Retorna a frequência atual em Hz.
-     */
-    float getFrequency() const;
+        /**
+         * @brief Retorna o número BCM do pino.
+         */
+        int getPinNumber() const;
 
-    /**
-     * @brief Retorna o modo de operação do pino.
-     */
-    PinMode getMode() const;
+        /**
+         * @brief Indica se o pino está ativo (inicializado e não liberado).
+         */
+        bool isActive() const;
 
-    /**
-     * @brief Retorna o número BCM do pino.
-     */
-    int getPinNumber() const;
+    private:
+    
+        int pinNumber  = -1;
+        int kernelPin  = -1;
+        int pwmChannel = -1;
+        PinMode mode;
+        bool active = false;
 
-    /**
-     * @brief Indica se o pino está ativo (inicializado e não liberado).
-     */
-    bool isActive() const;
+        std::string gpioPath;
+        std::string pwmPath;
 
-private:
-    // ------------------------------------------------------------------ //
-    //  Estado interno                                                     //
-    // ------------------------------------------------------------------ //
+        // Frequência e duty armazenados para consulta e reconfiguração
+        std::atomic<float> currentDuty {0.0f};
+        std::atomic<float> currentFrequency {50.0f};
 
-    int     pinNumber  = -1;
-    int     kernelPin  = -1;
-    int     pwmChannel = -1;
-    PinMode mode;
-    bool    active     = false;
+        // Mutex para operações de escrita/leitura em modo digital
+        mutable std::mutex ioMutex;
 
-    std::string gpioPath;
-    std::string pwmPath;
+        std::thread softPwmThread;
+        std::atomic<bool> runSoftPwm {false};
 
-    // Frequência e duty armazenados para consulta e reconfiguração
-    std::atomic<float> currentDuty     {0.0f};
-    std::atomic<float> currentFrequency{50.0f};
+        /* Loop executado pela thread de software PWM. */
+        void softPwmWorker();
 
-    // Mutex para operações de escrita/leitura em modo digital
-    mutable std::mutex ioMutex;
+        /* Inicia a thread de software PWM (chama apenas uma vez por sessão). */
+        void startSoftPwm();
 
-    // ------------------------------------------------------------------ //
-    //  Soft-PWM                                                          //
-    // ------------------------------------------------------------------ //
+        /** Para e junta a thread de software PWM. */
+        void stopSoftPwm();
 
-    std::thread       softPwmThread;
-    std::atomic<bool> runSoftPwm{false};
+        static int  bcmToKernel(int bcm);
+        static bool pathExists(const std::string& path);
+        static void validatePin(int pin);
+        static bool isPWMPin(int pin);
+        static int  gpioToPWMChannel(int pin);
 
-    /** Loop executado pela thread de software PWM. */
-    void softPwmWorker();
-
-    /** Inicia a thread de software PWM (chama apenas uma vez por sessão). */
-    void startSoftPwm();
-
-    /** Para e junta a thread de software PWM. */
-    void stopSoftPwm();
-
-    // ------------------------------------------------------------------ //
-    //  Utilitários                                                        //
-    // ------------------------------------------------------------------ //
-
-    static int  bcmToKernel(int bcm);
-    static bool pathExists(const std::string& path);
-    static void validatePin(int pin);
-    static bool isPWMPin(int pin);
-    static int  gpioToPWMChannel(int pin);
-
-    void        writeFile(const std::string& path, const std::string& value);
-    std::string readFile(const std::string& path);
+        void writeFile(const std::string& path, const std::string& value);
+        std::string readFile(const std::string& path);
 };
 
 #endif // PIN_HPP
