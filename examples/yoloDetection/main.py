@@ -30,7 +30,7 @@ if __name__ == "__main__":
     
     while True:
         
-        ret, frame = camera.read() # ler frame 
+        ret, frame = camera.get_frame() # ler frame 
         
         if ret:
             
