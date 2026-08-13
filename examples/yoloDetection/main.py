@@ -28,7 +28,7 @@ if __name__ == "__main__":
     camera = Camera(HEIGHT, WIDTH) 
     camera.start()
     
-    while camera.isOpened():
+    while True:
         
         ret, frame = camera.read() # ler frame 
         
