@@ -30,9 +30,9 @@ if __name__ == "__main__":
     
     while True:
         
-        ret, frame = camera.get_frame() # ler frame 
+        frame = camera.get_frame() # ler frame 
         
-        if ret:
+        if frame is not None:
             
             start_time = time.time()
             h_origin, w_origin = frame.shape[:2] 
