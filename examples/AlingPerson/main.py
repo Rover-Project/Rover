@@ -4,7 +4,8 @@ import numpy
 import onnxruntime as onnx
 from pathlib import Path
 import time
-from roverlib.plugins.camera.camera import Camera
+#from roverlib.plugins.camera.camera import Camera
+#from roverlib.modules.movement.PID import PID
 
 MODEL_PAHT = Path(__file__).parent / "models" / "yolov8n.onnx" # path do modelo
 IMAGE_SIZE = 320 # proporção da imagem
@@ -12,7 +13,7 @@ CONF_THRESHOLD = 0.4 # limiar de confiança para a detecçao
 HEIGHT = 640
 WIDTH = 640
 
-CLASS_INTEREST = {0: "Pessoa", 39: "Garrafa", 56: "Cadeira"}
+CLASS_INTEREST = {0: "Pessoa"}
 
 if __name__ == "__main__":
     providers = ["CPUExecutionProvider"] # Força execução na CPU
@@ -25,12 +26,16 @@ if __name__ == "__main__":
     input_name = model_session.get_inputs()[0].name
     
      # Inicia câmera
-    camera = Camera(HEIGHT, WIDTH) 
-    camera.start()
+    #camera = Camera(HEIGHT, WIDTH) 
+    #camera.start()
+    
+    camera = opencv.VideoCapture(0)
     
     while True:
         
-        frame = camera.get_frame() # ler frame 
+        # frame = camera.get_frame() # ler frame 
+        
+        _, frame = camera.read()
         
         if frame is not None:
             
@@ -77,12 +82,27 @@ if __name__ == "__main__":
                     class_ids.append(class_id)
             
             indices = opencv.dnn.NMSBoxes(boxes, confidences, CONF_THRESHOLD, 0.45)
+            
+            cont = 0 
+            
+            array_x, array_y, array_w, array_h = [], [], [], []
+            
+            if len(indices) > 0:
+                for detection in indices.flatten():
+                    array_x.append(boxes[detection][0])
+                    array_y.append(boxes[detection][1])
+                    array_h.append(boxes[detection][2])
+                    array_w.append(boxes[detection][3])
+                    
+                max_x, max_y, max_w, max_h = min(array_x), min(array_y), max(array_w), max(array_h)
+                opencv.rectangle(frame, (max_x, max_y), (max_x + max_w, max_y + max_h), (0, 0, 255), 2)
 
             if len(indices) > 0:
                 for detection in indices.flatten():
+                    cont += 1
                     x, y, w, h = boxes[detection]
                     cls_id = class_ids[detection]
-                    label = f"{CLASS_INTEREST[cls_id]}: {confidences[detection]:.2f}"
+                    label = f"{CLASS_INTEREST[cls_id]}: {confidences[detection]:.2f} - index: {cont}"
                     
                     # calcula o centroide
                     center_x = x + (w // 2)
@@ -90,12 +110,11 @@ if __name__ == "__main__":
                     
                     # desenha caixa e ponto central no objeto
                     opencv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                    opencv.circle(frame, (center_x, center_y), 5, (0, 0, 255), -1)
                     opencv.putText(frame, label, (x, y - 10), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             
             # calcula a quantidade de fps        
             fps = 1.0 / (time.time() - start_time)
-            #opencv.putText(frame, f"FPS (CPU): {fps:.1f}", (20, 40), opencv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            opencv.putText(frame, f"FPS (CPU): {fps:.1f}", (20, 40), opencv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
             opencv.imshow("Teste - YOLOv8 ONNX (Pi5)", frame)
             
@@ -106,5 +125,6 @@ if __name__ == "__main__":
                 opencv.imwrite("foto.jpg", frame) 
                 break
             
-    camera.cleanup()
+    # camera.cleanup()
+    camera.release()
     opencv.destroyAllWindows()
