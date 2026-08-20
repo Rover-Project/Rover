@@ -9,8 +9,8 @@ from roverlib.plugins.camera.camera import Camera
 MODEL_PAHT = Path(__file__).parent / "models" / "yolov8n.onnx" # path do modelo
 IMAGE_SIZE = 320 # proporção da imagem
 CONF_THRESHOLD = 0.4 # limiar de confiança para a detecçao
-HEIGHT = 640
-WIDTH = 640
+HEIGHT = 4656 
+WIDTH = 3496
 
 CLASS_INTEREST = {0: "Pessoa", 39: "Garrafa", 56: "Cadeira"}
 
@@ -99,10 +99,12 @@ if __name__ == "__main__":
 
             opencv.imshow("Teste - YOLOv8 ONNX (Pi5)", frame)
             
-            if opencv.waitKey(1) & 0xFF == ord('q'):
+            key = opencv.waitKey(1) & 0xFF
+            
+            if key == ord('q'):
                 break
             
-            if opencv.waitKey(1) & 0xFF == ord('s'):
+            elif key & 0xFF == ord('s'):
                 opencv.imwrite("foto.jpg", frame) 
                 break
             
