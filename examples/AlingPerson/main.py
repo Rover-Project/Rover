@@ -14,7 +14,7 @@ HEIGHT = 640
 WIDTH = 640
 CLASS_INTEREST = {0: "Pessoa"}
 
-SPEED = 10 # Velocidade padrao
+SPEED = 0.1 # Velocidade padrao
 SERVO_V = 1 # Servo vertival 
 SERVO_H = 0 # Servo Horizontal
     
