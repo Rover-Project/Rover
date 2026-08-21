@@ -160,7 +160,7 @@ if __name__ == "__main__":
             # Exibe o frame em tela
             opencv.imshow("Teste - YOLOv8 ONNX (Pi5)", frame)
 
-            key = opencv.waitKey(1) & 0xFF
+            key = opencv.waitKey(10) & 0xFF
             
             if key == ord("w"):
                 servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
@@ -178,7 +178,7 @@ if __name__ == "__main__":
                 break
             
             else:
-                servos.stop_all()
+                servos.stop(channels=tuple([SERVO_V, SERVO_H]))
 
 
     camera.cleanup()
