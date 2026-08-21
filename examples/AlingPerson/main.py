@@ -193,7 +193,7 @@ if __name__ == "__main__":
                 servos.stop(channels=tuple([SERVO_V, SERVO_H]))
                 pause = True
                 
-            elif key == ord("p"):
+            elif key == ord("c"):
                 pause = False
 
 
