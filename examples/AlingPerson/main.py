@@ -171,11 +171,11 @@ if __name__ == "__main__":
                     servos.stop(channels=tuple([SERVO_V]))
                 else:
                     # pra cima
-                    if error_y < 0:
+                    if error_y > 0:
                         servos.forward(channels=tuple([SERVO_V]), speed=SPEED + 0.3)
 
                     # pra baixo
-                    elif error_y > 0:
+                    elif error_y < 0:
                         servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
 
                 # pausa o servo horizontal caso o erro seja baixo
