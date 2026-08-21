@@ -41,6 +41,9 @@ if __name__ == "__main__":
     
     # Inicia servos 
     servos = PCAServos()
+    
+    # Se deve mover os servos
+    pause = True
 
     while True:
         frame = camera.get_frame()
@@ -189,7 +192,10 @@ if __name__ == "__main__":
             elif key == ord("p"):
                 servos.stop(channels=tuple([SERVO_V, SERVO_H]))
                 pause = True
-            
+                
+            elif key == ord("p"):
+                pause = False
+
 
 
 
