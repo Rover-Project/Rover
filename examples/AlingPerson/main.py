@@ -146,8 +146,6 @@ if __name__ == "__main__":
             error_x = c_x - (WIDTH // 2)
             error_y = c_y - (HEIGHT // 2)
             
-            servos.forward(0)
-
             info_text = f"FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C | Err: ({error_x}, {error_y})"
             opencv.putText(
                 frame,
@@ -175,6 +173,9 @@ if __name__ == "__main__":
 
             elif key == ord("d"):
                 servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
+                
+            elif key == ord("q"):
+                break
 
 
     camera.cleanup()
