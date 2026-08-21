@@ -1,130 +1,160 @@
-
+from pathlib import Path
+import time
 import cv2 as opencv
 import numpy
 import onnxruntime as onnx
-from pathlib import Path
-import time
-#from roverlib.plugins.camera.camera import Camera
-#from roverlib.modules.movement.PID import PID
+from roverlib.plugins.camera.autoFocus import AfCamera
+from roverlib.plugins.PCAServos.pcaServos import PCAServos 
 
-MODEL_PAHT = Path(__file__).parent / "models" / "yolov8n.onnx" # path do modelo
-IMAGE_SIZE = 320 # proporção da imagem
-CONF_THRESHOLD = 0.4 # limiar de confiança para a detecçao
+# Configurações do Modelo e Câmera
+MODEL_PATH = Path(__file__).parent / "models" / "yolov8n.onnx"
+IMAGE_SIZE = 320  # Resolução de entrada da YOLO
+CONF_THRESHOLD = 0.4  # Limiar de confiança para detecção
 HEIGHT = 640
 WIDTH = 640
-
 CLASS_INTEREST = {0: "Pessoa"}
 
-if __name__ == "__main__":
-    providers = ["CPUExecutionProvider"] # Força execução na CPU
-    
-    model_session = onnx.InferenceSession(
-        MODEL_PAHT,
-        providers=providers
-    )
+def get_cpu_temp():
+    """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
+    try:
+        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            # O valor vem em miligraus Celsius 
+            return float(f.read().strip()) / 1000.0
+    except Exception:
+        return 0.0
 
+
+if __name__ == "__main__":
+    providers = ["CPUExecutionProvider"]  # Força execução na CPU
+
+    model_session = onnx.InferenceSession(MODEL_PATH, providers=providers)
     input_name = model_session.get_inputs()[0].name
-    
-     # Inicia câmera
-    #camera = Camera(HEIGHT, WIDTH) 
-    #camera.start()
-    
-    camera = opencv.VideoCapture(0)
-    
+
+    camera = AfCamera(height=HEIGHT, width=WIDTH)
+    camera.start()
+
     while True:
-        
-        # frame = camera.get_frame() # ler frame 
-        
-        _, frame = camera.read()
-        
+        frame = camera.get_frame()
+
         if frame is not None:
-            
             start_time = time.time()
-            h_origin, w_origin = frame.shape[:2] 
-            
-            # ajusta o tamanho da imagem para 320x320 e trasforma o espaco de cores
-            img = opencv.resize(frame, (IMAGE_SIZE, IMAGE_SIZE), opencv.INTER_CUBIC)
-            img = opencv.cvtColor(img, opencv.COLOR_BGR2RGB)
-            
-            # normaliza para o intervalo [0,1]
-            input_tensor = img.astype(numpy.float32) / 255.0 
+            HEIGHT, WIDTH = frame.shape[:2]
+
+            # valores padrões se nenhuma pessoa for detectada
+            c_x, c_y = WIDTH // 2, HEIGHT // 2
+
+            # Redimensiona para 320x320 e converte BGR para RGB
+            img = opencv.resize(
+                frame, (IMAGE_SIZE, IMAGE_SIZE), opencv.INTER_CUBIC
+            )
+        
+            # Normalização [0,1] e adequação de dimensões
+            input_tensor = img.astype(numpy.float32) / 255.0
             input_tensor = numpy.transpose(input_tensor, (2, 0, 1))
             input_tensor = numpy.expand_dims(input_tensor, axis=0)
-            
-            # Inferência do modelo
+
+            # Inferência 
             results = model_session.run(None, {input_name: input_tensor})[0]
-            
             predictions = numpy.squeeze(results).T
-            
+
             boxes = []
             confidences = []
             class_ids = []
-            
-            x_factor = w_origin / IMAGE_SIZE
-            y_factor = h_origin / IMAGE_SIZE
-        
+
+            # Fatores de escala para mapear de volta à dimensão original da imagem
+            x_factor = WIDTH / IMAGE_SIZE
+            y_factor = HEIGHT / IMAGE_SIZE
+
+            # processamendo de boxs
             for prediction in predictions:
                 scores = prediction[4:]
                 class_id = numpy.argmax(scores)
                 max_score = scores[class_id]
-                
+
                 if max_score >= CONF_THRESHOLD and class_id in CLASS_INTEREST:
-                    cx, cy, w, h = prediction[0], prediction[1], prediction[2], prediction[3]
-                    
-                    # ajusta as coordenadas para o tamanho original do frame
+                    cx, cy, w, h = (
+                        prediction[0],
+                        prediction[1],
+                        prediction[2],
+                        prediction[3],
+                    )
+
                     left = int((cx - 0.5 * w) * x_factor)
                     top = int((cy - 0.5 * h) * y_factor)
                     width = int(w * x_factor)
-                    height = int(h * x_factor)
+                    height = int(
+                        h * y_factor
+                    ) 
 
                     boxes.append([left, top, width, height])
                     confidences.append(float(max_score))
                     class_ids.append(class_id)
-            
-            indices = opencv.dnn.NMSBoxes(boxes, confidences, CONF_THRESHOLD, 0.45)
-            
-            cont = 0 
-            
+
+            # Aplicação de NMS (Non-Maximum Suppression)
+            indices = opencv.dnn.NMSBoxes(
+                boxes, confidences, CONF_THRESHOLD, 0.45
+            )
+
             array_x, array_y, array_w, array_h = [], [], [], []
-            
-            if len(indices) > 0:
-                for detection in indices.flatten():
-                    array_x.append(boxes[detection][0])
-                    array_y.append(boxes[detection][1])
-                    array_h.append(boxes[detection][2])
-                    array_w.append(boxes[detection][3])
-                    
-                max_x, max_y, max_w, max_h = min(array_x), min(array_y), max(array_w), max(array_h)
-                opencv.rectangle(frame, (max_x, max_y), (max_x + max_w, max_y + max_h), (0, 0, 255), 2)
 
             if len(indices) > 0:
                 for detection in indices.flatten():
-                    cont += 1
-                    x, y, w, h = boxes[detection]
-                    cls_id = class_ids[detection]
-                    label = f"{CLASS_INTEREST[cls_id]}: {confidences[detection]:.2f} - index: {cont}"
-                    
-                    # calcula o centroide
-                    center_x = x + (w // 2)
-                    center_y = y + (h // 2)
-                    
-                    # desenha caixa e ponto central no objeto
-                    opencv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                    opencv.putText(frame, label, (x, y - 10), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            
-            # calcula a quantidade de fps        
+                    array_x.append(min(boxes[detection][0], WIDTH))
+                    array_y.append(min(boxes[detection][1], HEIGHT))
+                    array_w.append(min(boxes[detection][2], WIDTH))
+                    array_h.append(min(boxes[detection][3], HEIGHT))
+
+                min_x, min_y = min(array_x), min(array_y)
+                max_x = min(max(array_w) + max(array_x), WIDTH)
+                max_y = min(max(array_h) + max(array_y), HEIGHT)
+
+                w = numpy.sqrt(numpy.pow(max_x - min_x, 2))
+                h = numpy.sqrt(numpy.pow(max_y - min_y, 2))
+
+                # Atualiza o centro com base nas detecções
+                c_x = int(min_x + (w // 2))
+                c_y = int(min_y + (h // 2))
+
+                # Desenha o retângulo na área de interesse
+                opencv.rectangle(
+                    frame, (min_x, min_y), (max_x, max_y), (0, 255, 0), 2
+                )
+                opencv.circle(frame, (c_x, c_y), 5, (0, 0, 255), -1)
+                opencv.putText(
+                    frame,
+                    f"center: ({c_x},{c_y})",
+                    (c_x, c_y - 10),
+                    opencv.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 0, 255),
+                    1,
+                )
+
+            # Calculo de fps e temperatura
             fps = 1.0 / (time.time() - start_time)
-            opencv.putText(frame, f"FPS (CPU): {fps:.1f}", (20, 40), opencv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            temp_cpu = get_cpu_temp()
 
+            error_x = c_x - (WIDTH // 2)
+            error_y = c_y - (HEIGHT // 2)
+
+            info_text = f"FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C | Err: ({error_x}, {error_y})"
+            opencv.putText(
+                frame,
+                info_text,
+                (20, 30),
+                opencv.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (255, 0, 0),
+                1,
+            )
+
+            # Exibe o frame em tela
             opencv.imshow("Teste - YOLOv8 ONNX (Pi5)", frame)
+
+            key = opencv.waitKey(1) & 0xFF
             
-            if opencv.waitKey(1) & 0xFF == ord('q'):
+            if key == ord("q"):
                 break
-            
-            if opencv.waitKey(1) & 0xFF == ord('s'):
-                opencv.imwrite("foto.jpg", frame) 
-                break
-            
-    # camera.cleanup()
-    camera.release()
+
+    camera.cleanup()
     opencv.destroyAllWindows()
