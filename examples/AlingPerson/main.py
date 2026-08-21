@@ -14,6 +14,11 @@ HEIGHT = 640
 WIDTH = 640
 CLASS_INTEREST = {0: "Pessoa"}
 
+SPEED = 50 # Velocidade padrao
+SERVO_V = 1 # Servo vertival 
+SERVO_H = 0 # Servo Horizontal
+    
+
 def get_cpu_temp():
     """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
     try:
@@ -159,24 +164,18 @@ if __name__ == "__main__":
 
             key = opencv.waitKey(1) & 0xFF
             
-            if key == ord("q"):
-                break
-            
             if key == ord("w"):
-                servos.forward(0)
-                servos.stop()
-                
-            if key == ord("s"):
-                servos.backward(0)
-                servos.stop()
-                
-            if key == ord("a"):
-                servos.forward(1)
-                servos.stop()
-                    
-            if key == ord("s"):
-                servos.backward(1)
-                servos.stop()
+                servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
+
+            elif key == ord("s"):
+                servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
+
+            elif key == ord("a"):
+                servos.forward(channels=tuple([SERVO_H]), speed=SPEED)
+
+            elif key == ord("d"):
+                servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
+
 
     camera.cleanup()
     opencv.destroyAllWindows()
