@@ -176,6 +176,9 @@ if __name__ == "__main__":
                 
             elif key == ord("q"):
                 break
+            
+            else:
+                servos.stop_all()
 
 
     camera.cleanup()
