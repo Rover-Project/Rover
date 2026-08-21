@@ -14,7 +14,7 @@ HEIGHT = 640
 WIDTH = 640
 CLASS_INTEREST = {0: "Pessoa"}
 
-SPEED = 50 # Velocidade padrao
+SPEED = 10 # Velocidade padrao
 SERVO_V = 1 # Servo vertival 
 SERVO_H = 0 # Servo Horizontal
     
@@ -162,15 +162,19 @@ if __name__ == "__main__":
 
             key = opencv.waitKey(10) & 0xFF
             
+            # pra cima
             if key == ord("w"):
-                servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
-
-            elif key == ord("s"):
                 servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
 
+            # pra baixo
+            elif key == ord("s"):
+                servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
+
+            # pra esquerda 
             elif key == ord("a"):
                 servos.forward(channels=tuple([SERVO_H]), speed=SPEED)
 
+            # pra direita
             elif key == ord("d"):
                 servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
                 
