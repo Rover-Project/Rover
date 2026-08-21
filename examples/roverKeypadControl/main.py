@@ -1,5 +1,5 @@
 from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera.autoFocus import AfCamera
 from roverlib.utils.config_manager import Config
 from pathlib import Path
 import cv2 as openCv
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     speed = 50 # Velocidade inicial
     
     try:
-        camera = Camera(HEIGHT, WIDTH)
+        camera = AfCamera(HEIGHT, WIDTH)
         camera.start()
 
     except:
@@ -35,7 +35,7 @@ if __name__ == "__main__":
             
             openCv.imshow("Rover", frame)
             
-            key = openCv.waitKey(1) & 0xFF # Espera resposta do teclado
+            key = openCv.waitKey(10) & 0xFF # Espera resposta do teclado
             
             if key == ord("w"):
                 robot.forward(speed)

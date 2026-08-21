@@ -1,294 +1,181 @@
-# PIN Plugin
+# Pin
 
-Módulo responsável pelo controle de **GPIO e PWM** da Raspberry Pi utilizando uma implementação híbrida **C++ + Python**.
-
-A biblioteca fornece uma API simples em Python para manipulação de pinos digitais e PWM, enquanto a implementação de baixo nível é feita em C++ para garantir maior desempenho e controle direto sobre o sistema.
-
----
-
-# Arquitetura do Módulo
-
-O módulo segue uma arquitetura em camadas:
-
-```
-Python Application
-        │
-        ▼
-      pin.py
-(API de alto nível em Python)
-        │
-        ▼
-      pin.so
-(Biblioteca nativa compilada)
-        │
-        ▼
-      C++
-(Acesso direto ao sistema Linux)
-```
-
-A camada Python fornece uma interface amigável para o usuário, enquanto a camada C++ realiza o acesso direto aos arquivos de controle do kernel Linux.
-
-O módulo é compilado utilizando **CMake** e integrado ao Python através da biblioteca pybind11.
+Plugin de controle GPIO de baixo nível para a **roverlib**.  
+Substitui a dependência do `RPi.GPIO` com uma camada nativa em C++ exposta ao Python via **pybind11**.
 
 ---
 
-# Estrutura do Diretório
+## Estrutura
 
 ```
-pin
+pin/
+├── src/
+│   ├── includes/
+│   │   └── pin.hpp         # Interface pública da
+│   ├── src/                # classe Pin
+│   │   └── pin.cpp         # Implementação C++
+│   ├── binds.cpp           # Bindings pybind11
+│   └── CMakeLists.txt      # Configuração de build
 │
-├── src
-│   ├── includes
-│   │   └── pin.hpp
-│   │
-│   ├── src
-│   │   └── pin.cpp
-│   │
-│   ├── binds.cpp
-│   └── CMakeLists.txt
-│
-├── bin
-│   └── pin.so
-│
-├── pin.py
-│
-├── testLedApi.py
-├── testPwm.py
-│
-└── README.md
+├── bin/
+│   └── pin.so              # Módulo compilado  
+│                           # (gerado pelo CMake)
+├── pin.py                  # Abstração Python 
+└── README.md               # (interface principal)
 ```
-
-Descrição dos componentes:
-
-| Arquivo          | Descrição                                      |
-| ---------------- | ---------------------------------------------- |
-| `pin.hpp`        | Definição da classe Pin                        |
-| `pin.cpp`        | Implementação da lógica de controle GPIO e PWM |
-| `binds.cpp`      | Interface entre C++ e Python                   |
-| `CMakeLists.txt` | Configuração de compilação                     |
-| `pin.so`         | Biblioteca compilada utilizada pelo Python     |
-| `pin.py`         | Classe de abstração Python                     |
-| `testLedApi.py`  | Teste de controle digital                      |
-| `testPwm.py`     | Teste de controle PWM                          |
 
 ---
 
-# Funcionalidades
+## Dependências
 
-O módulo permite:
-
-* Criar um pino GPIO
-* Configurar modo do pino
-* Ler valores digitais
-* Escrever valores digitais
-* Gerar sinal PWM
-* Liberar o pino após uso
-* Validar erros de uso incorreto
+| Ferramenta | Versão mínima | Instalação |
+|---|---|---|
+| CMake | 3.15 | `sudo apt install cmake` |
+| GCC / Clang | C++17 | `sudo apt install build-essential` |
+| Python | 3.8+ | — |
+| pybind11 | 2.10+ | `pip install pybind11` |
 
 ---
 
-# Modos de Operação
+## Compilação
 
-Os modos disponíveis são:
-
+```bash
+# A partir da raiz do repositório, dentro de pin/src/
+cd pin/src
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
 ```
-PinMode.DIGITAL_IN
-PinMode.DIGITAL_OUT
-PinMode.PWM
-```
 
-| Modo        | Descrição                |
-| ----------- | ------------------------ |
-| DIGITAL_IN  | leitura de sinal digital |
-| DIGITAL_OUT | escrita de sinal digital |
-| PWM         | geração de sinal PWM     |
+O arquivo `pin.so` será gerado automaticamente em `pin/bin/`.
 
 ---
 
-# GPIO suportados
+## Uso
 
-Os GPIO válidos são:
-
-```
-0 - 27
-```
-
-Para PWM apenas os pinos abaixo são suportados:
-
-```
-12
-13
-18
-19
-```
-
-Caso um pino inválido seja utilizado, o sistema lança uma exceção.
-
----
-
-# Compilação
-
-A biblioteca precisa ser compilada antes de ser utilizada.
-
-Entre no diretório do plugin:
-
-```
-cd roverlib/plugins/pin
-```
-
-Crie o diretório de build:
-
-```
-mkdir build
-cd build
-```
-
-Configure o projeto:
-
-```
-cmake ../src
-```
-
-Compile a biblioteca:
-
-```
-make
-```
-
-Após a compilação o arquivo `.so` deve ser copiado para o diretório `bin`.
-
----
-
-# Uso em Python
-
-Exemplo de controle digital:
+### Importação
 
 ```python
-from pin import Pin, PinMode
-import time
+from pin.pin import Pin, PinMode
+```
 
+### Saída digital
+
+```python
 led = Pin(17, PinMode.DIGITAL_OUT)
-
-try:
-
-    while True:
-
-        led.on()
-        time.sleep(1)
-
-        led.off()
-        time.sleep(1)
-
-finally:
-
-    led.release()
+led.on()          # HIGH
+led.off()         # LOW
+led.write(1)      # equivalente a on()
+led.release()
 ```
 
----
-
-# Exemplo PWM
+### Entrada digital
 
 ```python
-from pin import Pin, PinMode
-import time
-
-led = Pin(18, PinMode.PWM)
-
-try:
-
-    led.pwm(0.1)
-    time.sleep(2)
-
-    led.pwm(0.5)
-    time.sleep(2)
-
-    led.pwm(0.9)
-    time.sleep(2)
-
-finally:
-
-    led.release()
+botao = Pin(4, PinMode.DIGITAL_IN)
+estado = botao.read()   # 0 ou 1
+botao.release()
 ```
 
-O valor de PWM deve estar entre:
+### PWM por hardware (pinos 12, 13, 18, 19)
 
-```
-0.0 → 0%
-1.0 → 100%
-```
-
----
-
-# Tratamento de Erros
-
-O módulo implementa diversas validações para evitar uso incorreto:
-
-| Erro                   | Descrição                                  |
-| ---------------------- | ------------------------------------------ |
-| GPIO inválido          | pino fora do intervalo permitido           |
-| PWM em pino não PWM    | tentativa de usar PWM em pino incompatível |
-| Escrita em pino INPUT  | tentativa de escrita em pino de entrada    |
-| Leitura em pino OUTPUT | tentativa de leitura em pino de saída      |
-| Duty cycle inválido    | valor de PWM fora do intervalo permitido   |
-
-Essas validações geram exceções que podem ser tratadas pelo Python.
-
----
-
-# Liberação de Recursos
-
-Sempre que um pino não estiver mais em uso ele deve ser liberado:
+Usa o subsistema `pwmchip0` do kernel — resolução nanosegundo, sem overhead de CPU.
 
 ```python
-pin.release()
+servo = Pin(18, PinMode.PWM)
+
+# Posicionamento de servo (50 Hz, período = 20 ms)
+servo.pwm(0.050)    # ~1,0 ms → posição mínima
+servo.pwm(0.075)    # ~1,5 ms → posição central
+servo.pwm(0.100)    # ~2,0 ms → posição máxima
+
+# Mudar frequência em tempo real
+servo.pwm(0.5, frequency=1000)   # 50 % duty, 1 kHz
+
+servo.stop_pwm()    # para sem liberar o pino
+servo.release()
 ```
 
-Isso remove o pino do controle do kernel Linux e evita conflitos com outros módulos.
+### PWM por software (qualquer pino DIGITAL_OUT)
+
+Usa uma thread dedicada. Adequado para LEDs, ESCs simples e motores DC quando os pinos de hardware não estão disponíveis. Precisão menor que o hardware PWM.
+
+```python
+motor = Pin(17, PinMode.DIGITAL_OUT)
+motor.pwm(0.5, frequency=50)    # 50 % duty, 50 Hz
+
+# Alterar parâmetros em tempo real sem reiniciar a thread
+motor.pwm(0.75, frequency=50)
+
+motor.stop_pwm()
+motor.release()
+```
+
+### Context manager (`with`)
+
+O `with` garante que `release()` seja chamado mesmo em caso de exceção:
+
+```python
+with Pin(18, PinMode.PWM) as servo:
+    servo.pwm(0.075)
+    # ... ao sair do bloco, release() é chamado automaticamente
+```
 
 ---
 
-# Sistema Operacional
+## Propriedades
 
-O módulo foi desenvolvido para execução em:
+```python
+pin = Pin(18, PinMode.PWM)
 
-* Raspberry Pi OS
-* Linux
-
-utilizando a interface do kernel:
-
-```
-/sys/class/gpio
-/sys/class/pwm
+pin.number      # int  → número BCM do pino
+pin.mode        # PinMode → modo configurado
+pin.active      # bool → True se inicializado e não liberado
+pin.duty        # float → duty cycle atual (0.0–1.0)
+pin.frequency   # float → frequência PWM atual em Hz
 ```
 
 ---
 
-# Dependências
+## Pinos PWM de hardware
 
-Para compilar o módulo são necessárias as seguintes ferramentas:
+| GPIO (BCM) | Canal PWM |
+|---|---|
+| 12 | PWM0 |
+| 18 | PWM0 |
+| 13 | PWM1 |
+| 19 | PWM1 |
 
-```
-CMake
-g++
-pybind11
-Python3
+> **Atenção:** os pinos 12/18 compartilham o mesmo canal (PWM0), assim como 13/19 compartilham PWM1. Não é possível configurá-los com parâmetros diferentes simultaneamente.
+
+---
+
+## Offset do kernel
+
+O mapeamento BCM → número do kernel usa o offset **571** (padrão Raspberry Pi 5).  
+Para Raspberry Pi 4, altere a constante em `bcmToKernel()` em `pin.cpp`:
+
+```cpp
+// RPi 4:
+return bcm + 512;
+
+// RPi 5:
+return bcm + 571;
 ```
 
 ---
 
-# Objetivo do Módulo
+## Permissões
 
-Este plugin foi desenvolvido para servir como **base de controle de hardware** para o projeto Rover.
+O acesso ao sysfs GPIO requer permissões adequadas. Opções:
 
-Outros módulos poderão utilizar este plugin para controlar:
+```bash
+# Opção 1: rodar com sudo (desenvolvimento)
+sudo python main.py
 
-* motores
-* servos
-* sensores digitais
-* encoders
-* atuadores PWM
+# Opção 2: adicionar o usuário ao grupo gpio (produção)
+sudo usermod -aG gpio $USER
+# (requer logout/login)
+```
 
-Centralizando toda a manipulação de GPIO em uma única biblioteca.
-
-
-(ARQUIVO DE TESTE: PASSIVO DE MUDANÇAS FUTURAS)
+---

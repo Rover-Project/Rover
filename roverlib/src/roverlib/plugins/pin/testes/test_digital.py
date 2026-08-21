@@ -3,6 +3,7 @@ import time
 from pin import Pin, PinMode
 
 with Pin(17, PinMode.DIGITAL_OUT) as led:
+
     print("[1] LED ON por 2 s")
     led.on()
     time.sleep(2)

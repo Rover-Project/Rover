@@ -33,3 +33,7 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Permitir que os binários compilados entrem no repositório
+!*.so
+!roverlib/src/roverlib/plugins/pin/bin/**/*.so

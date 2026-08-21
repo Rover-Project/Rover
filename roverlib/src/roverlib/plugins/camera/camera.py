@@ -2,8 +2,8 @@ import cv2 as openCV
 from .cameraInterface import CameraInterface
 from .exceptions import CameraNotStart
 from roverlib.modules.processing.processing_image import ProcessingImage
-from time import time
-from enum import Enum
+from time import time, sleep
+from enum import IntEnum 
 
 try: 
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
@@ -14,13 +14,14 @@ except (ImportError, ModuleNotFoundError):
     
 try:
     # Tenta importar a biblioteca picamera2, específica da Raspberry Pi
-    from picamera2 import Picamera2 # type: ignore
+    from picamera2 import Picamera2, Preview
+    from picamera2.encoders import H264Encoder, Quality 
+    from picamera2.outputs import FileOutput
     availablePicamera2 = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False
     
-
-class CameraFormat(Enum):
+class CameraFormat(IntEnum):
     """
     Enum para conversão de formato de rgb para bgr, gray ou hsv
     """
@@ -150,12 +151,7 @@ class Camera(CameraInterface):
         """
         
         self.fps = fps
-        
-        self.picam2.set_controls(
-            {
-                "FrameRate": fps
-            }
-        )
+        self.picam2.controls.FrameRate = self.fps
         
     def set_brightness(self, brightness: float = 0.0):
         """
@@ -193,7 +189,7 @@ class Camera(CameraInterface):
         # Configura o contrast
         self.picam2.set_controls(
             {
-                "Constrast": contrast
+                "Contrast": contrast
             }
         )
     
@@ -274,7 +270,7 @@ class Camera(CameraInterface):
         
     def get_picture(self, file:str):
         """
-        Captura imagem e salva.
+        Captura imagem e salva. Teclas S para captura frame.
         Args:
             file (str): Caminho para salvar imagem.
         """
@@ -282,28 +278,37 @@ class Camera(CameraInterface):
         if not self.runing:
             raise CameraNotStart("Câmera não iniciada")
         
-        try:
-            self.picam2.start_and_capture_file(file) # captura e salva imagem com o path do file
-            print('Imagem capturada com sucesso!')
-        except:
-            print("Erro ao capturar imagem.")
+        while True:
+            
+            frame = self.get_frame()
+            
+            openCV.imshow("Frame", frame)
+            
+            key = openCV.waitKey(10) & 0xFF  
+
+            if key == ord('s'):
+                openCV.imwrite(file, frame)
+                break
         
-    def get_video(self, file:str, duration:int):
+        openCV.destroyAllWindows()
+    
+    def get_video(self, file:str, t:float):
         """
         Captura video e salva.
         Args:
             file (str): caminho para salvar video.
             duration (int): duração do video.
         """
-        
         if not self.runing:
             raise CameraNotStart("Câmera não iniciada") 
         
-        try:
-            self.picam2.start_and_record_Video(file, duration)
-            print("Video gravado com sucesso!")
-        except:
-            print("Erro ao capturar Video.")
+        self.picam2.start_preview(Preview.QTGL) # Inicia pre-vizualização
+        encoder = H264Encoder() # Encoder h264
+        output = FileOutput(file) # Saida para o arquivo
+        
+        self.picam2.start_recording(encoder, output, Quality.HIGH) #  inicia gravação 
+        sleep(t) # Tempo de gravação
+        self.picam2.stop_recording() # termina gravação
             
     def metadata(self):
         """

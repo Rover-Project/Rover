@@ -307,3 +307,4 @@ float   Pin::getFrequency() const { return currentFrequency.load(); }
 PinMode Pin::getMode()      const { return mode;                    }
 int     Pin::getPinNumber() const { return pinNumber;               }
 bool    Pin::isActive()     const { return active;                  }
+

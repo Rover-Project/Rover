@@ -1,12 +1,12 @@
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.utils.config_manager import Config
+from roverlib.plugins.camera.camera import Camera
 from roverlib.plugins.camera.cameraInterface import CameraInterface
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
 import cv2 as openCv
-import numpy 
-
+import numpy
 
 def set_args(args: list[dict]=[{"name":"", "type": None, "help": ""}], discrip:str="") -> Namespace:
     """
@@ -83,6 +83,7 @@ def cam_config(type: str="") -> CameraInterface | None:
         cameraInterface | None: Objeto que implementa uma interface de cãmera.
     """
     
+<<<<<<< HEAD:examples/circleDetect/src/circleDetect.py
     type_of_camera = set_args(
         [
             {
@@ -127,6 +128,20 @@ def cam_config(type: str="") -> CameraInterface | None:
         
         try:
             from roverlib.plugins.camera.webcam import Webcam    
+=======
+    
+    camera = Camera(
+        HEIGHT, 
+        WIDTH, 
+        fps=30,
+    )
+    camera.start()
+    
+    # Configuração base de captura
+    camera.set_brightness(-0.25) # 0.5 de brilho fica muito bom
+    camera.set_contrast(1)
+    camera.set_saturation(1)
+>>>>>>> origin/motor_refactor:examples/circleDetect/src/fixed.py
 
             camera = Webcam(
                 height=cam_config["resolution"]["h"], 
