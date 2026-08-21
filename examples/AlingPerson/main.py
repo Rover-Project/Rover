@@ -162,27 +162,35 @@ if __name__ == "__main__":
 
             key = opencv.waitKey(10) & 0xFF
             
-            # pra cima
-            if key == ord("w"):
-                servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
+            if not pause:
+                # pra cima
+                if key == ord("w"):
+                    servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
 
-            # pra baixo
-            elif key == ord("s"):
-                servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
+                # pra baixo
+                elif key == ord("s"):
+                    servos.forward(channels=tuple([SERVO_V]), speed=SPEED)
 
-            # pra esquerda 
-            elif key == ord("a"):
-                servos.forward(channels=tuple([SERVO_H]), speed=SPEED)
-
-            # pra direita
-            elif key == ord("d"):
-                servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
+                # pausa o servo horizontal caso o erro seja baixo
+                if numpy.abs(error_x) < 25:
+                    servos.stop(channels=tuple([SERVO_H]))
                 
+                # pra esquerda 
+                elif error_x < 0:
+                    servos.forward(channels=tuple([SERVO_H]), speed=SPEED)
+                
+                # pra direita 
+                elif error_x > 0:
+                    servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
+                    
             elif key == ord("q"):
                 break
             
-            else:
+            elif key == ord("p"):
                 servos.stop(channels=tuple([SERVO_V, SERVO_H]))
+                pause = True
+            
+
 
 
     camera.cleanup()
