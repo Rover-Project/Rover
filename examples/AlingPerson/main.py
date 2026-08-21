@@ -190,7 +190,7 @@ if __name__ == "__main__":
                     elif error_x > 0:
                         servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
                     
-            elif key == ord("q"):
+            if key == ord("q"):
                 break
             
             elif key == ord("p"):
