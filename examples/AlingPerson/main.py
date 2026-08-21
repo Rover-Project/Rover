@@ -30,8 +30,12 @@ if __name__ == "__main__":
     model_session = onnx.InferenceSession(MODEL_PATH, providers=providers)
     input_name = model_session.get_inputs()[0].name
 
+    # Inicia câmera 
     camera = AfCamera(height=HEIGHT, width=WIDTH)
     camera.start()
+    
+    # Inicia servos 
+    servos = PCAServos()
 
     while True:
         frame = camera.get_frame()
@@ -127,7 +131,7 @@ if __name__ == "__main__":
                     opencv.FONT_HERSHEY_SIMPLEX,
                     0.5,
                     (0, 0, 255),
-                    1,
+                    2,
                 )
 
             # Calculo de fps e temperatura
@@ -136,6 +140,8 @@ if __name__ == "__main__":
 
             error_x = c_x - (WIDTH // 2)
             error_y = c_y - (HEIGHT // 2)
+            
+            servos.forward(0)
 
             info_text = f"FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C | Err: ({error_x}, {error_y})"
             opencv.putText(
@@ -145,7 +151,7 @@ if __name__ == "__main__":
                 opencv.FONT_HERSHEY_SIMPLEX,
                 0.5,
                 (255, 0, 0),
-                1,
+                2,
             )
 
             # Exibe o frame em tela
@@ -155,6 +161,22 @@ if __name__ == "__main__":
             
             if key == ord("q"):
                 break
+            
+            if key == ord("w"):
+                servos.forward(0)
+                servos.stop()
+                
+            if key == ord("s"):
+                servos.backward(0)
+                servos.stop()
+                
+            if key == ord("a"):
+                servos.forward(1)
+                servos.stop()
+                    
+            if key == ord("s"):
+                servos.backward(1)
+                servos.stop()
 
     camera.cleanup()
     opencv.destroyAllWindows()
