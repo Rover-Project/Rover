@@ -289,15 +289,22 @@ class PCA9685Driver:
         off = max(0, min(4095, int(off)))
 
         base = _REG_LED0_ON_L + channel * 4
+        
+        # Empacota os 4 bytes na ordem exata dos registradores
+        data_block = [
+            on & 0xFF,          # base+0: ON_L
+            (on >> 8) & 0x0F,   # base+1: ON_H
+            off & 0xFF,         # base+2: OFF_L
+            (off >> 8) & 0x0F   # base+3: OFF_H
+        ]
+        
         try:
-            self._write_register(base + 0, on  & 0xFF)         # ON_L
-            self._write_register(base + 1, (on  >> 8) & 0x0F)  # ON_H
-            self._write_register(base + 2, off & 0xFF)          # OFF_L
-            self._write_register(base + 3, (off >> 8) & 0x0F)  # OFF_H
+            # Envia o bloco inteiro em uma única transação I2C
+            self._bus.write_i2c_block_data(self.address, base, data_block)
         except Exception as exc:
-            raise I2CError(f"Falha ao escrever PWM no canal {channel}: {exc}") from exc
+            raise I2CError(f"Falha ao escrever bloco PWM no canal {channel}: {exc}") from exc
 
-        logger.debug("Canal %d: ON=%d OFF=%d", channel, on, off)
+        logger.debug("Canal %d atualizado atomicamente: ON=%d OFF=%d", channel, on, off)
 
     def set_duty_cycle(self, channel: int, value: int) -> None:
         """
@@ -344,14 +351,22 @@ class PCA9685Driver:
         """
         on  = max(0, min(4095, int(on)))
         off = max(0, min(4095, int(off)))
+        
+        # Empacota os 4 bytes para os registradores ALL_LED
+        data_block = [
+            on & 0xFF,
+            (on >> 8) & 0x0F,
+            off & 0xFF,
+            (off >> 8) & 0x0F
+        ]
+        
         try:
-            self._write_register(_REG_ALL_LED_ON_L,  on  & 0xFF)
-            self._write_register(_REG_ALL_LED_ON_H,  (on  >> 8) & 0x0F)
-            self._write_register(_REG_ALL_LED_OFF_L, off & 0xFF)
-            self._write_register(_REG_ALL_LED_OFF_H, (off >> 8) & 0x0F)
+            # Envia para o endereço base _REG_ALL_LED_ON_L (0xFA)
+            self._bus.write_i2c_block_data(self.address, _REG_ALL_LED_ON_L, data_block)
         except Exception as exc:
-            raise I2CError(f"Falha ao escrever ALL_LED: {exc}") from exc
-        logger.debug("Todos os canais: ON=%d OFF=%d", on, off)
+            raise I2CError(f"Falha ao escrever bloco ALL_LED: {exc}") from exc
+            
+        logger.debug("Todos os canais atualizados atomicamente: ON=%d OFF=%d", on, off)
 
     def get_pwm(self, channel: int) -> tuple[int, int]:
         """
