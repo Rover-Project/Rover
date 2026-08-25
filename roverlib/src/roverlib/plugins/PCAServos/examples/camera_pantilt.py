@@ -4,14 +4,21 @@ examples/camera_pantilt.py
 Exemplo de uso: Controle de câmera Pan/Tilt com dois servos.
 
 Hardware esperado:
-    • Raspberry Pi 5
-    • PCA9685 no endereço padrão 0x40 (I2C bus 1)
-    • Servo PAN  → canal 0  (rotação horizontal)
-    • Servo TILT → canal 1  (inclinação vertical)
+  • Raspberry Pi 5
+  • PCA9685 no endereço padrão 0x40 (I2C bus 1)
+  • Servo PAN  → canal 0  (rotação horizontal)
+  • Servo TILT → canal 1  (inclinação vertical)
+
+Nota sobre o Driver:
+--------------------
+Este script utiliza a implementação nativa com Escrita Atômica (I2C Block Write).
+Isso garante que os 4 bytes do sinal PWM sejam atualizados no chip em um 
+único ciclo de clock do barramento, eliminando o "PWM Tearing" (pulos bruscos)
+e garantindo movimentos extremamente suaves e seguros para o hardware.
 
 Para executar na Raspberry Pi:
-    pip install smbus2
-    python examples/camera_pantilt.py
+  pip install smbus2
+  python examples/camera_pantilt.py
 """
 
 import time
@@ -19,6 +26,7 @@ import logging
 import sys
 import os
 
+# Adiciona o diretório raiz do plugin ao path para permitir o import local
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 logging.basicConfig(
@@ -40,7 +48,8 @@ def varredura_horizontal(pan: Servo, steps: int = 9) -> None:
     for grau in range(0, 181, 180 // steps):
         pan.angle = grau
         print(f"  PAN: {grau}°")
-        time.sleep(0.4)
+        # O delay permite que o servo alcance a posição fisicamente
+        time.sleep(0.4) 
     pan.center()
     print("  PAN: 90° (centro)")
 
@@ -57,7 +66,7 @@ def varredura_vertical(tilt: Servo, min_grau: int = 45, max_grau: int = 135) -> 
 
 
 def posicao_inicial(pan: Servo, tilt: Servo) -> None:
-    """Move ambos os servos para o centro."""
+    """Move ambos os servos para o centro simultaneamente."""
     print("\n── Posição inicial (centro) ──")
     pan.center()
     tilt.center()
@@ -67,9 +76,10 @@ def posicao_inicial(pan: Servo, tilt: Servo) -> None:
 def main() -> None:
     print("=" * 50)
     print("  Rover – Controle de Câmera Pan/Tilt")
-    print("  PCA9685 Plugin próprio (sem Adafruit)")
+    print("  PCA9685 Plugin próprio (Escrita Atômica I2C)")
     print("=" * 50)
 
+    # O uso do 'with' garante que os motores sejam desligados ao sair (close automático)
     with PCAServos(address=0x40, bus=1, frequency=50) as pca:
         pan  = Servo(pca, channel=0, min_pulse_us=500, max_pulse_us=2500)
         tilt = Servo(pca, channel=1, min_pulse_us=600, max_pulse_us=2400)
@@ -94,7 +104,7 @@ def main() -> None:
 
         posicao_inicial(pan, tilt)
 
-    print("\nDemo finalizado. Servos desativados.")
+    print("\nDemo finalizado. Servos desativados com segurança.")
 
 
 if __name__ == "__main__":
