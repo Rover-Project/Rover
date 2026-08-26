@@ -6,6 +6,7 @@ camera:
   resolution:
   - 3280
   - 2464
+  
 gpio:
   motor:
     right: [12, 13] # in3, in4
