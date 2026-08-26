@@ -123,7 +123,8 @@ def folowCircle():
             if r >= 100:
                 right = 0
                 left = 0
-            else:
+                
+            elif error_x != 0:
                 error_x = activation_function(error_x, thers=CIRCLE_THRES)
 
                 if error_x != 0:
@@ -133,7 +134,7 @@ def folowCircle():
                         error_x = int(smoothed_error(error_x, last_error, alph=0.3))
                         last_error = error_x
 
-                    error_x = nomalize(error_x, (HEIGHT / 2))
+                    error_x = nomalize(error_x, (WIDTH / 2))
                     
                     # Controle dos motores caso tenha um cículo
                     speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional

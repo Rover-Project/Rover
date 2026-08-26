@@ -28,7 +28,7 @@ def nomalize(error: float, size_interval: float) -> float:
         float: erro normalizado para o intevalo
     """
     
-    return size_interval / error
+    return error / size_interval
 
 def smoothed_error(error: float, last_error: float, alph: float = 0.3) -> float:
     """
