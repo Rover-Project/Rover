@@ -29,6 +29,7 @@ def folowCircle():
     max_r =  min(WIDTH, HEIGHT) // 2 # Raio máximo
     pause = True # Varial para ativar os motores
     last_error = None
+    speed_x = 0
     
     # Carrega configurações
     config = Config(Path(__file__).parent / "config.yaml")
@@ -123,6 +124,7 @@ def folowCircle():
             if r >= 100:
                 right = 0
                 left = 0
+                speed_x = 0
                 
             elif error_x != 0:
                 error_x = activation_function(error_x, thers=CIRCLE_THRES)
