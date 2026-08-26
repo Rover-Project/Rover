@@ -126,11 +126,11 @@ def folowCircle():
             else:
                 error_x = activation_function(error_x, thers=CIRCLE_THRES)
 
-                # if last_error is None:
-                #     last_error = error_x
-                # else:
-                #     error_x = smoothed_error(error_x, last_error, alph=0.3)
-                #     last_error = error_x
+                if last_error is None:
+                    last_error = error_x
+                else:
+                    error_x = int(smoothed_error(error_x, last_error, alph=0.3))
+                    last_error = error_x
 
                 # error_x = nomalize(error_x, 100)
                 
