@@ -22,6 +22,11 @@ SERVO_H = 0  # Servo horizontal
 DEADZONE = 25
 SMOOTH_ALFA = 0.3
 
+# Parâmetros de Suavização do Servo
+MIN_SPEED = 0.05       # Velocidade mínima para vencer o atrito inicial
+MAX_SPEED = 0.40       # Velocidade máxima (evita trancos)
+MAX_RAMP_DELTA = 0.05  # Rampa de aceleração/desaceleração por frame
+
 def get_cpu_temp():
     """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
     try:
@@ -45,10 +50,11 @@ if __name__ == "__main__":
     servos = PCAServos()
     
     # Instância do PID para o Eixo Horizontal (X)
-    # Satura a saída no intervalo de velocidade do servo [-1.0, 1.0]
-    pid_x = PID(kp=1.2, ki=0.01, kd=0.05, max_I=0.5, max_dt=0.5)
+    pid_x = PID(kp=0.35, ki=0.005, kd=0.02, max_I=0.3, max_dt=0.5)
 
+    # Inicialização das variáveis de estado
     last_smoothed_error_x = None
+    last_speed_h = 0.0
     pause = True
 
     while True:
@@ -143,7 +149,7 @@ if __name__ == "__main__":
                     2,
                 )
 
-            # --- PROCESSAMENTO DO ERRO E PID (EIXO X) ---
+            # processamento do erro no eixo X
             raw_error_x = c_x - (WIDTH // 2)
 
             # Filtro Passa-Baixas no erro bruto
@@ -167,19 +173,31 @@ if __name__ == "__main__":
             # controle dos servos
             if not pause:
                 if numpy.abs(error_x) == 0.0:
+                    target_speed = 0.0
+                else:
+                    raw_speed = numpy.abs(u_x)
+                    target_speed = MIN_SPEED + (raw_speed * (MAX_SPEED - MIN_SPEED))
+                    target_speed = min(MAX_SPEED, max(MIN_SPEED, target_speed))
+
+                # Aplica a rampa de aceleração e desaceleração
+                speed_delta = target_speed - last_speed_h
+                speed_delta = max(-MAX_RAMP_DELTA, min(MAX_RAMP_DELTA, speed_delta))
+                
+                speed_h = last_speed_h + speed_delta
+                last_speed_h = speed_h
+
+                if speed_h < 0.01:
                     servos.stop(channels=tuple([SERVO_H]))
                 else:
-                    # u_x retorna entre -1.0 e 1.0
-                    # speed em forward e backward deve ser a magnitude positiva [0.0 a 1.0]
-                    speed_h = min(1.0, numpy.abs(u_x))
-
                     if u_x < 0:
                         servos.forward(channels=tuple([SERVO_H]), speed=speed_h)
                     else:
                         servos.backward(channels=tuple([SERVO_H]), speed=speed_h)
             else:
-                pid_x.reset()  # Zera o acúmulo da integral enquanto pausado
-
+                servos.stop(channels=tuple([SERVO_H]))
+                pid_x.reset()
+                last_speed_h = 0.0
+                
             # Telemetria na Tela
             fps = 1.0 / (time.time() - start_time)
             temp_cpu = get_cpu_temp()
