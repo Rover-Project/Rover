@@ -7,8 +7,8 @@ from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
 import cv2 as openCv
 from pathlib import Path
-from decision import voting, inInterval
-from error_signal import nomalize, activation_function, smoothed_error
+from .decision import voting, inInterval
+from .error_signal import nomalize, activation_function, smoothed_error
 import numpy
 
 
@@ -18,8 +18,8 @@ def folowCircle():
     THRES_RED = 350_000 # Limite de proximidade para detectar a bola com base no raio máximo (pi * r²): r = 320
     CIRCLE_THRES = 40  # tolerância para considerar mesma circuferencia
     NO_DET_LIMIT = 10  # número máximo de frames sem detecção
-    R_SPEED = 60 # Velocidade de investida para seguir a bola
-    X_SPEED = 40 # Velocidade para controle direcional no eixo X
+    #R_SPEED = 60 # Velocidade de investida para seguir a bola
+    #X_SPEED = 40 # Velocidade para controle direcional no eixo X
     SEARCH_SPEED = 70
     have_detect = False  # Verifica se já teve alguma detecção
     circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
@@ -58,14 +58,14 @@ def folowCircle():
     
     # Configura controlador PID para p eixo x
     pid_x = PID(
-        kp=(X_SPEED / x_center),  # constante de normalização para a velociade de controle x
+        kp=1,  # constante de normalização para a velociade de controle x
         ki=1, 
         kd=1
     )
     
     # Configura controlador PID para o tamanho do raio 
     pid_r = PID(
-        kp=(R_SPEED / max_r),
+        kp=1,
         ki=1,
         kd=1
     )
