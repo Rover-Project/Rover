@@ -59,16 +59,16 @@ def folowCircle():
     
     # Configura controlador PID para p eixo x
     pid_x = PID(
-        kp=1,  # constante de normalização para a velociade de controle x
-        ki=1, 
-        kd=1
+        kp=0.2,  # constante de normalização para a velociade de controle x
+        ki=0.4, 
+        kd=0.4
     )
     
     # Configura controlador PID para o tamanho do raio 
     pid_r = PID(
-        kp=1,
-        ki=1,
-        kd=1
+        kp=0.2,
+        ki=0.4,
+        kd=0.4
     )
     
     # Loop principal de movimento
@@ -150,7 +150,7 @@ def folowCircle():
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-            txt = f"Error em X = {error_x} | Sinal PDI: {speed_x} | ({x},{y})"
+            txt = f"Error em X = {error_x:.2f} | Sinal PDI: {speed_x:.2f} | ({x},{y})"
             
         openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
