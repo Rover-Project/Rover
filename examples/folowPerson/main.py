@@ -166,16 +166,16 @@ if __name__ == "__main__":
             
             if not pause:
                 
-                if numpy.abs(error_y) < 25:
-                    servos.stop(channels=tuple([SERVO_V]))
-                else:
-                    # pra cima
-                    if error_y > 0:
-                        servos.forward(channels=tuple([SERVO_V]), speed=SPEED + 0.3)
+                # if numpy.abs(error_y) < 25:
+                #     servos.stop(channels=tuple([SERVO_V]))
+                # else:
+                #     # pra cima
+                #     if error_y > 0:
+                #         servos.forward(channels=tuple([SERVO_V]), speed=SPEED + 0.3)
 
-                    # pra baixo
-                    elif error_y < 0:
-                        servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
+                #     # pra baixo
+                #     elif error_y < 0:
+                #         servos.backward(channels=tuple([SERVO_V]), speed=SPEED)
 
                 # pausa o servo horizontal caso o erro seja baixo
                 if numpy.abs(error_x) < 25:
