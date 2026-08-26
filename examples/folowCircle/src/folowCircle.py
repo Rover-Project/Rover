@@ -143,6 +143,9 @@ def folowCircle():
                     speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional
                     
                     nomalize(speed_x, 100)
+                    
+                    right = speed_x
+                    left = speed_x
                 
                 else: 
                     speed_x = 0
@@ -150,7 +153,7 @@ def folowCircle():
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-            txt = f"Error em X = {error_x:.2f} | Sinal PDI: {speed_x:.2f} | ({x},{y})"
+            txt = f"Error em X = {error_x:.2f} | Sinal PDI: {speed_x:.2f} | ({x},{y}) | {r}"
             
         openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
