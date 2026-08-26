@@ -142,7 +142,7 @@ def folowCircle():
                     # Controle dos motores caso tenha um cículo
                     speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional
                     
-                    nomalize(speed_x, 100)
+                    nomalize(speed_x, 60)
                     
                     right = speed_x
                     left = speed_x
@@ -193,7 +193,7 @@ def folowCircle():
                         
             else: # Segue circulo                    
                     print(f"Velocidade:\nL - {left}\nR - {right}")
-                    robot.move(speed_left=left, speed_right=right)
+                    robot.move(speed_left=left + 40, speed_right=right + 40)
         
         else:
             robot.stop()
