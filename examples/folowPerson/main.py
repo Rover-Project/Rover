@@ -50,7 +50,7 @@ if __name__ == "__main__":
     servos = PCAServos()
     
     # Instância do PID para o Eixo Horizontal (X)
-    pid_x = PID(kp=0.35, ki=0.005, kd=0.02, max_I=0.3, max_dt=0.5)
+    pid_x = PID(kp=0.3, ki=0.055, kd=0.02, max_I=0.3, max_dt=0.5)
 
     # Inicialização das variáveis de estado
     last_smoothed_error_x = None
