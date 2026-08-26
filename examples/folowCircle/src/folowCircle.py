@@ -126,20 +126,25 @@ def folowCircle():
             else:
                 error_x = activation_function(error_x, thers=CIRCLE_THRES)
 
-                if last_error is None:
-                    last_error = error_x
-                else:
-                    error_x = int(smoothed_error(error_x, last_error, alph=0.3))
-                    last_error = error_x
+                if error_x != 0:
+                    if last_error is None:
+                        last_error = error_x
+                    else:
+                        error_x = int(smoothed_error(error_x, last_error, alph=0.3))
+                        last_error = error_x
 
-                error_x = nomalize(error_x, (HEIGHT / 2))
+                    error_x = nomalize(error_x, (HEIGHT / 2))
+                    
+                    # Controle dos motores caso tenha um cículo
+                    speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional
+                    
+                    nomalize(speed_x, 100)
                 
-                # Controle dos motores caso tenha um cículo
-                speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional
+                    speed_r = (pid_r.computer(abs(error_r)) if r <= max_r - 60 else 0)
                 
-                nomalize(speed_x, 100)
-                
-                speed_r = (pid_r.computer(abs(error_r)) if r <= max_r - 60 else 0)
+                else: 
+                    speed_x = 0
+                    speed_r = 0
                 
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
