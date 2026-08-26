@@ -6,9 +6,6 @@ camera:
   resolution:
   - 3280
   - 2464
-  saturation:
-  1
-  
   
 gpio:
   motor:

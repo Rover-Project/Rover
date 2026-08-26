@@ -34,7 +34,7 @@ def folowCircle():
     config = Config(Path(__file__).parent / "config.yaml")
     
     # Carrega configuração de câmera
-    camera_configs = config.get("camera")
+    #camera_configs = config.get("camera")
     
     # Inicia câmera
     picam = Camera(HEIGHT, WIDTH) 
