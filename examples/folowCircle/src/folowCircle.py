@@ -41,9 +41,9 @@ def folowCircle():
     picam.start()
     
     # Configuração da câmera
-    picam.set_saturation(camera_configs["saturation"])
-    picam.set_brightness(camera_configs["brigh"])
-    picam.set_contrast(camera_configs["contrast"])
+    #picam.set_saturation(camera_configs["saturation"])
+    #picam.set_brightness(camera_configs["brigh"])
+    #picam.set_contrast(camera_configs["contrast"])
 
     motor_config = config.get("gpio")["motor"]
     
