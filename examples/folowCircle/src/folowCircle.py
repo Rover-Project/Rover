@@ -82,7 +82,6 @@ def folowCircle():
         hough = (numpy.array(hough) if hough is not None else None)
         contour = (numpy.array(contour) if contour is not None else None) 
 
-
         # escolhe a melhor detecção entre hough e canny
         if hough is not None and contour is not None:
             det = voting(
@@ -146,7 +145,7 @@ def folowCircle():
             # Configuração do texto do frame
             openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
             openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-            txt = f"Error em X = {error_x} | Error em R = {error_r} | R = {r}"
+            txt = f"Error em X = {error_x} | Sinal PDI: {speed_x}"
             
         openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         openCv.imshow("Deteccao Final", frame)
