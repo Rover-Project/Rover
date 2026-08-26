@@ -23,9 +23,9 @@ DEADZONE = 25
 SMOOTH_ALFA = 0.3
 
 # Parâmetros de Suavização do Servo
-MIN_SPEED = 0.05       # Velocidade mínima para vencer o atrito inicial
-MAX_SPEED = 0.40       # Velocidade máxima (evita trancos)
-MAX_RAMP_DELTA = 0.05  # Rampa de aceleração/desaceleração por frame
+MIN_SPEED = 0.03       # Velocidade mínima para vencer o atrito inicial
+MAX_SPEED = 0.20       # Velocidade máxima (evita trancos)
+MAX_RAMP_DELTA = 0.01  # Rampa de aceleração/desaceleração por frame
 
 def get_cpu_temp():
     """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     servos = PCAServos()
     
     # Instância do PID para o Eixo Horizontal (X)
-    pid_x = PID(kp=0.3, ki=0.055, kd=0.02, max_I=0.3, max_dt=0.5)
+    pid_x = PID(kp=0.2, ki=0.055, kd=0.02, max_I=0.3, max_dt=0.5)
 
     # Inicialização das variáveis de estado
     last_smoothed_error_x = None
