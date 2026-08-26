@@ -1,14 +1,15 @@
-# Configuração para o script folowCircle
 camera:
   fps: 30
-  brigh: 0.25
-  saturation: 1
-  contrast: 1
-
+  preview_resolution:
+  - 640
+  - 480
+  resolution:
+  - 3280
+  - 2464
 gpio:
   motor:
     right: [12, 13] # in3, in4
-    left: [5, 6] # in1, in2
+    left: [6, 5] # in1, in2
     calibration:
       right: 1
       left: 1

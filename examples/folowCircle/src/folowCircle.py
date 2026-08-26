@@ -7,47 +7,10 @@ from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
 import cv2 as openCv
 from pathlib import Path
+from decision import voting, inInterval
+from error_signal import nomalize, activation_function, smoothed_error
 import numpy
 
-def voting(hough: numpy.ndarray, contour: numpy.ndarray, thers_xy: int = 20, thers_r: float = 0.3) -> numpy.ndarray:
-    """
-    Função de votação, para os dois métodos de detectção do círculo.
-
-    Args:
-        hough (tuple[int, int, int]): x, y e r da detecção da transformada de Hough
-        contorno (tuple[int, int, int]): x, y e r  da detecção do método de contornos
-        thers_xy (int, optional): Limiar de diferença para as coordenadas x e y. Por padrão 20.
-        thers_r (float, optional): Limiar de diferença entre os raios. Por padrão 0.3.
-
-    Returns:
-        numpy.ndarray: Retorna uma média da coordenadas caso a discordância for menos que os limiares. Caso contrário retorna o método mais confiavel. 
-    """
-    
-    # votação
-    if abs(numpy.sum(hough[:2] - contour[:2])) < thers_xy:
-        if abs(hough[2] - contour[2]) < (hough[2] * thers_r):
-            return (hough + contour) // 2 
-
-    # Se a discordancia for alta, retorna o metodo mais seguro
-    return contour
-    
-def inInterval(v1: numpy.ndarray, v2: numpy.ndarray, thers: float) -> bool:
-    """
-    Verifica se a diferença de dois vetores é menor que que o limiar.
-
-    Args:
-        v1 (numpy.ndarray): Primeiro array. 
-        v2 (numpy.ndarray): Segundo array.
-        thers (int): limiar de diferença.
-
-    Returns:
-        bool: True se a diferença for menor que o limiar.
-    """
-    
-    if abs(numpy.sum(v1 - v2)) > thers:
-        return False
-    
-    return True
 
 def folowCircle():
     HEIGHT = 640 # Altura da imagem 
@@ -65,6 +28,7 @@ def folowCircle():
     x_center = WIDTH // 2 # Centro do frame no eixo x
     max_r =  min(WIDTH, HEIGHT) // 2 # Raio máximo
     pause = True # Varial para ativar os motores
+    last_error = None
     
     # Carrega configurações
     config = Config(Path(__file__).parent / "config.yaml")
@@ -161,10 +125,20 @@ def folowCircle():
                 right = 0
                 left = 0
             else:
-                # Controle dos motores caso tenha um cículo
-                speed_x =  pid_x.controller_P(abs(error_x)) # Usando só o controle proporcional
+                error_x = activation_function(error_x, thers=CIRCLE_THRES)
+
+                if last_error is None:
+                    last_error = error_x
+                else:
+                    error_x = smoothed_error(error_x, last_error, alph=0.3)
+                    last_error = error_x
+
+                error_x = nomalize(error_x, 100)
                 
-                speed_r = (pid_r.controller_P(abs(error_r)) if r <= max_r - 60 else 0)
+                # Controle dos motores caso tenha um cículo
+                speed_x =  pid_x.computer(abs(error_x)) # Usando só o controle proporcional
+                
+                speed_r = (pid_r.computer(abs(error_r)) if r <= max_r - 60 else 0)
                 
                 right = (speed_x + speed_r if error_x < 0 else speed_r)
                 left = (speed_x + speed_r if error_x > 0 else speed_r)
