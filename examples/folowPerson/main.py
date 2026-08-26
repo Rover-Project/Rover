@@ -46,7 +46,7 @@ if __name__ == "__main__":
     
     # Instância do PID para o Eixo Horizontal (X)
     # Satura a saída no intervalo de velocidade do servo [-1.0, 1.0]
-    pid_x = PID(kp=1.2, ki=0.01, kd=0.05, max_integral=0.5, max_dt=0.5)
+    pid_x = PID(kp=1.2, ki=0.01, kd=0.05, max_I=0.5, max_dt=0.5)
 
     last_smoothed_error_x = None
     pause = True
@@ -162,7 +162,7 @@ if __name__ == "__main__":
             norm_error_x = error_x / (WIDTH / 2)
 
             # Cálculo do Sinal PID
-            u_x = pid_x.compute(norm_error_x)
+            u_x = pid_x.computer(norm_error_x)
 
             # controle dos servos
             if not pause:
