@@ -20,7 +20,7 @@ def folowCircle():
     NO_DET_LIMIT = 10  # número máximo de frames sem detecção
     #R_SPEED = 60 # Velocidade de investida para seguir a bola
     #X_SPEED = 40 # Velocidade para controle direcional no eixo X
-    SEARCH_SPEED = 70
+    SEARCH_SPEED = 80
     have_detect = False  # Verifica se já teve alguma detecção
     circleHistory = None  # média acumulada, para suavizar as mudanças de posição do circulo
     counterHistory = 0 # Quantidade de frames acumulados
@@ -60,8 +60,8 @@ def folowCircle():
     # Configura controlador PID para p eixo x
     pid_x = PID(
         kp=0.2,  # constante de normalização para a velociade de controle x
-        ki=0.6, 
-        kd=0.2
+        ki=0.4, 
+        kd=0.6
     )
     
     # Configura controlador PID para o tamanho do raio 
