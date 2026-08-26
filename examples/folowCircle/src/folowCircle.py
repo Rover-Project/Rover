@@ -60,8 +60,8 @@ def folowCircle():
     # Configura controlador PID para p eixo x
     pid_x = PID(
         kp=0.2,  # constante de normalização para a velociade de controle x
-        ki=0.4, 
-        kd=0.4
+        ki=0.6, 
+        kd=0.2
     )
     
     # Configura controlador PID para o tamanho do raio 
