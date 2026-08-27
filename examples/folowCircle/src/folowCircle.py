@@ -108,7 +108,7 @@ def folowCircle():
 
       # Error no eixo X
       raw_error_x = x_center - x 
-      raw_error_x = activation_function(raw_error_x, thers=CIRCLE_THRES)
+      raw_error_x = activation_function(raw_error_x, min_deadzone=CIRCLE_THRES)
 
       if last_error_x is None:
         smoothed_x = raw_error_x
