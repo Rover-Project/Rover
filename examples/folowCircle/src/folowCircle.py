@@ -133,7 +133,7 @@ def folowCircle():
       # Renderização visual no OpenCV
       openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
       openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-      txt = f"ErrX: {raw_error_x:.2f} | ErrR: {error_r:.1f} | L: {left_speed:.0f} R: {right_speed:.0f}"
+      txt = f"ErrX: {norm_error_x:.2f} | ErrR: {error_r:.1f} | L: {left_speed:.0f} R: {right_speed:.0f}"
 
     openCv.putText(
         frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
