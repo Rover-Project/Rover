@@ -109,6 +109,10 @@ def folowCircle():
       # Error no eixo X
       raw_error_x = x - x_center 
       raw_error_x = activation_function(raw_error_x, min_deadzone=CIRCLE_THRES)
+      
+      # o erro não pode esta fora deste intervalo
+      if raw_error_x > (HEIGHT / 2):
+        raw_error_x = last_error_x
 
       if last_error_x is None:
         smoothed_x = raw_error_x
@@ -118,7 +122,7 @@ def folowCircle():
         
       last_error_x = smoothed_x
 
-      norm_error_x = normalize(smoothed_x, (WIDTH / 2))
+      norm_error_x = normalize(smoothed_x, (HEIGHT / 2))
       u_rot = pid_x.computer(norm_error_x)
       
       error_r = TARGET_RADIUS - r
