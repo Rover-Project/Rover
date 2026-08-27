@@ -107,7 +107,7 @@ def folowCircle():
       x, y, r = circleHistory
 
       # Error no eixo X
-      raw_error_x = x_center - x 
+      raw_error_x = x - x_center 
       raw_error_x = activation_function(raw_error_x, min_deadzone=CIRCLE_THRES)
 
       if last_error_x is None:
