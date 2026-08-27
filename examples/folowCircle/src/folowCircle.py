@@ -111,7 +111,7 @@ def folowCircle():
       raw_error_x = activation_function(raw_error_x, deadzone=CIRCLE_THRES)
       
       # o erro não pode esta fora deste intervalo
-      if raw_error_x > (HEIGHT / 2):
+      if raw_error_x > (HEIGHT / 2) and last_error_x is not None:
         raw_error_x = last_error_x
 
       if last_error_x is None:
