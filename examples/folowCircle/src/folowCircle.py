@@ -112,6 +112,7 @@ def folowCircle():
 
       if last_error_x is None:
         smoothed_x = raw_error_x
+        
       else:
         smoothed_x = smooth_signal(raw_error_x, last_error_x, alph=0.3)
         

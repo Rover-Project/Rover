@@ -10,7 +10,6 @@ def activation_function(raw_speed: float, min_deadzone: float) -> float:
   """Aplica o limiar mínimo de acionamento (40 e 30) remapeando a escala 0-100."""
  
   sign = 1.0 if raw_speed > 0 else -1.0 # verifica o sinal do pulso
-  abs_speed = min(100.0, abs(raw_speed)) 
 
   # Mapeia linearmente a saída do PID para iniciar acima do valor de atrito mínimo
   scaled = min_deadzone + (abs_speed / 100.0) * (100.0 - min_deadzone)
