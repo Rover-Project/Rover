@@ -131,8 +131,8 @@ def folowCircle():
       #raw_left = u_dist - u_rot
       #raw_right = u_dist + u_rot
       
-      raw_left = u_dist 
-      raw_right = u_dist 
+      raw_left = -u_rot 
+      raw_right = u_rot
 
       left_speed = activation_deadzone(raw_left, MIN_PW_LEFT)
       right_speed = activation_deadzone(raw_right, MIN_PW_RIGHT)
