@@ -108,7 +108,7 @@ def folowCircle():
 
       # Error no eixo X
       raw_error_x = x - x_center 
-      raw_error_x = activation_function(raw_error_x, min_deadzone=CIRCLE_THRES)
+      raw_error_x = activation_function(raw_error_x, deadzone=CIRCLE_THRES)
       
       # o erro não pode esta fora deste intervalo
       if raw_error_x > (HEIGHT / 2):
