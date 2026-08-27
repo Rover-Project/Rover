@@ -128,8 +128,8 @@ def folowCircle():
       error_r = TARGET_RADIUS - r
       u_dist = pid_r.computer(error_r)
      
-      raw_left = u_dist - u_rot
-      raw_right = u_dist + u_rot
+      #raw_left = u_dist - u_rot
+      #raw_right = u_dist + u_rot
 
       left_speed = activation_deadzone(raw_left, MIN_PW_LEFT)
       right_speed = activation_deadzone(raw_right, MIN_PW_RIGHT)
