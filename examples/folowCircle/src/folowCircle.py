@@ -122,7 +122,7 @@ def folowCircle():
         
       last_error_x = smoothed_x
 
-      norm_error_x = normalize(smoothed_x, (HEIGHT / 2))
+      norm_error_x = normalize(error=smoothed_x, radius=HEIGHT / 2)
       u_rot = pid_x.computer(norm_error_x)
       
       error_r = TARGET_RADIUS - r
