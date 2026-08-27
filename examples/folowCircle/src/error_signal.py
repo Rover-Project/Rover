@@ -1,47 +1,20 @@
-import numpy
+def normalize(error: float, radius: float) -> float:
+  """Normaliza o erro entorno do raio"""
+  return (error / radius)
 
-def activation_function(error: int, thers: int =  25) -> int:
-    """
-    Função de ativação para o error.
-    
-    se o erro estiver contido dentro do intervalo [-thers, thers] retorna o próprio error caso contrário retorna 0
+def smooth_signal(current_error: float, last_error: float, alpha: float) -> float:
+  """Suavização via filtro de passas baixas"""
+  return (alpha * current_error) + ((1.0 - alpha) * last_error)
 
-    Args:
-        error (int): erro observado.
-        thers (int, optional): limiar. Valor padrão 25.
+def activation_function(raw_speed: float, min_deadzone: float) -> float:
+  """Aplica o limiar mínimo de acionamento (40 e 30) remapeando a escala 0-100."""
+ 
+  sign = 1.0 if raw_speed > 0 else -1.0 # verifica o sinal do pulso
+  abs_speed = min(100.0, abs(raw_speed)) 
 
-    Returns:
-        value: retorno da ativação do erro
-    """
-    
-    return (0.0 if  numpy.abs(error) < thers else error)
+  # Mapeia linearmente a saída do PID para iniciar acima do valor de atrito mínimo
+  scaled = min_deadzone + (abs_speed / 100.0) * (100.0 - min_deadzone)
+  return sign * scaled
 
-def nomalize(error: float, size_interval: float) -> float:
-    """
-    Normaliza para o intervalo [0, size_interval]
-
-    Args:
-        error (float): erro de entrada.
-        size_interval (float): intervalo de normalização
-
-    Returns:
-        float: erro normalizado para o intevalo
-    """
-    
-    return error / size_interval
-
-def smoothed_error(error: float, last_error: float, alph: float = 0.3) -> float:
-    """
-    Aplica um filtro de passas baixas no erro
-
-    Args:
-        error (float): _description_
-        last_error (_type_): _description_
-        alph (float, optional): _description_. Defaults to 0.3.
-
-    Returns:
-        float: _description_
-    """
-    
-    return alph * error + (1 - alph) * last_error
-            
+def activation_deadzone(error: float, deadzone: float):
+  return error if abs(error) > deadzone else 0

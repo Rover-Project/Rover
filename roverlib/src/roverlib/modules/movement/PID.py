@@ -1,7 +1,4 @@
-from collections import deque 
 import time
-import matplotlib.pyplot as plt
-
 class PID:
     """
     Classe que implementa um controlador PID gérico para os sensores
@@ -40,7 +37,7 @@ class PID:
             self._last_erro = error 
             return self.kp * error 
         
-        dt = current_time - self._last_erro # calcula a distância dos pontos ao longo do tempo
+        dt = current_time - self._last_time # calcula a distância dos pontos ao longo do tempo
         self._last_time = current_time
         
         # em caso de erro na leitura do tempo
@@ -67,6 +64,7 @@ class PID:
         d_term = 0.0 # termo derivada 
         if use_D and self.kd != 0:
             d_term = (error - self._last_erro) / dt 
+            d_term *= self.kd
         
         self._last_erro = error # atualiza o ultimo erro 
         
