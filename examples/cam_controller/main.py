@@ -5,7 +5,7 @@ import cv2 as openCv
 if __name__ == "__main__":
     FREQUENCY_SERVOS = 50 # Frequencia do PWM
     
-    SPEED = 50 # Velocidade padrao
+    SPEED = 0.3 # Velocidade padrao
     SERVO_V = 1 # Servo vertival 
     SERVO_H = 0 # Servo Horizontal
     
@@ -52,29 +52,35 @@ if __name__ == "__main__":
             elif key == ord("d"):
                 servos.backward(channels=tuple([SERVO_H]), speed=SPEED)
 
-            elif key == "z":
+            elif key == ord("z"):
                 b += 0.1
-                camera.set_brightness(b)
+                camera.set_brightness(min(b, 1))
+                print(b)
             
-            elif key == "x":
+            elif key == ord("x"):
                 b -= 0.1   
-                camera.set_brightness(b)
+                camera.set_brightness(max(b, -1))
+                print(b)
                 
-            elif key == "c":
-                s += 0.1
-                camera.set_saturation(s)
+            elif key == ord("c"):
+                s += 1
+                camera.set_saturation(min(s, 32))
+                print(s)
             
-            elif key == "v":
-                s -= 0.1
-                camera.set_saturation(s)
+            elif key == ord("v"):
+                s -= 1
+                camera.set_saturation(max(s, 0))
+                print(s)
             
-            elif key == "b":
-                c += 0.1
-                camera.set_contrast(c)
+            elif key == ord("b"):
+                c += 1
+                camera.set_contrast(min(c, 32))
+                print(c)
                 
-            elif key == "n":
-                c -= 0.1
-                camera.set_contrast(c)
+            elif key == ord("n"):
+                c -= 1
+                camera.set_contrast(max(c, 0))
+                print(c)
 
             elif key == ord("q"):
                 break
