@@ -19,9 +19,9 @@ def folowCircle():
   CIRCLE_THRES_X = 40  # Tolerância de variação no círculo
   RADIUS_THRES_R = 20
   NO_DET_LIMIT = 10  # Limite de frames sem detecção
-  SEARCH_SPEED = 60  # Velocidade para busca da bola
+  SEARCH_SPEED = 50  # Velocidade para busca da bola
 
-  CIRCLE_THRES = 45 
+  CIRCLE_THRES = 50 
 
   # Raio desejado para a bola 
   TARGET_RADIUS = 150
@@ -154,8 +154,8 @@ def folowCircle():
         raw_left = u_dist - u_rot
         raw_right = u_dist + u_rot
         
-        right_speed = raw_right
-        left_speed = raw_left
+        right_speed = -raw_right
+        left_speed = -raw_left
 
         # Renderização visual no OpenCV
         opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
