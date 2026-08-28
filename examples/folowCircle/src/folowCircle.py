@@ -21,7 +21,7 @@ def folowCircle():
   NO_DET_LIMIT = 10  # Limite de frames sem detecção
   SEARCH_SPEED = 60  # Velocidade para busca da bola
 
-  CIRCLE_THRES = 50 
+  CIRCLE_THRES = 45 
 
   # Raio desejado para a bola 
   TARGET_RADIUS = 150
@@ -58,10 +58,10 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=30.0, ki=20.0, kd=10.0, max_I=30.0)
+  pid_x = PID(kp=20.0, ki=15.0, kd=15.0, max_I=30.0)
 
   # PID para Distância
-  pid_r = PID(kp=20, ki=10, kd=10, max_I=30.0)
+  pid_r = PID(kp=40.0, ki=10, kd=10, max_I=30.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
