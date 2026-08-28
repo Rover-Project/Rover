@@ -183,13 +183,16 @@ def folowCircle():
         if circleHistory is None:
           if not have_detect:
             robot.turn_right(SEARCH_SPEED)
+            print(SEARCH_SPEED)
           elif red_area >= THRES_RED:
             robot.stop()
           else:
             if last_error_x is not None and last_error_x < 0:
               robot.turn_left(SEARCH_SPEED)
+              print(SEARCH_SPEED)
             else:
               robot.turn_right(SEARCH_SPEED)
+              print(SEARCH_SPEED)
         else:
           robot.move(speed_left=left_speed, speed_right=right_speed)
       else:
