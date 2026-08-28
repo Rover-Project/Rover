@@ -88,8 +88,9 @@ if __name__ == "__main__":
             else:
                 servos.stop(channels=tuple([SERVO_V, SERVO_H]))
 
-file = input("Nome do arquivo: ")
 
 camera.cleanup()
-openCv.imwrite(file, frame)
 openCv.destroyAllWindows()
+file = input("Nome do arquivo: ")
+
+openCv.imwrite(file, frame)
