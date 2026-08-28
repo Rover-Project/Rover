@@ -154,7 +154,7 @@ def folowCircle():
         raw_left = u_dist - u_rot
         raw_right = u_dist + u_rot
         
-        right_speed = -raw_right
+        right_speed = raw_right
         left_speed = raw_left
 
         # Renderização visual no OpenCV
