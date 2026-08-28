@@ -40,8 +40,8 @@ def folowCircle():
   # centro da imagem 
   X_CENTER = WIDTH // 2 
 
-  MAX_VALUE_ROT = 60
-  MAX_VALUE_DIST = 40
+  MAX_VALUE_ROT = 40
+  MAX_VALUE_DIST = 60
   
   circleHistory = None # cuidado com unsignedint
   counterHistory = 0
@@ -66,10 +66,10 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=20.0, ki=25.0, kd=5.0, max_I=100.0)
+  pid_x = PID(kp=10, ki=15.0, kd=10.0, max_I=100.0)
 
   # PID para Distância
-  pid_r = PID(kp=25.0, ki=25.0, kd=10, max_I=100.0)
+  pid_r = PID(kp=30, ki=25.0, kd=20, max_I=100.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
