@@ -17,7 +17,7 @@ def folowCircle():
   WIDTH = 640  # Largura da imagem
   THRES_RED = 350_000  # Limite de proximidade para detectar a bola
   CIRCLE_THRES_X = 40  # Tolerância de variação no círculo
-  RADIUS_THRES_R = 50
+  RADIUS_THRES_R = 70
   NO_DET_LIMIT = 10  # Limite de frames sem detecção
   SEARCH_SPEED = 50  # Velocidade para busca da bola
 
