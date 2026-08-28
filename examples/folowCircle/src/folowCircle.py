@@ -160,7 +160,7 @@ def folowCircle():
         # Renderização visual no OpenCV
         opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
         opencv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-        txt = f"PID_R: {norm_error_r} | right: {right_speed:.2f} | left: {left_speed:.2f}"
+        txt = f"PID_R: {u_dist} | right: {right_speed:.2f} | left: {left_speed:.2f}"
 
       opencv.putText(
           frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
@@ -182,13 +182,13 @@ def folowCircle():
       if not pause:
         if circleHistory is None:
           if not have_detect:
-            robot.turn_right(SEARCH_SPEED)
+            robot.turn_left(SEARCH_SPEED)
             print(SEARCH_SPEED)
           elif red_area >= THRES_RED or r == 0:
             robot.stop()
           else:
             if last_error_x is not None and last_error_x < 0:
-              robot.turn_left(SEARCH_SPEED)
+              robot.turn_right(SEARCH_SPEED)
               print(SEARCH_SPEED)
             else:
               robot.turn_right(SEARCH_SPEED)
