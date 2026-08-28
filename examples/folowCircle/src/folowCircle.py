@@ -21,7 +21,7 @@ def folowCircle():
   NO_DET_LIMIT = 10  # Limite de frames sem detecção
   SEARCH_SPEED = 60  # Velocidade para busca da bola
 
-  CIRCLE_THRES = 40 
+  CIRCLE_THRES = 50 
 
   # Raio desejado para a bola 
   TARGET_RADIUS = 150
