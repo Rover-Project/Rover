@@ -8,9 +8,20 @@ from roverlib.modules.processing.processing_image import ProcessingImage
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.camera import Camera
 from roverlib.utils.config_manager import Config
+import time
 
 from .decision import inInterval, voting
 from .error_signal import activation_function, normalize, smooth_signal, activation_deadzone
+
+
+def get_cpu_temp():
+    """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
+    try:
+        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            # O valor vem em miligraus Celsius 
+            return float(f.read().strip()) / 1000.0
+    except Exception:
+        return 0.0
 
 def folowCircle():
   HEIGHT = 640 # Altura da imagem
@@ -54,10 +65,10 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=10.0, ki=20.0, kd=20.0, max_I=30.0)
+  pid_x = PID(kp=10.0, ki=20.0, kd=20.0, max_I=50.0)
 
   # PID para Distância
-  pid_r = PID(kp=40.0, ki=10, kd=10, max_I=30.0)
+  pid_r = PID(kp=20.0, ki=20, kd=20, max_I=30.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
@@ -68,8 +79,8 @@ def folowCircle():
     
     if frame is not None:
       
-      frame = opencv.resize(frame, (HEIGHT, WIDTH))
-
+      start_time = time.time()
+    
       mask = ProcessingImage.color_dual_segmentation(frame)
       hough, _ = VisionModule.houghCircleDetect(mask)
       contour = VisionModule.circleCannyDetect(mask)
@@ -156,7 +167,11 @@ def folowCircle():
         # Renderização visual no OpenCV
         opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
         opencv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-        txt = f"PID_R: {norm_error_r:.2f} | right: {right_speed:.2f} | left: {left_speed:.2f}"
+        
+        temp_cpu = get_cpu_temp()
+        fps = 1.0 / (time.time() - start_time)
+      
+        txt = f"FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C | right: {right_speed:.2f} | left: {left_speed:.2f}"
 
       opencv.putText(
           frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
