@@ -4,7 +4,7 @@ class PID:
     Classe que implementa um controlador PID gérico para os sensores
     """
     
-    def __init__(self, kp:float = 1, ki:float = 1, kd:float = 1, max_I: float = 100, max_dt: float = 0.5):
+    def __init__(self, kp:float = 1, ki:float = 1, kd:float = 1, max_I: float = 20, max_dt: float = 0.5):
         self.kp = kp 
         self.ki = ki 
         self.kd = kd
