@@ -160,7 +160,7 @@ def folowCircle():
         # Renderização visual no OpenCV
         opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
         opencv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-        txt = f"PID_R: {u_dist} | right: {right_speed:.2f} | left: {left_speed:.2f}"
+        txt = f"PID_R: {norm_error_r:.2f} | right: {right_speed:.2f} | left: {left_speed:.2f}"
 
       opencv.putText(
           frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
