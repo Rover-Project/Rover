@@ -184,7 +184,7 @@ def folowCircle():
           if not have_detect:
             robot.turn_right(SEARCH_SPEED)
             print(SEARCH_SPEED)
-          elif red_area >= THRES_RED:
+          elif red_area >= THRES_RED or r == 0:
             robot.stop()
           else:
             if last_error_x is not None and last_error_x < 0:
