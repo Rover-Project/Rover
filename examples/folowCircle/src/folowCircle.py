@@ -226,4 +226,4 @@ def folowCircle():
   picam.cleanup()
   opencv.destroyAllWindows()
   
-  print(f"Tempo de execução: {start_test - end_test}")
+  print(f"Tempo de execução: {end_test - start_test}")
