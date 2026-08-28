@@ -11,7 +11,7 @@ from roverlib.utils.config_manager import Config
 import time
 
 from .decision import inInterval, voting
-from .error_signal import activation_function, normalize, smooth_signal, activation_deadzone
+from .error_signal import activation_function, normalize, smooth_signal
 
 
 def get_cpu_temp():
@@ -42,14 +42,15 @@ def folowCircle():
 
   MAX_VALUE_ROT = 60
   MAX_VALUE_DIST = 40
-
-  have_detect = False
+  
   circleHistory = None # cuidado com unsignedint
   counterHistory = 0
   noDetCounter = 0
   pause = True
   last_error_x = None
   last_error_r = None
+  temp_cpu = None
+  fps = None
 
   # Carrega configurações
   config = Config(Path(__file__).parent / "config.yaml")
@@ -168,8 +169,16 @@ def folowCircle():
         opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
         opencv.circle(frame, (x, y), 3, (0, 0, 255), -1)
         
-        temp_cpu = get_cpu_temp()
-        fps = 1.0 / (time.time() - start_time)
+        if temp_cpu is not None:
+          temp_cpu = (temp_cpu + get_cpu_temp()) / 2
+        else:
+          temp_cpu = get_cpu_temp()
+          
+        if fps is not None:
+          fps = (fps + (1.0 / (time.time() - start_time))) / 2
+        
+        else:
+          fps = 1.0 / (time.time() - start_time) 
       
         txt = f"| FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C |"
 
@@ -181,6 +190,7 @@ def folowCircle():
 
       key = opencv.waitKey(10) & 0xFF
       if key == ord("q"):
+        opencv.imwrite("dados.png", frame)
         break
       elif key == ord("p"):
         pause = True
