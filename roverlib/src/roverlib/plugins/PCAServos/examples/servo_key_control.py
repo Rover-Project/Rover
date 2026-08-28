@@ -1,13 +1,11 @@
 import sys
 import tty
 import termios
-from pathlib import Path
-from roverlib.utils.config_manager import Config
-from roverlib.plugins.PCAServos.pca9685.driver import PCA9685
-from roverlib.plugins.PCAServos.pca9685.servos import ServoManager # ou a classe de servos correspondente do seu driver
+import time
+from roverlib.plugins.PCAServos.pca9685.servos import PCAServos, Servo
 
-# Função auxiliar para ler uma tecla sem precisar pressionar Enter (específico para Linux/Raspberry Pi)
 def get_key():
+    """Lê uma tecla do terminal sem precisar pressionar Enter."""
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -18,72 +16,78 @@ def get_key():
     return ch
 
 def main():
-    # Inicializa o driver PCA9685 (endereço padrão 0x40)
-    pca = PCA9685(bus_num=1, address=0x40)
-    pca.set_pwm_freq(50)  # Frequência padrão para servos (50Hz)
-
-    # Definição dos canais e LIMITES SEGUROS para proteger o cabo flat
-    # Ajuste os canais (ex: canal 0 para Pan, canal 1 para Tilt) conforme a sua montagem
-    PAN_CHANNEL = 0
-    TILT_CHANNEL = 1
-
-    # Limites rígidos em graus para evitar tracionar o cabo flat da câmera
-    PAN_MIN, PAN_MAX = 45, 135     # Centro em 90
-    TILT_MIN, TILT_MAX = 60, 120   # Centro em 90
-
-    # Posições iniciais seguras (Centralizado)
-    pan_angle = 90
-    tilt_angle = 90
-    step = 5
-
-    def apply_angles():
-        # Converte graus para o pulso PWM adequado do PCA9685 e envia para os canais
-        # (Substitua pela chamada exata do seu driver de servos se necessário)
-        pca.set_servo_angle(PAN_CHANNEL, pan_angle)
-        pca.set_servo_angle(TILT_CHANNEL, tilt_angle)
-        print(f"\rPan: {pan_angle}° | Tilt: {tilt_angle}°   ", end="", flush=True)
-
-    print("=== CONTROLE MANUAL DOS SERVOS (W, A, S, D) ===")
-    print("W / S: Move Tilt (Cima / Baixo)")
-    print("A / D: Move Pan  (Esquerda / Direita)")
-    print("Q    : Sair e centralizar com segurança\n")
-
+    # Limites rígidos de segurança para proteger o cabo flat da câmera
+    PAN_MIN, PAN_MAX = 45, 135     # Centro é 90
+    TILT_MIN, TILT_MAX = 60, 120   # Centro é 90
+    STEP = 5                       # Graus por toque
+    
+    print("Inicializando comunicação com PCA9685...")
+    
     try:
-        # Envia para a posição central inicial
-        apply_angles()
-
-        while True:
-            key = get_key().lower()
-
-            if key == 'q':
-                print("\nSaindo...")
-                break
-            elif key == 'w':
-                tilt_angle = min(TILT_MAX, tilt_angle + step)
-            elif key == 's':
-                tilt_angle = max(TILT_MIN, tilt_angle - step)
-            elif key == 'd':
-                pan_angle = min(PAN_MAX, pan_angle + step)
-            elif key == 'a':
-                pan_angle = max(PAN_MIN, pan_angle - step)
-            else:
-                continue
-
-            apply_angles()
-
-    except Exception as e:
-        print(f"\nErro durante a execução: {e}")
-
-    finally:
-        # BLOCO DE SEGURANÇA: Retorna a câmera para o centro (90°) antes de fechar o programa
-        print("\nRetornando para a posição central (90°)...")
+        # Instancia a interface principal usando a sua classe
+        pca = PCAServos(address=0x40, bus=1, frequency=50)
+        
+        # Cria os objetos dos servos (ajuste os canais se a montagem for diferente)
+        pan_servo = Servo(pca, channel=0)
+        tilt_servo = Servo(pca, channel=1)
+        
+        # Centraliza inicialmente
+        pan_servo.center()
+        tilt_servo.center()
+        
         pan_angle = 90
         tilt_angle = 90
+        
+        print("\n=== CONTROLE MANUAL PAN/TILT (CABO FLAT SEGURO) ===")
+        print(" W / S : Tilt (Cima / Baixo)")
+        print(" A / D : Pan  (Esquerda / Direita)")
+        print(" C     : Recentralizar a câmera")
+        print(" Q     : Sair e desativar torque\n")
+        
+        while True:
+            key = get_key().lower()
+            
+            if key == 'q':
+                break
+            elif key == 'c':
+                pan_angle = 90
+                tilt_angle = 90
+            elif key == 'w':
+                # Subtrai ou soma dependendo de como o servo foi montado fisicamente no suporte
+                tilt_angle = max(TILT_MIN, tilt_angle - STEP)
+            elif key == 's':
+                tilt_angle = min(TILT_MAX, tilt_angle + STEP)
+            elif key == 'a':
+                pan_angle = max(PAN_MIN, pan_angle - STEP)
+            elif key == 'd':
+                pan_angle = min(PAN_MAX, pan_angle + STEP)
+            
+            # Aplica o ângulo usando a sua propriedade @angle.setter
+            pan_servo.angle = pan_angle
+            tilt_servo.angle = tilt_angle
+            
+            print(f"\rPosição atual -> Pan: {pan_angle:03d}° | Tilt: {tilt_angle:03d}°   ", end="", flush=True)
+
+    except Exception as e:
+        print(f"\nErro de execução: {e}")
+        
+    finally:
+        print("\n\nEncerrando: centralizando a câmera e cortando o torque para proteger o cabo...")
         try:
-            apply_angles()
-        except:
+            # Retorna para o meio
+            pan_servo.center()
+            tilt_servo.center()
+            time.sleep(0.5) # Aguarda meio segundo para o movimento mecânico terminar
+            
+            # Libera o motor para não forçar o cabo desligado
+            pan_servo.detach()
+            tilt_servo.detach()
+            
+            # Fecha o barramento I2C
+            pca.close()
+        except Exception:
             pass
-        print("Finalizado com segurança.")
+        print("Sistema desligado com segurança.")
 
 if __name__ == "__main__":
     main()
