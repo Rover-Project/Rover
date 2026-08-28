@@ -24,7 +24,7 @@ def folowCircle():
   CIRCLE_THRES = 40 
 
   # Raio desejado para a bola 
-  TARGET_RADIUS = 60.0
+  TARGET_RADIUS = 150
   
   # centro da imagem 
   X_CENTER = WIDTH // 2 
@@ -121,7 +121,7 @@ def folowCircle():
               
         error_x = int(X_CENTER) - int(x) # calculo do erro no eixo X, erro_x pertence [-X_CENTER, X_CENTER]
         
-        error_r = int(r) - int(TARGET_RADIUS) # calcula do erro no em relação a distância
+        error_r = -(int(r) - int(TARGET_RADIUS)) # calcula do erro no em relação a distância
         
         # função de ativação para o erro no eixo X
         raw_error_x = activation_function(error_x, deadzone=CIRCLE_THRES_X) 
