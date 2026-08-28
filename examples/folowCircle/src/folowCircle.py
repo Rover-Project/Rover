@@ -65,7 +65,7 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=20.0, ki=20.0, kd=15.0, max_I=50.0)
+  pid_x = PID(kp=20.0, ki=20.0, kd=20.0, max_I=100.0)
 
   # PID para Distância
   pid_r = PID(kp=20.0, ki=20, kd=20, max_I=30.0)
@@ -171,10 +171,10 @@ def folowCircle():
         temp_cpu = get_cpu_temp()
         fps = 1.0 / (time.time() - start_time)
       
-        txt = f"FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C | right: {right_speed:.2f} | left: {left_speed:.2f}"
+        txt = f"| FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C |"
 
       opencv.putText(
-          frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
+          frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2
       )
       opencv.imshow("Deteccao Final", frame)
       opencv.imshow("Mascara", mask)
