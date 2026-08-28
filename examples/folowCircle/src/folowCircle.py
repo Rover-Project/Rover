@@ -40,8 +40,8 @@ def folowCircle():
   # centro da imagem 
   X_CENTER = WIDTH // 2 
 
-  MAX_VALUE_ROT = 40
-  MAX_VALUE_DIST = 60
+  MAX_VALUE_ROT = 60
+  MAX_VALUE_DIST = 40
   
   circleHistory = None # cuidado com unsignedint
   counterHistory = 0
