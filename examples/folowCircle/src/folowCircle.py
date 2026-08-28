@@ -58,7 +58,7 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=10.0, ki=20.0, kd=20.0, max_I=30.0)
+  pid_x = PID(kp=5.0, ki=30.0, kd=15.0, max_I=30.0)
 
   # PID para Distância
   pid_r = PID(kp=40.0, ki=10, kd=10, max_I=30.0)
