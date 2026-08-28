@@ -29,10 +29,6 @@ def folowCircle():
   # centro da imagem 
   X_CENTER = WIDTH // 2 
 
-  # Limiares de acionamento mínimo
-  MIN_PW_LEFT = 40.0
-  MIN_PW_RIGHT = 30.0
-  
   MAX_VALUE_ROT = 60
   MAX_VALUE_DIST = 40
 
@@ -58,7 +54,7 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=5.0, ki=30.0, kd=15.0, max_I=30.0)
+  pid_x = PID(kp=10.0, ki=20.0, kd=20.0, max_I=30.0)
 
   # PID para Distância
   pid_r = PID(kp=40.0, ki=10, kd=10, max_I=30.0)
@@ -181,7 +177,7 @@ def folowCircle():
       # Controle dos Atuadores
       if not pause:
         if circleHistory is None:
-          if not have_detect:
+          if last_error_x is None:
             robot.turn_left(SEARCH_SPEED)
             print(SEARCH_SPEED)
           elif red_area >= THRES_RED or r == 0:
