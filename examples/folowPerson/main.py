@@ -48,7 +48,7 @@ if __name__ == "__main__":
     input_name = model_session.get_inputs()[0].name
 
     # 2. Inicialização dos Motores DC via Configuração
-    config = Config(Path(__file__).parent / "config.yaml")
+    config = Config(Path(__file__).parent / "src" / "config.yaml")
     motor_config = config.get("gpio")["motor"]
 
     robot = Robot(
