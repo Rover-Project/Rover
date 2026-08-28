@@ -66,10 +66,10 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=20, ki=30.0, kd=20.0, max_I=100.0)
+  pid_x = PID(kp=20, ki=30.0, kd=30.0, max_I=100.0)
 
   # PID para Distância
-  pid_r = PID(kp=20, ki=20.0, kd=20, max_I=100.0)
+  pid_r = PID(kp=10, ki=20.0, kd=20, max_I=100.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
