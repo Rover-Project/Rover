@@ -58,10 +58,10 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=30.0, ki=3, kd=5.0, max_I=30.0)
+  pid_x = PID(kp=30.0, ki=20.0, kd=10.0, max_I=30.0)
 
   # PID para Distância
-  pid_r = PID(kp=1.5, ki=0.05, kd=0.2, max_I=30.0)
+  pid_r = PID(kp=20, ki=10, kd=10, max_I=30.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
@@ -121,7 +121,7 @@ def folowCircle():
               
         error_x = int(X_CENTER) - int(x) # calculo do erro no eixo X, erro_x pertence [-X_CENTER, X_CENTER]
         
-        error_r = int(TARGET_RADIUS) - int(r) # calcula do erro no em relação a distância
+        error_r = int(r) - int(TARGET_RADIUS) # calcula do erro no em relação a distância
         
         # função de ativação para o erro no eixo X
         raw_error_x = activation_function(error_x, deadzone=CIRCLE_THRES_X) 
