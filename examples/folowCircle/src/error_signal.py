@@ -1,4 +1,4 @@
-def normalize(error: float, radius: float) -> float:
+def normalize(error: float, radius: float = 100) -> float:
   """Normaliza o erro entorno do raio"""
   return (error / radius)
 

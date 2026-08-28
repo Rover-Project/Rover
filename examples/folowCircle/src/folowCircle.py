@@ -1,5 +1,5 @@
 from pathlib import Path
-import cv2 as openCv
+import cv2 as opencv
 import numpy
 from roverlib.modules.movement.motorCalibration import Calibration
 from roverlib.modules.movement.PID import PID
@@ -13,27 +13,36 @@ from .decision import inInterval, voting
 from .error_signal import activation_function, normalize, smooth_signal, activation_deadzone
 
 def folowCircle():
-  HEIGHT = 640  # Altura da imagem
+  HEIGHT = 640 # Altura da imagem
   WIDTH = 640  # Largura da imagem
   THRES_RED = 350_000  # Limite de proximidade para detectar a bola
-  CIRCLE_THRES = 40  # Tolerância de variação no círculo
+  CIRCLE_THRES_X = 40  # Tolerância de variação no círculo
+  RADIUS_THRES_R = 20
   NO_DET_LIMIT = 10  # Limite de frames sem detecção
   SEARCH_SPEED = 60  # Velocidade para busca da bola
 
+  CIRCLE_THRES = 40 
+
   # Raio desejado para a bola 
   TARGET_RADIUS = 60.0
+  
+  # centro da imagem 
+  X_CENTER = WIDTH // 2 
 
   # Limiares de acionamento mínimo
   MIN_PW_LEFT = 40.0
   MIN_PW_RIGHT = 30.0
+  
+  MAX_VALUE_ROT = 60
+  MAX_VALUE_DIST = 40
 
   have_detect = False
-  circleHistory = None
+  circleHistory = None # cuidado com unsignedint
   counterHistory = 0
   noDetCounter = 0
-  x_center = WIDTH // 2  # Centro do frame no eixo X
   pause = True
   last_error_x = None
+  last_error_r = None
 
   # Carrega configurações
   config = Config(Path(__file__).parent / "config.yaml")
@@ -49,7 +58,7 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=35.0, ki=0.5, kd=2.0, max_I=20.0)
+  pid_x = PID(kp=30.0, ki=3, kd=5.0, max_I=30.0)
 
   # PID para Distância
   pid_r = PID(kp=1.5, ki=0.05, kd=0.2, max_I=30.0)
@@ -60,121 +69,132 @@ def folowCircle():
 
   while True:
     frame = picam.get_frame()
-
-    mask = ProcessingImage.color_dual_segmentation(frame)
-    hough, _ = VisionModule.houghCircleDetect(mask)
-    contour = VisionModule.circleCannyDetect(mask)
-
-    hough = numpy.array(hough) if hough is not None else None
-    contour = numpy.array(contour) if contour is not None else None
-
-    if hough is not None and contour is not None:
-      det = voting(hough, contour)
+    
+    if frame is not None:
       
-    elif hough is not None:
-      det = hough
-      
-    else:
-      det = contour
+      frame = opencv.resize(frame, (HEIGHT, WIDTH))
 
-    if det is not None:
-      noDetCounter = 0
-      have_detect = True
+      mask = ProcessingImage.color_dual_segmentation(frame)
+      hough, _ = VisionModule.houghCircleDetect(mask)
+      contour = VisionModule.circleCannyDetect(mask)
 
-      if circleHistory is None or not inInterval(
-          det, circleHistory, CIRCLE_THRES
-      ):
-        circleHistory = det.copy()
-        counterHistory = 1
-      else:
-        circleHistory = (det + circleHistory) // 2
-        counterHistory += 1
-    else:
-      noDetCounter += 1
-      if noDetCounter >= NO_DET_LIMIT:
-        circleHistory = None
-        counterHistory = 0
+      hough = numpy.array(hough) if hough is not None else None
+      contour = numpy.array(contour) if contour is not None else None
+
+      if hough is not None and contour is not None:
+        det = voting(hough, contour)
         
-        pid_x.reset()
-        pid_r.reset()
-        last_error_x = None
-
-    txt = "Nenhum circulo detectado"
-    left_speed = 0.0
-    right_speed = 0.0
-
-    if circleHistory is not None:
-      x, y, r = circleHistory
-
-      # Error no eixo X
-      raw_error_x = x - x_center 
-      raw_error_x = activation_function(raw_error_x, deadzone=CIRCLE_THRES)
-      
-      # o erro não pode esta fora deste intervalo
-      if raw_error_x > (HEIGHT / 2) and last_error_x is not None:
-        raw_error_x = last_error_x
-
-      if last_error_x is None:
-        smoothed_x = raw_error_x
+      elif hough is not None:
+        det = hough
         
       else:
-        smoothed_x = smooth_signal(raw_error_x, last_error_x, alph=0.3)
-        
-      last_error_x = smoothed_x
+        det = contour
 
-      norm_error_x = normalize(error=smoothed_x, radius=HEIGHT / 2)
-      u_rot = pid_x.computer(norm_error_x)
-      
-      error_r = TARGET_RADIUS - r
-      u_dist = pid_r.computer(error_r)
-     
-      #raw_left = u_dist - u_rot
-      #raw_right = u_dist + u_rot
-      
-      raw_left = -u_rot 
-      raw_right = u_rot
+      if det is not None:
+        noDetCounter = 0
+        have_detect = True
 
-      left_speed = activation_deadzone(raw_left, MIN_PW_LEFT)
-      right_speed = activation_deadzone(raw_right, MIN_PW_RIGHT)
-
-      # Renderização visual no OpenCV
-      openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
-      openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)
-      txt = f"ErrX: {norm_error_x:.2f} | ErrR: {error_r:.1f} | L: {left_speed:.0f} R: {right_speed:.0f}"
-
-    openCv.putText(
-        frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
-    )
-    openCv.imshow("Deteccao Final", frame)
-    openCv.imshow("Mascara", mask)
-
-    key = openCv.waitKey(10) & 0xFF
-    if key == ord("q"):
-      break
-    elif key == ord("p"):
-      pause = True
-    elif key == ord("c"):
-      pause = False
-
-    red_area = openCv.countNonZero(mask)
-
-    # Controle dos Atuadores
-    if not pause:
-      if circleHistory is None:
-        if not have_detect:
-          robot.turn_right(SEARCH_SPEED)
-        elif red_area >= THRES_RED:
-          robot.stop()
+        if circleHistory is None or not inInterval(
+            det, circleHistory, CIRCLE_THRES
+        ):
+          circleHistory = det.copy()
+          counterHistory = 1
         else:
-          if last_error_x is not None and last_error_x < 0:
-            robot.turn_left(SEARCH_SPEED)
-          else:
-            robot.turn_right(SEARCH_SPEED)
+          circleHistory = (det + circleHistory) // 2
+          counterHistory += 1
       else:
-        robot.move(speed_left=left_speed, speed_right=right_speed)
-    else:
-      robot.stop()
+        noDetCounter += 1
+        if noDetCounter >= NO_DET_LIMIT:
+          circleHistory = None
+          counterHistory = 0
+          
+          pid_x.reset()
+          pid_r.reset()
+          last_error_x = None
+
+      txt = "Nenhum circulo detectado"
+      left_speed = 0.0
+      right_speed = 0.0
+
+      if circleHistory is not None:
+        x, y, r = circleHistory
+              
+        error_x = int(X_CENTER) - int(x) # calculo do erro no eixo X, erro_x pertence [-X_CENTER, X_CENTER]
+        
+        error_r = int(TARGET_RADIUS) - int(r) # calcula do erro no em relação a distância
+        
+        # função de ativação para o erro no eixo X
+        raw_error_x = activation_function(error_x, deadzone=CIRCLE_THRES_X) 
+        raw_error_r = activation_function(error_r, deadzone=RADIUS_THRES_R)  
+          
+        # suaviza o erro com filtro passas baixas
+        if last_error_x is None:
+          smoothed_x = raw_error_x
+        else:
+          smoothed_x = smooth_signal(raw_error_x, last_error_x, alph=0.3) 
+          
+        # suaviza o erro com filtro passas baixas
+        if last_error_r is None:
+          smoothed_r = raw_error_r
+        else:
+          smoothed_r = smooth_signal(raw_error_r, last_error_r, alph=0.3) 
+      
+        last_error_x = smoothed_x
+        last_error_r = smoothed_r
+
+        # normaliza o erro para o intervalo [-1, 1]
+        norm_error_x = normalize(error=smoothed_x, radius=WIDTH//2)
+        norm_error_r = normalize(error=smoothed_r, radius=240)
+        
+        # cácula os valores PID para x e r
+        u_rot = min(pid_x.computer(norm_error_x), MAX_VALUE_ROT)
+        u_dist = min(pid_r.computer(norm_error_r), MAX_VALUE_DIST)
+      
+        # velocidades diferenciais 
+        raw_left = u_dist - u_rot
+        raw_right = u_dist + u_rot
+        
+        right_speed = raw_right
+        left_speed = raw_left
+
+        # Renderização visual no OpenCV
+        opencv.circle(frame, (x, y), r, (0, 255, 0), 3)
+        opencv.circle(frame, (x, y), 3, (0, 0, 255), -1)
+        txt = f"ErrX: {norm_error_x:.2f} | PID_R: {u_dist:.2f} | right: {right_speed:.2f} | left: {left_speed:.2f} | R: {r}"
+
+      opencv.putText(
+          frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
+      )
+      opencv.imshow("Deteccao Final", frame)
+      opencv.imshow("Mascara", mask)
+
+      key = opencv.waitKey(10) & 0xFF
+      if key == ord("q"):
+        break
+      elif key == ord("p"):
+        pause = True
+      elif key == ord("c"):
+        pause = False
+
+      red_area = opencv.countNonZero(mask)
+
+      # Controle dos Atuadores
+      if not pause:
+        if circleHistory is None:
+          if not have_detect:
+            robot.turn_right(SEARCH_SPEED)
+          elif red_area >= THRES_RED:
+            robot.stop()
+          else:
+            if last_error_x is not None and last_error_x < 0:
+              robot.turn_left(SEARCH_SPEED)
+            else:
+              robot.turn_right(SEARCH_SPEED)
+        else:
+          robot.move(speed_left=left_speed, speed_right=right_speed)
+      else:
+        robot.stop()
 
   robot.cleanup()
   picam.cleanup()
-  openCv.destroyAllWindows()
+  opencv.destroyAllWindows()
