@@ -24,7 +24,7 @@ def folowCircle():
   CIRCLE_THRES = 50 
 
   # Raio desejado para a bola 
-  TARGET_RADIUS = 100
+  TARGET_RADIUS = 70
   
   # centro da imagem 
   X_CENTER = WIDTH // 2 
