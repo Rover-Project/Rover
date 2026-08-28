@@ -66,14 +66,16 @@ def folowCircle():
   )
 
   # PID para Rotação 
-  pid_x = PID(kp=20.0, ki=20.0, kd=20.0, max_I=100.0)
+  pid_x = PID(kp=20.0, ki=25.0, kd=5.0, max_I=100.0)
 
   # PID para Distância
-  pid_r = PID(kp=20.0, ki=20, kd=20, max_I=30.0)
+  pid_r = PID(kp=25.0, ki=25.0, kd=10, max_I=100.0)
 
   # Câmera
   picam = Camera(HEIGHT, WIDTH)
   picam.start()
+
+  start_test = time.time()
 
   while True:
     frame = picam.get_frame()
@@ -183,7 +185,7 @@ def folowCircle():
         txt = f"| FPS: {fps:.1f} | Temp: {temp_cpu:.1f}C |"
 
       opencv.putText(
-          frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2
+          frame, txt, (10, 35), opencv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2
       )
       opencv.imshow("Deteccao Final", frame)
       opencv.imshow("Mascara", mask)
@@ -191,6 +193,7 @@ def folowCircle():
       key = opencv.waitKey(10) & 0xFF
       if key == ord("q"):
         opencv.imwrite("dados.png", frame)
+        end_test = time.time()
         break
       elif key == ord("p"):
         pause = True
@@ -222,3 +225,5 @@ def folowCircle():
   robot.cleanup()
   picam.cleanup()
   opencv.destroyAllWindows()
+  
+  print(f"Tempo de execução: {start_test - end_test}")
