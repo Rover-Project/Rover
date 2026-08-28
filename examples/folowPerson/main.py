@@ -72,6 +72,9 @@ if __name__ == "__main__":
                 start_time = time.time()
                 HEIGHT, WIDTH = frame.shape[:2]
                 x_center_img = WIDTH // 2
+                
+                norm_error_x = 0.0
+                u_x = 0
 
                 # Redimensiona para 320x320 e converte BGR para RGB
                 img = opencv.resize(frame, (IMAGE_SIZE, IMAGE_SIZE), opencv.INTER_CUBIC)
