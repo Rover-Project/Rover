@@ -144,7 +144,7 @@ def folowCircle():
 
         # normaliza o erro para o intervalo [-1, 1]
         norm_error_x = normalize(error=smoothed_x, radius=WIDTH//2)
-        norm_error_r = normalize(error=smoothed_r, radius=240)
+        norm_error_r = normalize(error=smoothed_r, radius=200)
         
         # cácula os valores PID para x e r
         u_rot = min(pid_x.computer(norm_error_x), MAX_VALUE_ROT)
