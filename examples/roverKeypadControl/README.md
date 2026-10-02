@@ -7,7 +7,10 @@ roverKeypadControl/
 │
 ├── config.yaml
 ├── main.py
-└── README.md
+├── README.md
+└── src/
+    ├── __init__.py
+    └── keypad_controller.py
 ```
 
 ## config.yaml

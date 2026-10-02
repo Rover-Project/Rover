@@ -64,7 +64,7 @@ que fornece:
 # Fluxo Geral do sistema 
 O fluxo principal da aplicação é:
 ```bash
-Captura do frame
+Captura dos frames
         ↓
 Segmentação por cor
         ↓
@@ -80,7 +80,7 @@ Desenho da detecção no frame
         ↓
 Controlador PID
         ↓
-Ativação do motores 
+Ativação dos motores 
 ```
 
 # Como usar 

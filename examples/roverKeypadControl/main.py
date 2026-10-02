@@ -1,73 +1,17 @@
-from roverlib.modules.movement.robot import Robot
-from roverlib.plugins.camera.autoFocus import AfCamera
-from roverlib.utils.config_manager import Config
 from pathlib import Path
-import cv2 as openCv
+from src.keypad_controller import KeypadController
+
+def main():
+    config_path = Path(__file__).parent / "config.yaml"
+    controller = KeypadController(config_path)
+
+    try:
+        controller.run()
+    except KeyboardInterrupt:
+        print("\nExecução interrompida via terminal.")
+    finally:
+        # Garante que os pinos GPIO e a câmera sejam liberados
+        controller.cleanup()
 
 if __name__ == "__main__":
-    HEIGHT = 640
-    WIDTH = 640
-    
-    # Carrega configuração da gpio
-    config = Config(Path(__file__).parent / "config.yaml")
-    
-    pins_motors = config.get("gpio")["motor"]
-    letf = pins_motors["left"]
-    right = pins_motors["right"]
-    
-    # Inicia motores
-    robot = Robot(left=letf, right=right)
-    speed = 50 # Velocidade inicial
-    
-    try:
-        camera = AfCamera(HEIGHT, WIDTH)
-        camera.start()
-
-    except:
-        raise RuntimeError("Erro ao abrir câmera")
-    
-    while True:
-        frame = camera.get_frame()
-        
-        if frame is not None:
-        
-            speed = max(0, min(speed, 100))        
-            
-            openCv.imshow("Rover", frame)
-            
-            key = openCv.waitKey(10) & 0xFF # Espera resposta do teclado
-            
-            if key == ord("w"):
-                robot.forward(speed)
-                pass
-            
-            elif key == ord("a"):
-                robot.turn_left(speed)
-                pass
-            
-            elif key == ord("d"):
-                robot.turn_right(speed)
-                pass
-            
-            elif key == ord("s"):
-                robot.backward(speed)
-                pass
-                
-            elif key == ord("e"):
-                speed = max(0, min(speed + 10, 100))
-            
-            elif key == ord("r"):
-                speed = max(0, min(speed - 10, 100))
-            
-            elif key == ord("q"):
-                break
-        
-            else:
-                pass
-                robot.stop()
-            
-            print(speed)
-    
-    robot.cleanup()
-    camera.cleanup()
-    openCv.destroyAllWindows()
+    main()
