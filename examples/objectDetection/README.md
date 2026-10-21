@@ -82,3 +82,16 @@ Com a câmera devidamente conectada a Rasp, partindo da raiz do projeto, execute
 ```bash
 python -m examples.objectDetection.main
 ```
+
+## ESTRUTURA
+```bash
+objectDetection/
+│
+├── config.yaml
+├── main.py
+├── README.md
+├── yolov8n.pt
+└── src/
+    ├── __init__.py
+    ├── decision.py
+    └── detector.py

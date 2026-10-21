@@ -1,13 +1,16 @@
 # SlideFocus
 Sistema de ajuste de forma manual utilizando o teclado.
 
-# Estrutura 
+# Estrutura
 ```bash
 slideFocus/
 │
 ├── config.yaml
 ├── main.py
-└── README.md
+├── README.md
+└── src/
+    ├── __init__.py
+    └── focus_controller.py
 ```
 
 ## config.yaml
