@@ -1,9 +1,10 @@
-from roverlib.modules.movement.PID import PID # type: ignore
-from roverlib.modules.movement.robot import Robot # type: ignore
-from roverlib.modules.movement.motorCalibration import Calibration # type: ignore
-from roverlib.utils.config_manager import Config # type: ignore
+from roverlib.modules.movement.PID import PID
+from roverlib.modules.movement.robot import Robot 
+from roverlib.modules.movement.motorCalibration import Calibration 
+from roverlib.utils.config_manager import Config 
 import time
 from pathlib import Path
+
 
 class decision:
     def __init__(self):

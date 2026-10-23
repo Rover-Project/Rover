@@ -12,9 +12,9 @@ circleDetect/
 ├── config.yaml
 ├── main.py
 ├── README.md
-│
 └── src/
-   └── circleDetect.py
+    ├── __init__.py
+    └── detector.py
 
 ```
 
