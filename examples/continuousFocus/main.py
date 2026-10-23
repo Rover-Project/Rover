@@ -1,27 +1,16 @@
-from roverlib.plugins.camera.autoFocus import AfCamera
-import cv2 as openCV
+from pathlib import Path
+from src.focus_app import ContinuousFocusApp
+
+def main():
+    config_path = Path(__file__).parent / "config.yaml"
+    app = ContinuousFocusApp(config_path)
+
+    try:
+        app.run()
+    except KeyboardInterrupt:
+        print("\nExecução interrompida via terminal.")
+    finally:
+        app.cleanup()
 
 if __name__ == "__main__":
-    
-    camera = AfCamera(height=1080, width=1080, verticalFlip=True)
-    camera.start()
-    
-    while True:
-        
-        frame = camera.get_frame()
-        
-        if frame is not None:
-            openCV.imshow("Frame", frame)
-
-        key = openCV.waitKey(10) & 0xFF
-        
-        if key == ord("q"):
-            break
-        
-        elif key == ord("s"):
-            openCV.imwrite('foto.jpeg', frame)
-            break
-         
-
-    camera.cleanup()
-    openCV.destroyAllWindows()
+    main()
