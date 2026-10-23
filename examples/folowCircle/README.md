@@ -4,14 +4,15 @@ Sistema que usa os frames capturados pela câmera para detectar e seguir uma bol
 
 # Estrutura 
 ```bash
-circleDetect/
+folowCircle/
 │
 ├── config.yaml
 ├── main.py
 ├── README.md
 │
 └── src/
-   └── circleDetect.py
+    ├── __init__.py
+    └── follower.py
 
 ```
 
