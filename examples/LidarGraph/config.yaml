@@ -1,6 +1,0 @@
-lidar:
-  port: "/dev/serial0"
-  baudrate: 115200
-graph:
-  max_points: 50
-  interval_ms: 30
