@@ -1,0 +1,7 @@
+camera:
+  resolution:
+    h: 1080
+    w: 1080
+  brigh: 0.25
+  contrast: 1
+  saturation: 1
