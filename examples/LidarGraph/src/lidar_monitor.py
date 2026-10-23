@@ -13,7 +13,6 @@ class LidarMonitorApp:
         self.max_points = graph_config["max_points"]
         self.interval_ms = graph_config["interval_ms"]
         
-        # Estruturas de dados (substituindo as variáveis globais)
         self.x_data = []
         self.dist_data = []
         self.strength_data = []
@@ -87,7 +86,6 @@ class LidarMonitorApp:
 
     def run(self):
         print("Iniciando monitoramento. Feche a janela do gráfico para encerrar.")
-        # É essencial atribuir FuncAnimation a uma variável da classe (self.ani) para que não seja destruída pelo Python
         self.ani = FuncAnimation(
             self.fig, 
             self._update_graph, 
