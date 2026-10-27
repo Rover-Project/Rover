@@ -30,12 +30,18 @@ dependencies = [
   "numpy",
   "opencv-python",
   "click",
-  "PyYAML"
+  "PyYAML",
+  "matplotlib",
+  "gpiozero",
+  "adafruit-blinka",
+  "adafruit-circuitpython-pca9685",
+  "adafruit-circuitpython-motor"
 ]
 
 [project.optional-dependencies]
 cli = ["click"]
 dev = ["pytest", "black", "ruff"]
+ai = ["ultralytics", "mediapipe"]
 
 [project.scripts]
 rover = "roverlib.cli.main:cli"
