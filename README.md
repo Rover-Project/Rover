@@ -229,13 +229,30 @@ main(h=680, w=480, minDist=40, minRadius=10, maxRadius=120)
 ## Dependências
 
 
-Instale os essenciais acessando o arquivo `pyproject.toml`:
-```
-numpy             # Álgebra linear
-opencv-python     # Visão computacional (Hough, Canny, etc.)
-click             # Para a CLI "rover"
-PyYAML            # Carregamento de configuração
-```
+As bibliotecas abaixo cobrem o funcionamento base da `roverlib`, bem como os plugins de visão avançada e controle de hardware. Você pode instalar as dependências principais através do `pyproject.toml`.
+
+**Bibliotecas Essenciais e de Processamento:**
+- `numpy`: Álgebra linear e operações matriciais.
+- `opencv-python`: Visão computacional clássica (Hough, Canny, processamento de vídeo).
+- `PyYAML`: Carregamento e leitura dos arquivos `config.yaml`.
+- `click`: Responsável pela interface de linha de comando (CLI) `rover`.
+- `matplotlib`: Renderização de gráficos de sensores em tempo real (ex: `lidarGraph`).
+
+**Dependências de Hardware e Eletrônica (Raspberry Pi):**
+- `gpiozero`: Controle de motores DC e sinais GPIO nativos.
+- `adafruit-blinka`: Camada de compatibilidade da Adafruit para usar I2C, SPI e GPIO no Linux.
+- `adafruit-circuitpython-pca9685`: Driver de comunicação com o módulo PCA9685.
+- `adafruit-circuitpython-motor`: Utilizado em conjunto com o PCA9685 para servos e motores.
+- *Nota: Módulos como `picamera2` ou `rpi-gpio` são geralmente gerenciados via `apt` diretamente no Raspberry Pi OS.*
+
+**Visão Avançada e Inteligência Artificial (Opcionais):**
+- `ultralytics`: Framework do modelo YOLOv8 para detecção de objetos e prevenção de colisão.
+- `mediapipe`: Soluções do Google para rastreamento topológico e segmentação.
+
+**Desenvolvimento e Documentação:**
+- `mkdocs-material`: Para compilar a documentação localmente (`mkdocs serve`).
+- `pytest`, `black`, `ruff`: Ferramentas de formatação e testes (`pip install -e .[dev]`).
+
 
 **Dependências de Hardware (RPi):**
 - `rpi.gpio`, `gpiozero`, `picamera2`
