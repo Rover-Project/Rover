@@ -39,45 +39,6 @@ roverlib/plugins/camera/
 
 ## Arquitetura
 
-```mermaid
-classDiagram
-    class CameraInterface {
-        <<abstract>>
-        +get_frame()
-        +start()
-        +stop()
-        +cleanup()
-    }
-    class Camera {
-        +picam2: Picamera2
-        +size: tuple
-        +fps: int
-        +format: CameraFormat
-        +region_interest: tuple
-        +set_exposure() / enable_exposure()
-        +set_brightness() / set_contrast() / set_saturation()
-        +set_FPS() / set_format()
-        +set_region_interest() / clear_region_interest()
-        +get_frame_time() / get_picture() / get_video()
-        +metadata() / isRunning()
-    }
-    class AfCamera {
-        +afMode: AfModeEnum
-        +afSpeed: AfSpeedEnum
-        +set_afMode() / set_afSpeed()
-        +set_focus_position()
-        +lock_focus() / unlock_focus()
-        +autofocus_cycle() / stop_autofocus_cycle()
-        +focus_time()
-    }
-    class Webcam {
-        +camera: cv2.VideoCapture
-    }
-    CameraInterface <|-- Camera
-    CameraInterface <|-- Webcam
-    Camera <|-- AfCamera
-```
-
 | Classe | Arquivo | Uso |
 |--------|---------|-----|
 | `CameraInterface` | `cameraInterface.py` | Classe base abstrata (`ABC`). Define os métodos obrigatórios `get_frame`, `start`, `stop` e `cleanup` |
