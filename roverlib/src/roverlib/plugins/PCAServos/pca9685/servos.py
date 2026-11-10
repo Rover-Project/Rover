@@ -82,7 +82,9 @@ class Servo:
 
     @angle.setter
     def angle(self, degrees: float) -> None:
-        degrees = max(0.0, min(180.0, float(degrees)))
+        degrees = float(degrees)
+        if not (0.0 <= degrees <= 180.0):
+            raise ValueError(f"Ângulo inválido: {degrees}. O valor deve estar entre 0.0 e 180.0 graus para proteger o motor.")
         self._adafruit_servo.angle = degrees
 
     def detach(self) -> None:
