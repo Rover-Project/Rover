@@ -15,7 +15,7 @@ def new(name: str):
             f"Diretório '{name}' já existe."
         )
 
-    template = resources.files("roverlib.templates").joinpath("project")
+    template = resources.files("roverlib.cli.templates").joinpath("project")
     shutil.copytree(template, target) # type: ignore
 
     click.echo(f"Projeto '{name}' criado com sucesso!")
