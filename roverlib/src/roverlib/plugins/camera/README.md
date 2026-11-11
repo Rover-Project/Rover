@@ -19,8 +19,7 @@ Todas as câmeras seguem a mesma interface (`CameraInterface`), então um códig
   - [Webcam](#webcam)
   - [Exceções](#exceções)
 - [Exemplos](#exemplos)
-- [Formato dos frames](#formato-dos-frames)
-- [Limitações conhecidas](#limitações-conhecidas)
+
 
 ---
 
