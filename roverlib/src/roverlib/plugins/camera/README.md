@@ -325,22 +325,4 @@ cam.unlock_focus()
 cam.cleanup()
 ```
 
----
 
-## Formato dos frames
-
-Com `format=None` (padrão), `Camera.get_frame()` já retorna os pixels na ordem **BGR**. O formato `"RGB888"` do Picamera2 armazena os bytes como B, G, R, que é exatamente o que o OpenCV espera. A `Webcam` também retorna BGR. Portanto, nos dois casos o frame pode ir direto para `cv2.imshow`, `cv2.cvtColor(..., cv2.COLOR_BGR2GRAY)` etc., cumprindo o contrato da `CameraInterface`.
-
-O enum `CameraFormat` (`BGR`, `Gray`, `HSV`) define uma conversão extra no `get_frame`, mas veja a limitação abaixo antes de usá-lo.
-
----
-
-## Limitações conhecidas
-
-- **`format` não tem efeito:** em `Camera.get_frame`, o retorno de `cv2.cvtColor` não é atribuído ao frame, então a conversão é descartada. Além disso, os valores do enum partem de RGB (`COLOR_RGB2...`), mas o frame já chega em BGR. Ao corrigir, use `frame = cv2.cvtColor(frame, self.format)` e troque os códigos para `COLOR_BGR2GRAY` e `COLOR_BGR2HSV` (e remova o `BGR`, ou faça dele uma conversão nula). Até lá, faça a conversão no seu próprio código.
-- **`autofocus.py` não importa sem libcamera:** os enums usam `controls.AfModeEnum` na definição da classe, o que gera `NameError` no PC antes da checagem `availableLibcamera`. Não importe esse módulo em ambientes sem libcamera.
-- **Docstring de `set_focus_position`:** indica o intervalo `[0, 1]`, mas o valor é em dioptrias e o código só rejeita negativos.
-- **Docstring de `stop_autofocus_cycle`:** diz que volta ao foco contínuo, mas o método apenas cancela o ciclo e permanece no modo `Auto`.
-- **`get_video`:** inicia um preview `QTGL` (exige ambiente gráfico) e não o encerra ao final da gravação.
-- **`Webcam`:** sempre abre o dispositivo `0` e não verifica se a abertura deu certo.
-- **`CameraInterface`:** os métodos abstratos são declarados sem o parâmetro `self`. Não afeta as subclasses atuais, mas o correto é `def get_frame(self): ...`.
