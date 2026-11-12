@@ -3,19 +3,39 @@ Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
 
-from roverlib.plugins.motor.motorDriver import MotorDriver
-from .motorCalibration import Calibration
+import os
 import time
+
+from roverlib.plugins.motor import motorDriver
+from roverlib.plugins.motor.motorDriver import MotorDriver
+from roverlib.plugins.motor.vitualMotor import VirtualMotor
+from .motorCalibration import Calibration
+
+# Variável de ambiente para forçar a simulação (ex.: testar na Raspberry sem mover as rodas)
+SIMULATE_ENV = "ROVER_SIMULATE"
+
+
+def _env_simulate() -> bool:
+    return os.environ.get(SIMULATE_ENV, "").strip().lower() in ("1", "true", "yes", "sim")
+
 
 class Robot:
     """
     Comandos básicos de movimento do Rover.
     Fornece métodos intuitivos para controlar o movimento.
+
+    Fora da Raspberry Pi (ou com simulate=True / ROVER_SIMULATE=1) os motores
+    são simulados: os comandos são exibidos no terminal e nada é enviado à GPIO.
     """
-    
 
-    def __init__(self, right:tuple[int, int], left: tuple[int, int], calibration: Calibration=Calibration(1, 1), pwm_frequency: int = 1000):
-
+    def __init__(
+        self,
+        right: tuple[int, int],
+        left: tuple[int, int],
+        calibration: Calibration = None,
+        pwm_frequency: int = 1000,
+        simulate: bool = None,
+    ):
         """
         Inicia os drivers para os motores.
         Args:
@@ -23,18 +43,44 @@ class Robot:
             right (tuple[int, int]): Pinos da GPIO conectados a ponte-H para o motor da direita.
             calibration (Calibration): Calibração para os motores. Por padrão Calibration(1, 1)
             pwm_frequency (int, optional): Frequência do sinal PWM em Hz(padrão: 1000Hz). Por padrão 1000.
+            simulate (bool, optional):
+                None (padrão) -> usa os motores reais se a GPIO estiver disponível; senão, simula.
+                True -> sempre simula.
+                False -> exige os motores reais (erro se a GPIO não estiver disponível).
         """
-        
-        # Crias instâncias para controlas os motores
-        self.left_motor = MotorDriver(left, pwm_frequency)
-        self.right_motor = MotorDriver(right, pwm_frequency)
 
-        self.calibration = calibration 
-        
+        if simulate is None:
+            simulate = _env_simulate() or not motorDriver.PIN_AVAILABLE
+            if not motorDriver.PIN_AVAILABLE and not _env_simulate():
+                print(
+                    "AVISO: GPIO (plugin pin) não disponível. "
+                    "Usando motores simulados. Use Robot(..., simulate=False) para exigir o hardware."
+                )
+
+        self.simulated = simulate
+
+        # Crias instâncias para controlas os motores
+        if simulate:
+            self.left_motor = VirtualMotor(left, "esquerdo", pwm_frequency)
+            self.right_motor = VirtualMotor(right, "direito", pwm_frequency)
+        else:
+            self.left_motor = MotorDriver(left, pwm_frequency)
+            self.right_motor = MotorDriver(right, pwm_frequency)
+
+        # Cada robô tem a sua própria calibração (evita compartilhar o objeto padrão)
+        self.calibration = calibration if calibration is not None else Calibration(1, 1)
+
         # Inicias os motores
         self.left_motor.initialize()
         self.right_motor.initialize()
-    
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.cleanup()
+        return False
+
     def forward(self, speed=50, duration=None):
         """
         Move o Rover para frente.

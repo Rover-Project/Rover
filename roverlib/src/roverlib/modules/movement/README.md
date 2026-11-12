@@ -82,13 +82,25 @@ A calibração é salva em `motor_calibration.json`:
 }
 ```
 
-## 🧪 Testes
+## 🖥️ Modo simulação
 
-Execute os testes com:
-```bash
-python3 tests/test_movement.py --test all
-python3 tests/test_movement.py --calibrate
+Sem Raspberry Pi (ou sem o plugin `pin` compilado), o `Robot` usa automaticamente motores simulados (`VirtualMotor`): os comandos aparecem no terminal e nada é enviado à GPIO.
+
+```python
+from roverlib.modules.movement.robot import Robot
+
+with Robot(right=(17, 27), left=(22, 23)) as robot:   # simula no PC, real na RPi
+    robot.forward(50, duration=2)
+    print(robot.simulated)
 ```
 
-Veja `tests/INSTRUCOES_TESTE.md` para detalhes completos.
+- `Robot(..., simulate=True)`: sempre simula.
+- `Robot(..., simulate=False)`: exige o hardware (erro se a GPIO não estiver disponível).
+- `ROVER_SIMULATE=1 python main.py`: força a simulação sem alterar o código (útil para testar na RPi sem mover as rodas).
 
+## 🧪 Testes
+
+Na pasta `roverlib/`:
+```bash
+python -m pytest src/roverlib/modules/movement/tests
+```

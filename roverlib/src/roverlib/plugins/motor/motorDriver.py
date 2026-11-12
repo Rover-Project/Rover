@@ -10,8 +10,9 @@ try:
     from roverlib.plugins.pin.pin import Pin, PinMode
     PIN_AVAILABLE = True
 except (ImportError, ModuleNotFoundError):
+    # Sem o plugin pin (ex.: PC ou versão de Python sem o .so compilado).
+    # O Robot usa esse indicador para cair automaticamente no VirtualMotor.
     PIN_AVAILABLE = False
-    print("AVISO: plugin pin não detectado. Este módulo requer Raspberry Pi com o plugin compilado.")
 
 
 class MotorDriver(MotorInterface):

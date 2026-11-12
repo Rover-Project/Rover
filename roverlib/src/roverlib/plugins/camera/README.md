@@ -63,7 +63,7 @@ roverlib/plugins/camera/
 - `opencv-python`
 - Uma webcam reconhecida como dispositivo `0`
 
-Se `picamera2` ou `libcamera` não estiverem disponíveis, o construtor de `Camera` lança `ModuleNotFoundError`. Isso permite implementar um fallback para `Webcam` (veja [Exemplos](#escolhendo-a-câmera-automaticamente)).
+Se `picamera2` ou `libcamera` não estiverem disponíveis, o construtor de `Camera` lança `ModuleNotFoundError`. Para usar a webcam automaticamente nesses casos, use `open_camera()` (veja [Exemplos](#escolhendo-a-câmera-automaticamente)).
 
 ---
 
@@ -208,18 +208,20 @@ Aceita os mesmos parâmetros de `Camera`, mais o modo e a velocidade iniciais do
 ### Webcam
 
 ```python
-Webcam(height, width)
+Webcam(height, width, fps=30, index=0)
 ```
 
-Usa `cv2.VideoCapture(0)`. Implementa apenas o contrato da interface:
+Usa `cv2.VideoCapture(index)`. Implementa o contrato da interface e alguns métodos comuns da `Camera`:
 
 | Método | Descrição |
 |--------|-----------|
 | `get_frame()` | Retorna o frame em BGR, ou `None` se não houver frame disponível |
+| `get_frame_time()` | Retorna `(frame, instante_da_captura)` |
+| `isRunning()` | `True` se a webcam estiver aberta |
 | `start()`, `stop()` | Sem efeito (a captura começa no construtor) |
 | `cleanup()` | Libera o dispositivo |
 
-Métodos específicos da `Camera` (ajustes de ISP, ROI, foto, vídeo, `get_frame_time`) **não existem** na `Webcam`. Chamá-los gera `AttributeError`.
+Ajustes de ISP, ROI, foto e vídeo são exclusivos da `Camera`. Chamá-los na `Webcam` gera `AttributeError`.
 
 ### Exceções
 
@@ -236,25 +238,17 @@ Definidas em `exceptions.py`, ambas herdam de `RuntimeError`:
 
 ### Escolhendo a câmera automaticamente
 
-Como todas seguem a `CameraInterface`, o código de visão não precisa saber qual câmera está em uso:
+`open_camera()` usa a Picamera2 na Raspberry Pi e a webcam no PC, e já devolve a câmera iniciada:
 
 ```python
-from roverlib.plugins.camera.cameraInterface import CameraInterface
-from roverlib.plugins.camera.webcam import Webcam
+from roverlib.plugins.camera.factory import open_camera
 
-def criar_camera(height=480, width=640) -> CameraInterface:
-    try:
-        from roverlib.plugins.camera.camera import Camera
-        return Camera(height=height, width=width)
-    except ModuleNotFoundError:
-        print("Picamera2 indisponível, usando webcam.")
-        return Webcam(height=height, width=width)
-
-cam = criar_camera()
-cam.start()
+cam = open_camera(height=480, width=640)   # Camera na RPi, Webcam no PC
 frame = cam.get_frame()
 cam.cleanup()
 ```
+
+Use `open_camera(use_webcam=True)` para forçar a webcam, ou `use_webcam=False` para exigir a Picamera2. Opções da `Camera` (ex.: `verticalFlip=True`) podem ser passadas direto e são ignoradas na webcam.
 
 ### Ajustes de imagem e ROI
 
