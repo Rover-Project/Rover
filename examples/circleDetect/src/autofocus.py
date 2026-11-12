@@ -120,8 +120,8 @@ def smoothDetect():
                 x = circleHistory[0] // cont
                 y = circleHistory[1] // cont
                 r = circleHistory[2] // cont
-                openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
-                openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
+                #openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
+                #openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
                 txt = f"X={x}  Y={y}  R={r}"
 
             openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
