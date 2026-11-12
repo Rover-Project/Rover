@@ -65,7 +65,7 @@ class decision:
                     return "perdido", 0
 
                 else:
-                    self.robot.backfowards(self.x_speed, 2)
+                    self.robot.backward(self.x_speed, duration=2)
                     return "voltando", 0
             
             # Se tem as duas linhas, centro da pista = (x1 + x2) / 2
@@ -83,8 +83,8 @@ class decision:
             # Ajuste de velocidad
             adjustment = self.pid_x.controller_P(erro)
             # Atribuicao dos Velocidade dos motores esquerdo e direito 
-            self.left_s = (self.x_speed + adjustment)
-            self.right_s = (self.x_speed - adjustment)
+            self.left_s = (self.x_speed - adjustment)
+            self.right_s = (self.x_speed + adjustment)
 
         # Linha unica (Competicao)
         elif drive_mode == "line": 
@@ -102,8 +102,8 @@ class decision:
 
                 adjustment = self.pid_x.controller_P(erro)
 
-                self.left_s = (self.x_speed - adjustment)
-                self.right_s = (self.x_speed + adjustment)
+                self.left_s = (self.x_speed + adjustment)
+                self.right_s = (self.x_speed - adjustment)
 
             else: 
                 if not self.history:
@@ -111,7 +111,7 @@ class decision:
                     return "perdido", 0
 
                 else:
-                    self.robot.backfowards(self.x_speed, 2)
+                    self.robot.backward(self.x_speed, duration=2)
                     return "Voltando", 0
 
         self.robot.move(speed_left=self.left_s, speed_right=self.right_s)

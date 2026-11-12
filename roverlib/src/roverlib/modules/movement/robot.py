@@ -192,9 +192,10 @@ class Robot:
             right_dir = 'stop'
             right_speed = 0
         
-        left_speed, right_speed = self.calibration.get_calibration(
+        # Calibra as velocidades (get_calibration retorna na ordem: direita, esquerda)
+        right_speed, left_speed = self.calibration.get_calibration(
             left_speed=left_speed, right_speed=right_speed
-        ) # Calibra as velocidades
+        )
         
         self.left_motor.set_movement(left_speed, left_dir)
         self.right_motor.set_movement(right_speed, right_dir)
@@ -203,19 +204,23 @@ class Robot:
             time.sleep(duration)
             self.stop()
 
-    # Considerando que o Rover leva x segundos para girar 360 graus em uma velocidade estabelecida
-    def turn_degrees(self, degress: float, time_to_turn = 12, turn_speed=55): # Valores ainda nao testados
+    def turn_degrees(self, degrees: float, time_to_turn: float = 12, turn_speed: float = 55):
         """
-        Gira o robô por uma quantidade específica de graus baseada em tempo.
-        Positivo para Direita, Negativo para Esquerda.
-        """
-        turn_duration = abs(degress) * (360 / time_to_turn)
+        Gira o robô no próprio eixo por uma quantidade de graus, estimada por tempo.
+        Positivo para a direita, negativo para a esquerda.
 
-        if degress > 0:
+        Args:
+            degrees (float): ângulo do giro em graus (ex.: 90 ou -45).
+            time_to_turn (float): tempo, em segundos, que o Rover leva para girar 360°
+                na velocidade `turn_speed`. Meça no seu Rover para obter giros precisos.
+            turn_speed (float): velocidade usada no giro (0 a 100).
+        """
+        turn_duration = abs(degrees) / 360 * time_to_turn
+
+        if degrees > 0:
             self.turn_right(speed=turn_speed, duration=turn_duration)
-        else:
+        elif degrees < 0:
             self.turn_left(speed=turn_speed, duration=turn_duration)
-
 
     def stop(self):
         """Para o Rover imediatamente."""

@@ -123,8 +123,10 @@ class CircleFollower:
                     speed_x = self.pid_x.controller_P(abs(self.error_x))
                     speed_r = self.pid_r.controller_P(abs(error_r)) if r <= self.max_r - 60 else 0
                     
-                    right = speed_x + speed_r if self.error_x < 0 else speed_r
-                    left = speed_x + speed_r if self.error_x > 0 else speed_r
+                    # Círculo à direita na imagem (error_x > 0) -> gira para a esquerda,
+                    # mesma convenção da busca abaixo (a imagem chega espelhada no Rover)
+                    right = speed_x + speed_r if self.error_x > 0 else speed_r
+                    left = speed_x + speed_r if self.error_x < 0 else speed_r
 
                 openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
                 openCv.circle(frame, (x, y), 3, (0, 0, 255), -1)

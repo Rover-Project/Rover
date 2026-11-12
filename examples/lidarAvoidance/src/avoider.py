@@ -98,7 +98,7 @@ class ObstacleAvoider:
             self.right_speed = max(0, min(90, r_val))
 
             print(f"Possivel objeto se aproximando em {dist} cm. Reduzindo")
-            self.robot.move(self.left_speed, self.right_speed)
+            self.robot.move(speed_left=self.left_speed, speed_right=self.right_speed)
             return False
         
         # --- CASO 3 - OBJETO A FRENTE --- 
@@ -109,7 +109,9 @@ class ObstacleAvoider:
             self.robot.backward(duration=3)
             time.sleep(0.1)
 
-            self.robot.turn_degrees(0.15)
+            # Giros por tempo (mesmas durações já testadas no Rover).
+            # Para girar por ângulo, meça o tempo de uma volta e use robot.turn_degrees(graus, time_to_turn=...)
+            self.robot.turn_right(speed=55, duration=4.5)
             time.sleep(0.2)
             self.robot.stop()
 
@@ -119,7 +121,7 @@ class ObstacleAvoider:
                 self.robot.forward()
                 return False
             else:
-                self.robot.turn_degrees(-0.35)
+                self.robot.turn_left(speed=55, duration=10.5)
                 time.sleep(0.2)
                 self.robot.stop()
 
@@ -135,7 +137,7 @@ class ObstacleAvoider:
         # --- CASO 4 - SEM SAIDA ---
         if no_way:
             self.robot.stop()
-            self.robot.turn_degrees(0.15)
+            self.robot.turn_right(speed=55, duration=4.5)
             self.robot.forward(duration=2)
 
             new_dist, _, _ = self.lidar.get_read()
@@ -144,14 +146,14 @@ class ObstacleAvoider:
                 self.robot.forward()
                 return False
             else:
-                self.robot.turn_degrees(-0.35)
+                self.robot.turn_left(speed=55, duration=10.5)
                 new_dist, _, _ = self.lidar.get_read()
                 if new_dist > dist and new_dist > self.max_dist:
                     print("Caminho livre a Esquerda")
                     self.robot.forward()
                     return False
             
-            self.robot.turn_degrees(0.35)
+            self.robot.turn_right(speed=55, duration=10.5)
             return False
         
         return False

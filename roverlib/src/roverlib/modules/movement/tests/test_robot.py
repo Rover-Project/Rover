@@ -122,15 +122,29 @@ def test_move_com_velocidades_iguais(robo):
     assert estado(robo) == (("BACKWARD", 30), ("FORWARD", 30))
 
 
-# ---------- bugs conhecidos (ver discussão antes de corrigir: exemplos dependem do comportamento atual) ----------
-
-@pytest.mark.xfail(strict=True, reason="move() troca as velocidades dos lados (get_calibration retorna (direita, esquerda))")
 def test_move_com_velocidades_diferentes(robo):
     robo.move(speed_right=80, speed_left=20)
     assert estado(robo) == (("FORWARD", 20), ("FORWARD", 80))
 
 
-@pytest.mark.xfail(strict=True, reason="turn_degrees() calcula a duração como graus * (360 / tempo) em vez de graus / 360 * tempo")
-def test_turn_degrees_duracao(robo, sem_espera):
-    robo.turn_degrees(90, time_to_turn=12)
-    assert sem_espera == [pytest.approx(3.0)]
+def test_move_sentidos_opostos_e_zero(robo):
+    robo.move(speed_right=-70, speed_left=0)
+    assert estado(robo) == (("STOP", 0), ("BACKWARD", 70))
+
+
+def test_move_aplica_calibracao_no_lado_certo():
+    r = Robot(right=(1, 2), left=(3, 4), calibration=Calibration(right=0.5, left=1), simulate=True)
+    r.move(speed_right=80, speed_left=20)
+    assert estado(r) == (("FORWARD", 20), ("FORWARD", 40))
+
+
+@pytest.mark.parametrize("graus, metodo, duracao", [(90, "turn_right", 3.0), (-180, "turn_left", 6.0)])
+def test_turn_degrees(robo, sem_espera, graus, metodo, duracao):
+    robo.turn_degrees(graus, time_to_turn=12)
+    assert sem_espera == [pytest.approx(duracao)]
+    assert estado(robo) == (("STOP", 0), ("STOP", 0))
+
+
+def test_turn_degrees_zero_nao_gira(robo, sem_espera):
+    robo.turn_degrees(0)
+    assert sem_espera == []
