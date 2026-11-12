@@ -19,7 +19,35 @@ O sensor TF-Luna opera utilizando o protocolo UART. Para a prosperidade, as espe
 
   - **_Byte 8_**: Checksum (método de verificação de erros ou "Impressão digital" dos dados)
 
-### 2. Pinout do Lidar:
+### 2. Uso rápido (API da RoverLib)
+
+O TF-Luna mede a distância de **um único ponto** à frente do sensor (0,2 m a 8 m).
+
+```python
+from roverlib.plugins.lidar.lidar import Lidar
+
+with Lidar() as lidar:               # start() e stop() automáticos
+    print(lidar.get_distance())      # distância em cm (ou None se inválida)
+    print(lidar.get_distance("m"))   # também aceita "m" e "mm"
+
+    if lidar.is_obstacle(30):        # obstáculo a 30 cm ou menos?
+        print("Pare!")
+
+    dist, forca, temp = lidar.get_read()  # leitura bruta completa
+```
+
+| Função | Descrição |
+|---|---|
+| `start()` / `stop()` | Abre a porta e inicia a leitura em segundo plano / encerra tudo |
+| `get_distance(unit="cm")` | Distância em `cm`, `m` ou `mm`; `None` se não houver leitura ou se o sinal for fraco (< 100) ou saturado (65535) |
+| `is_obstacle(limit_cm=30)` | `True` se houver leitura válida menor ou igual ao limite |
+| `get_read()` | Tupla `(distância_cm, força, temperatura_C)`; `(-1, -1, -1)` antes da 1ª leitura |
+| `change_config(**settings)` | Altera configurações da porta (ex.: `timeout=2`) e retorna as atuais |
+| `get_reads_until(n)` | Lê `n` bytes brutos (uso avançado/depuração) |
+
+Quadros com **checksum inválido são descartados**, e o Lidar é desligado automaticamente se o chip passar de 65 °C.
+
+### 3. Pinout do Lidar:
 
 ![alt text](image.png)
 
@@ -32,11 +60,13 @@ Com o lidar nessa posição, da direita pra esquerda, 1 -> 6.
 - 5. Input de configuração: Ground == I2C mode / 3.3V Serial mode
 - 6. Multiplexing output.
 
-### 3. Biblioteca usada (pySerial)
+### 4. Biblioteca usada (pySerial)
 
 Para comunicação entre Raspberry Pi 5 e o TF-Luna dos dados lidos pelo Lidar, foi utilizada a biblioteca pySerial.
 
-`pip install serial`
+`pip install pyserial`
+
+> Atenção: o pacote `serial` do PyPI é **outro** projeto e não funciona aqui. O correto é `pyserial` (importado como `import serial`).
 
 A baixo, teremos as funções utilizadas no script de teste:
 
@@ -73,7 +103,7 @@ A baixo, teremos as funções utilizadas no script de teste:
 
   - **Observação**: Sempre incluir em bloco com um KeyboardInterrupt ou semelhante.
 
-### 4. Problemas com o Buffer Serial (Overflow):
+### 5. Problemas com o Buffer Serial (Overflow):
 
 Durante o desenvolvimento do script de testes, foi encontrado um problema crítico no seu uso: **_A velocidade elevada de leitura contra a velocidade de processamento_**
 
