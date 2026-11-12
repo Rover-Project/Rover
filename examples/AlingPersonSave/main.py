@@ -19,7 +19,7 @@ SPEED = 0.1 # Velocidade padrao
 SERVO_V = 1 # Servo vertival 
 SERVO_H = 0 # Servo Horizontal
 
-save_file = sys.argv[2] # local pra salvar 
+save_file = sys.argv[1] # local pra salvar 
 
 def get_cpu_temp():
     """Lê a temperatura atual da CPU na Raspberry Pi 5 através do sistema de arquivos do Linux."""
