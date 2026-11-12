@@ -1,5 +1,5 @@
 camera:
   fps: 30
-  brigh: 0.25
+  brigh: 0
   saturation: 1
   contrast: 1

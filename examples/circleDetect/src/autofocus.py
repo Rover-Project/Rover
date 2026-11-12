@@ -2,6 +2,10 @@ from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.autoFocus import AfCamera, AfModeEnum
 import cv2 as openCv
 from roverlib.modules.processing.processing_image import ProcessingImage
+from pathlib import Path
+import sys
+
+save_file = sys.argv[1] # pega o lugar pra salvar 
 
 def circleVoting(hough, contorno):
     """Relaciona a detecção de dois metodos diferente"""
@@ -121,9 +125,15 @@ def smoothDetect():
             openCv.putText(frame, txt, (10, 35), openCv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             openCv.imshow("Deteccao Final", frame)
             openCv.imshow("Mascara", mask)
+             
+            key = openCv.waitKey(1) & 0xFF
 
-            if openCv.waitKey(1) & 0xFF == ord('q'):
+            if key == ord('q'):
                 break
+            
+            elif key == ord("s"):
+                openCv.imwrite(Path().home() / "Imagens" / "dataset_vc_lara" / (save_file + ".jpeg"), frame)
+                openCv.imwrite(Path().home() / "Imagens" / "dataset_vc_lara" / (save_file + "_maks.jpeg"), mask)
 
     camera.cleanup()
     openCv.destroyAllWindows()
