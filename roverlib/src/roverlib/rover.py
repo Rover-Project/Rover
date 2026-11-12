@@ -2,7 +2,8 @@
 Ponto de entrada único da RoverLib.
 
 A classe Rover lê o config.yaml do projeto e monta os componentes configurados
-(motores, câmera, Lidar), usando simulação/webcam automaticamente fora da Raspberry Pi.
+(motores, câmera, Lidar, pan-tilt da câmera), usando simulação/webcam automaticamente
+fora da Raspberry Pi.
 
 Exemplo:
     from roverlib import Rover
@@ -45,12 +46,14 @@ class Rover:
         rover.move    -> Robot (forward, backward, turn_left, turn_right, move, turn_degrees, stop)
         rover.camera  -> Camera (Raspberry Pi) ou Webcam (PC)
         rover.lidar   -> Lidar TF-Luna
+        rover.pan_tilt -> PanTilt (servos da câmera: PAN 360°, TILT 180°)
 
     Só são criados os componentes presentes na configuração. Acessar um componente
     não configurado gera ComponentNotAvailable com a explicação do que falta.
     """
 
-    def __init__(self, motors: dict = None, camera: dict = None, lidar: dict = None):
+    def __init__(self, motors: dict = None, camera: dict = None, lidar: dict = None,
+                 pan_tilt: dict = None):
         """
         Monta o Rover a partir de dicionários de configuração (as mesmas seções do config.yaml).
         Passe None para não usar o componente.
@@ -60,10 +63,13 @@ class Rover:
             camera (dict): width, height, fps, index, webcam, horizontal_flip, vertical_flip,
                            brightness, contrast, saturation
             lidar (dict): port, baudrate
+            pan_tilt (dict): address, simulate, pan {channel, trim, invert, time_per_turn},
+                             tilt {channel, min, max, center, invert}
         """
         self._move = None
         self._camera = None
         self._lidar = None
+        self._pan_tilt = None
         self._problems = {}
 
         try:
@@ -73,6 +79,8 @@ class Rover:
                 self._camera = self._try_build("camera", self._build_camera, camera)
             if lidar is not None:
                 self._lidar = self._try_build("lidar", self._build_lidar, lidar)
+            if pan_tilt is not None:
+                self._pan_tilt = self._try_build("pan_tilt", self._build_pan_tilt, pan_tilt)
         except Exception:
             self.cleanup()
             raise
@@ -98,6 +106,9 @@ class Rover:
               webcam: auto          # auto | true | false
             lidar:
               port: /dev/ttyAMA0
+            pan_tilt:
+              pan: {channel: 0}     # servo 360°
+              tilt: {channel: 1}    # servo 180°
 
         Por compatibilidade com os exemplos, também aceita os motores em `gpio: motor:`.
         """
@@ -121,6 +132,7 @@ class Rover:
             motors=section("motors"),
             camera=section("camera"),
             lidar=section("lidar"),
+            pan_tilt=section("pan_tilt"),
         )
 
     # ---------- construção de cada componente ----------
@@ -182,6 +194,28 @@ class Rover:
         lidar.start()
         return lidar
 
+    @staticmethod
+    def _build_pan_tilt(options: dict):
+        from roverlib.modules.pan_tilt.pan_tilt import PanTilt
+
+        pan = options.get("pan") or {}
+        tilt = options.get("tilt") or {}
+        return PanTilt(
+            pan_channel=pan.get("channel", 0),
+            tilt_channel=tilt.get("channel", 1),
+            address=options.get("address", 0x40),
+            tilt_min=tilt.get("min", 0),
+            tilt_max=tilt.get("max", 180),
+            tilt_center=tilt.get("center", 90),
+            tilt_invert=bool(tilt.get("invert", False)),
+            pan_trim=pan.get("trim", 0.0),
+            pan_invert=bool(pan.get("invert", False)),
+            pan_time_per_turn=pan.get("time_per_turn", 2.0),
+            pan_pulse=tuple(pan.get("pulse", (500, 2500))),
+            tilt_pulse=tuple(tilt.get("pulse", (500, 2500))),
+            simulate=_auto_bool(options.get("simulate")),
+        )
+
     # ---------- acesso aos componentes ----------
 
     def _get(self, name, value, section):
@@ -210,8 +244,13 @@ class Rover:
         """Lidar TF-Luna."""
         return self._get("lidar", self._lidar, "lidar")
 
+    @property
+    def pan_tilt(self):
+        """Servos da câmera (PanTilt)."""
+        return self._get("pan_tilt", self._pan_tilt, "pan_tilt")
+
     def has(self, name: str) -> bool:
-        """Indica se um componente ('move', 'camera' ou 'lidar') está disponível."""
+        """Indica se um componente ('move', 'camera', 'lidar' ou 'pan_tilt') está disponível."""
         return getattr(self, f"_{name}", None) is not None
 
     @property
@@ -222,15 +261,18 @@ class Rover:
     # ---------- encerramento ----------
 
     def stop(self):
-        """Para os motores."""
+        """Para os motores e o giro da câmera."""
         if self._move is not None:
             self._move.stop()
+        if self._pan_tilt is not None:
+            self._pan_tilt.stop()
 
     def cleanup(self):
         """Para os motores e libera todos os recursos. Pode ser chamado mais de uma vez."""
         for component, method in ((self._move, "cleanup"),
                                   (self._camera, "cleanup"),
-                                  (self._lidar, "stop")):
+                                  (self._lidar, "stop"),
+                                  (self._pan_tilt, "cleanup")):
             if component is None:
                 continue
             try:
@@ -253,4 +295,6 @@ class Rover:
             parts.append(type(self._camera).__name__)
         if self._lidar is not None:
             parts.append("lidar")
+        if self._pan_tilt is not None:
+            parts.append("pan-tilt simulado" if self._pan_tilt.simulated else "pan-tilt")
         return f"Rover({', '.join(parts) or 'sem componentes'})"

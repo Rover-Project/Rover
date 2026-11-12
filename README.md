@@ -26,7 +26,7 @@ with Rover.from_config("config.yaml") as rover:
 - **Configuração em `config.yaml`:** pinos, calibração, câmera e Lidar fora do código.
 - **CLI para projetos:** `rover new` cria um projeto com exemplos; `rover run` o executa.
 - **Visão computacional:** segmentação por cor e detecção de círculos e linhas com OpenCV.
-- **Sensores:** Lidar TF-Luna com `get_distance()` e `is_obstacle()`.
+- **Sensores e atuadores:** Lidar TF-Luna (`get_distance()`, `is_obstacle()`) e pan-tilt da câmera (`pan_right()`, `tilt_to()`).
 
 ## Início rápido
 
@@ -49,7 +49,7 @@ Instalação na Raspberry Pi (câmera, GPIO, UART): veja o guia de [Instalação
 | Motores | 2 motores DC com ponte-H L298N |
 | Câmera | Picamera2 (Camera Module 3 para foco automático) |
 | Distância | Lidar TF-Luna (UART) |
-| Servos | PCA9685 (I²C) ou GPIO |
+| Servos da câmera (pan-tilt) | PAN 360° + TILT 180° via PCA9685 (I²C) |
 
 ## Estrutura do repositório
 
@@ -58,11 +58,11 @@ Rover/
 ├── roverlib/            # a biblioteca (pacote Python publicado no PyPI)
 │   └── src/roverlib/
 │       ├── rover.py     # classe Rover (ponto de entrada)
-│       ├── modules/     # movimento (Robot, PID), visão e processamento de imagem
-│       ├── plugins/     # drivers: motor, câmera, Lidar, servos, GPIO (pin)
+│       ├── modules/     # movimento (Robot, PID), pan-tilt da câmera, visão e processamento de imagem
+│       ├── plugins/     # drivers: motor, câmera, Lidar, servos (PCA9685), GPIO (pin)
 │       ├── cli/         # comando `rover` e template do `rover new`
 │       └── utils/       # Config
-├── examples/            # projetos completos (seguir linha, seguir bola, Lidar, YOLO...)
+├── examples/            # projetos completos (seguir linha, seguir bola, câmera que acompanha objetos, Lidar, YOLO...)
 ├── docs/                # documentação (MkDocs)
 ├── mkdocs.yml
 └── rover_setup.sh       # setup da Raspberry Pi

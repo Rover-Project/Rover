@@ -25,3 +25,15 @@ motors:
 # Remova os "#" abaixo para usar o Lidar (rover.lidar). Requer o sensor ligado na UART.
 #lidar:
 #  port: /dev/ttyAMA0
+
+# ---------- Servos da câmera (pan-tilt, PCA9685) ----------
+# Remova os "#" abaixo para usar os servos (rover.pan_tilt).
+#pan_tilt:
+#  pan:                   # servo 360° (horizontal): controlado por velocidade
+#    channel: 0
+#    trim: 0              # ajuste se a câmera girar sozinha quando deveria estar parada
+#  tilt:                  # servo 180° (vertical): controlado por ângulo
+#    channel: 1
+#    min: 45              # limites para não forçar o suporte
+#    max: 135
+#    center: 90

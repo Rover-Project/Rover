@@ -72,6 +72,15 @@ python -c "from roverlib.plugins.motor.motorDriver import PIN_AVAILABLE; print(P
 
 O segundo comando deve imprimir `True`. Se imprimir `False`, os motores serão simulados; veja [Problemas comuns](#problemas-comuns).
 
+### Servos da câmera (PCA9685)
+
+Os servos do pan-tilt usam o barramento I²C. Ative-o em `sudo raspi-config` → *Interface Options* → *I2C* e confira se o PCA9685 aparece no endereço `0x40`:
+
+```bash
+sudo apt install -y i2c-tools
+i2cdetect -y 1
+```
+
 ### Lidar TF-Luna (opcional)
 
 O Lidar usa a UART da Raspberry Pi (`/dev/ttyAMA0`). Ative a porta serial em `sudo raspi-config` → *Interface Options* → *Serial Port* (shell de login: **não**; hardware serial: **sim**) e reinicie.
@@ -96,14 +105,17 @@ mkdocs serve
 
 ## Problemas comuns
 
-**Na Raspberry Pi aparece "GPIO (plugin pin) não disponível. Usando motores simulados."**
+**Na Raspberry Pi aparece "hardware de motores não disponível. Usando motores simulados."**
 :   O módulo nativo do plugin `pin` incluído no pacote foi compilado para **Python 3.13 (ARM64)**. Confira a versão com `python --version`. Em outra versão, é preciso recompilar o plugin (fontes em `roverlib/src/roverlib/plugins/pin/src`).
 
 **"câmera da Raspberry Pi (picamera2) não disponível. Usando a webcam."**
 :   No PC, é o comportamento esperado. Na Raspberry Pi, instale `python3-picamera2` pelo `apt` e crie o ambiente virtual com `--system-site-packages`.
 
+**Na Raspberry Pi aparece "hardware de servos não disponível. Usando servos simulados."**
+:   As bibliotecas da Adafruit não conseguiram acessar o I²C. Ative o I²C no `raspi-config` e confira a ligação do PCA9685 com `i2cdetect -y 1`.
+
 **Quero testar o programa na Raspberry Pi sem que as rodas girem**
-:   Execute com `ROVER_SIMULATE=1 rover run`.
+:   Execute com `ROVER_SIMULATE=1 rover run`. Os servos da câmera também ficam simulados.
 
 **`rover: command not found`**
 :   O ambiente virtual não está ativo, ou a biblioteca foi instalada sem o extra `[cli]`.

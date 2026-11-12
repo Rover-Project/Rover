@@ -68,5 +68,6 @@ nav:
       - Rover: api/rover.md
       - Movimento: api/movimento.md
       - Câmera: api/camera.md
+      - Pan-tilt da câmera: api/pan_tilt.md
       - Sensores: api/sensores.md
       - Visão e processamento: api/visao.md

@@ -9,10 +9,12 @@ Módulos disponíveis:
     - PCAServos      : interface de alto nível para controle de servos
     - Servo          : abstração para servo convencional (0°–180°)
     - ContinuousServo: abstração para servo de rotação contínua (360°)
+    - VirtualServo / VirtualContinuousServo: versões simuladas (PC, sem I²C)
 """
 
-from .servos import PCAServos, Servo, ContinuousServo
+from .servos import PCAServos, Servo, ContinuousServo, PCA_AVAILABLE
+from .virtual import VirtualServo, VirtualContinuousServo
 
-__all__ = ["PCAServos", "Servo", "ContinuousServo"]
+__all__ = ["PCAServos", "Servo", "ContinuousServo", "VirtualServo", "VirtualContinuousServo", "PCA_AVAILABLE"]
 __version__ = "1.0.0"
 __author__  = "Rover IC Project"

@@ -3,20 +3,13 @@ Comandos de alto nível para controle de movimento do Rover.
 Fornece interface simplificada para operações comuns.
 """
 
-import os
 import time
 
 from roverlib.plugins.motor import motorDriver
 from roverlib.plugins.motor.motorDriver import MotorDriver
 from roverlib.plugins.motor.vitualMotor import VirtualMotor
+from roverlib.utils.simulation import SIMULATE_ENV, resolve_simulate  # noqa: F401 (SIMULATE_ENV reexportado)
 from .motorCalibration import Calibration
-
-# Variável de ambiente para forçar a simulação (ex.: testar na Raspberry sem mover as rodas)
-SIMULATE_ENV = "ROVER_SIMULATE"
-
-
-def _env_simulate() -> bool:
-    return os.environ.get(SIMULATE_ENV, "").strip().lower() in ("1", "true", "yes", "sim")
 
 
 class Robot:
@@ -49,14 +42,9 @@ class Robot:
                 False -> exige os motores reais (erro se a GPIO não estiver disponível).
         """
 
-        if simulate is None:
-            simulate = _env_simulate() or not motorDriver.PIN_AVAILABLE
-            if not motorDriver.PIN_AVAILABLE and not _env_simulate():
-                print(
-                    "AVISO: GPIO (plugin pin) não disponível. "
-                    "Usando motores simulados. Use Robot(..., simulate=False) para exigir o hardware."
-                )
-
+        simulate = resolve_simulate(
+            simulate, motorDriver.PIN_AVAILABLE, "motores", "Robot(..., simulate=False)"
+        )
         self.simulated = simulate
 
         # Crias instâncias para controlas os motores

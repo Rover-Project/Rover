@@ -1,0 +1,25 @@
+# Configuração do exemplo cameraTracking
+camera:
+  width: 640
+  height: 480
+  fps: 30
+  vertical_flip: false
+
+pan_tilt:
+  address: 0x40
+  pan:              # servo 360° (horizontal)
+    channel: 0
+    trim: 0         # ajuste se a câmera girar sozinha quando deveria estar parada
+    invert: false   # true se a câmera girar para o lado contrário do objeto
+  tilt:             # servo 180° (vertical)
+    channel: 1
+    min: 45
+    max: 135
+    center: 90
+    invert: false   # true se a câmera subir quando deveria descer
+
+tracking:
+  kp_pan: 60        # velocidade do PAN (0-100) quando o objeto está na borda da imagem
+  kp_tilt: 6        # graus que o TILT anda por frame quando o objeto está na borda
+  deadzone: 0.08    # fração da imagem em torno do centro onde a câmera não se mexe
+  min_area: 0.005   # fração mínima da imagem ocupada pelo vermelho para considerar um objeto

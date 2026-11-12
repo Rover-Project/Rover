@@ -3,7 +3,7 @@ RoverLib: biblioteca educacional para controle do Rover.
 
 Atalhos para as classes mais usadas:
 
-    from roverlib import Rover, Robot, open_camera, Lidar, PID, ProcessingImage, VisionModule
+    from roverlib import Rover, Robot, open_camera, Lidar, PanTilt, PID, ProcessingImage, VisionModule
 
 As importações são feitas sob demanda, então `import roverlib` é rápido e não exige
 OpenCV, câmera ou GPIO até que a classe correspondente seja usada.
@@ -22,6 +22,7 @@ _EXPORTS = {
     "Camera": "roverlib.plugins.camera.camera",
     "Webcam": "roverlib.plugins.camera.webcam",
     "Lidar": "roverlib.plugins.lidar.lidar",
+    "PanTilt": "roverlib.modules.pan_tilt.pan_tilt",
     "ProcessingImage": "roverlib.modules.processing.processing_image",
     "VisionModule": "roverlib.modules.vision.visionModule",
     "Config": "roverlib.utils.config_manager",

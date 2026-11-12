@@ -7,6 +7,7 @@ O `config.yaml` descreve o hardware do Rover. `Rover.from_config("config.yaml")`
 | `motors:` | motores (ponte-H L298N) | `rover.move` |
 | `camera:` | Picamera2 ou webcam | `rover.camera` |
 | `lidar:` | Lidar TF-Luna | `rover.lidar` |
+| `pan_tilt:` | servos da câmera (PAN 360°, TILT 180°) | `rover.pan_tilt` |
 
 Uma seção vazia (por exemplo, só `camera:`) usa os valores padrão.
 
@@ -37,6 +38,21 @@ camera:
 lidar:
   port: /dev/ttyAMA0
   baudrate: 115200
+
+pan_tilt:
+  address: 0x40
+  simulate: auto
+  pan:
+    channel: 0
+    trim: 0
+    invert: false
+    time_per_turn: 2.0
+  tilt:
+    channel: 1
+    min: 45
+    max: 135
+    center: 90
+    invert: false
 ```
 
 ## `motors`
@@ -72,6 +88,28 @@ Se a câmera não puder ser iniciada (por exemplo, PC sem webcam), aparece um av
 | `baudrate` | `115200` | Velocidade da comunicação serial |
 
 Assim como a câmera, uma falha ao iniciar o Lidar vira um aviso, e o restante do Rover continua funcionando.
+
+## `pan_tilt`
+
+Os dois servos que movem a câmera, ligados a um PCA9685 (I²C).
+
+| Opção | Padrão | Descrição |
+|---|---|---|
+| `address` | `0x40` | Endereço I²C do PCA9685 |
+| `simulate` | `auto` | `auto`: simula quando não há I²C (PC). `true`: sempre simula. `false`: exige o hardware |
+| `pan.channel` | `0` | Canal do PCA9685 do servo **PAN** (horizontal, **360°**, rotação contínua) |
+| `pan.trim` | `0` | Velocidade (-1.0 a 1.0) em que o PAN fica realmente parado. Ajuste se a câmera girar devagar sozinha após `stop_pan()` (ex.: `0.03`) |
+| `pan.invert` | `false` | Inverte o sentido, se `pan_right()` girar para a esquerda |
+| `pan.time_per_turn` | `2.0` | Segundos para uma volta completa com velocidade 100. Usado por `pan_degrees()`: meça no seu Rover |
+| `pan.pulse` | `[500, 2500]` | Pulsos mínimo e máximo do servo, em µs |
+| `tilt.channel` | `1` | Canal do servo **TILT** (vertical, **180°**, posição) |
+| `tilt.min`, `tilt.max` | `0`, `180` | Limites de ângulo, para não forçar o suporte da câmera |
+| `tilt.center` | `90` | Ângulo com a câmera olhando para frente (usado por `center()`) |
+| `tilt.invert` | `false` | Inverte o sentido, se `tilt_up()` abaixar a câmera |
+| `tilt.pulse` | `[500, 2500]` | Pulsos mínimo e máximo do servo, em µs |
+
+!!! note "Por que o PAN não tem ângulo?"
+    O servo de 360° gira continuamente e não informa sua posição: ele é controlado por **velocidade** (como as rodas). `pan_degrees()` estima o ângulo pelo tempo de giro, por isso depende de `time_per_turn` estar medido.
 
 ## Formato antigo dos exemplos
 

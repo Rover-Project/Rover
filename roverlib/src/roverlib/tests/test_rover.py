@@ -177,10 +177,49 @@ def test_stop_e_cleanup_repetido():
     rover.cleanup()
 
 
+# ---------- pan-tilt ----------
+
+def test_pan_tilt_pelo_config(tmp_path, monkeypatch):
+    from roverlib.modules.pan_tilt import pan_tilt as pt_module
+    monkeypatch.setattr(pt_module.time, "sleep", lambda s: None)
+    path = escrever_config(tmp_path, """
+        pan_tilt:
+          address: 0x41
+          pan:
+            channel: 2
+            trim: 0.03
+            invert: true
+            time_per_turn: 3.5
+          tilt:
+            channel: 3
+            min: 40
+            max: 140
+            center: 85
+    """)
+    with Rover.from_config(path) as rover:
+        pt = rover.pan_tilt
+        assert pt.simulated                    # ROVER_SIMULATE=1 na fixture
+        assert pt._pan._channel == 2 and pt._tilt._channel == 3
+        assert (pt.pan_trim, pt.pan_invert, pt.pan_time_per_turn) == (0.03, True, 3.5)
+        assert (pt.tilt_min, pt.tilt_max, pt.tilt_center) == (40, 140, 85)
+        pt.pan_right(50)
+        rover.stop()                           # stop() também para o PAN
+        assert pt.pan_speed == 0
+        assert "pan-tilt simulado" in repr(rover)
+
+
+def test_pan_tilt_secao_vazia_usa_padroes(tmp_path):
+    rover = Rover.from_config(escrever_config(tmp_path, "pan_tilt:"))
+    assert rover.pan_tilt._pan._channel == 0
+    assert rover.pan_tilt._tilt._channel == 1
+    with pytest.raises(ComponentNotAvailable, match="motors:"):
+        rover.move
+
+
 # ---------- atalhos do pacote ----------
 
 def test_atalhos_do_pacote():
     assert roverlib.Rover is Rover
-    from roverlib import Robot, PID, open_camera, Lidar, ProcessingImage, VisionModule  # noqa: F401
+    from roverlib import Robot, PID, open_camera, Lidar, PanTilt, ProcessingImage, VisionModule  # noqa: F401
     with pytest.raises(AttributeError):
         roverlib.NaoExiste

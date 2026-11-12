@@ -1,9 +1,15 @@
 import logging
 from typing import Optional
-import board
-import busio
-from adafruit_pca9685 import PCA9685
-from adafruit_motor import servo
+
+try:
+    # Bibliotecas da Adafruit: só funcionam com I²C disponível (Raspberry Pi)
+    import board
+    import busio
+    from adafruit_pca9685 import PCA9685
+    from adafruit_motor import servo
+    PCA_AVAILABLE = True
+except Exception:  # ImportError no PC; NotImplementedError/RuntimeError do Blinka sem I²C
+    PCA_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +31,11 @@ class PCAServos:
         bus: int = 1, # Mantido para compatibilidade, a Adafruit detecta o bus automaticamente via board
         frequency: float = _DEFAULT_FREQ_HZ,
     ) -> None:
+        if not PCA_AVAILABLE:
+            raise RuntimeError(
+                "PCA9685 indisponível: as bibliotecas da Adafruit (I²C) não puderam ser carregadas. "
+                "Este driver requer a Raspberry Pi; no PC, use os servos simulados."
+            )
         try:
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.pca = PCA9685(self.i2c, address=address)

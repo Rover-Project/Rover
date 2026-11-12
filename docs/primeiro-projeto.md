@@ -31,7 +31,7 @@ rover run
 No PC, a saída mostra os motores simulados:
 
 ```
-AVISO: GPIO (plugin pin) não disponível. Usando motores simulados. ...
+AVISO: hardware de motores não disponível. Usando motores simulados. ...
 [simulação] Motor esquerdo inicializado. Pinos: (25, 16)  Frequência PWM: 1000Hz
 [simulação] Motor direito inicializado. Pinos: (17, 26)  Frequência PWM: 1000Hz
 Rover(motores simulados)

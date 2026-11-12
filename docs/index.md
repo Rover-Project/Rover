@@ -14,6 +14,8 @@ with Rover.from_config("config.yaml") as rover:
 
     if rover.lidar.is_obstacle(30):                # algo a menos de 30 cm?
         rover.move.stop()
+
+    rover.pan_tilt.tilt_to(60)                     # inclina a câmera
 ```
 
 ## Destaques
@@ -22,6 +24,7 @@ with Rover.from_config("config.yaml") as rover:
 - **Configuração em um arquivo.** Pinos, calibração, câmera e Lidar ficam no `config.yaml`, fora do código.
 - **Projetos prontos para começar.** `rover new meu_projeto` cria um projeto com exemplos; `rover run` o executa.
 - **Visão computacional incluída.** Segmentação por cor, detecção de círculos e de linhas com OpenCV.
+- **Câmera móvel.** Os servos do pan-tilt giram e inclinam a câmera com comandos como `pan_right()` e `tilt_to()`.
 - **Mensagens claras.** Erros explicam o que falta, como *"Adicione a seção 'camera:' ao config.yaml"*.
 
 ## Comece por aqui
@@ -36,7 +39,7 @@ rover run
 1. [Instalação](instalacao.md): no PC e na Raspberry Pi.
 2. [Primeiro projeto](primeiro-projeto.md): tutorial de 10 minutos, sem precisar do robô.
 3. [Configuração](configuracao.md): todas as opções do `config.yaml`.
-4. [Exemplos](exemplos.md): seguir linha, seguir bola, desviar de obstáculos, YOLO e outros.
+4. [Exemplos](exemplos.md): seguir linha, seguir bola, câmera que acompanha objetos, desviar de obstáculos, YOLO e outros.
 5. [Arquitetura](arquitetura.md): como a biblioteca é organizada e como estendê-la.
 6. [Referência da API](api/rover.md): todos os comandos, gerada a partir do código.
 
@@ -48,7 +51,7 @@ rover run
 | Motores DC | ponte-H L298N | `plugins/motor` |
 | Câmera | Raspberry Pi Camera (Picamera2), Camera Module 3 com foco | `plugins/camera` |
 | Distância | Lidar TF-Luna (UART) | `plugins/lidar` |
-| Servos | PCA9685 (I²C) ou GPIO | `plugins/PCAServos`, `plugins/servoMotor` |
+| Servos da câmera (pan-tilt) | PAN 360° + TILT 180° via PCA9685 (I²C) | `modules/pan_tilt`, `plugins/PCAServos` |
 
 ## Código aberto
 

@@ -33,6 +33,7 @@ python main.py
 
 | Exemplo | O que faz | Hardware |
 |---|---|---|
+| `cameraTracking` | A câmera acompanha um objeto vermelho movendo o pan-tilt (PAN 360°, TILT 180°) | câmera + servos (PCA9685) |
 | `continuousFocus` | Foco automático contínuo e captura de fotos | Camera Module 3 |
 | `slideFocus` | Ajuste manual do foco pelo teclado | Camera Module 3 |
 
@@ -49,7 +50,7 @@ python main.py
 |---|---|---|
 | `roverKeypadControl` | Dirige o Rover pelo teclado, com visualização da câmera | motores + câmera |
 | `roverTkControl` | Interface gráfica (Tkinter) para testar os motores | motores |
-| `servoMotor`, `servoController`, `servos_controller` | Controle de servos (pan-tilt da câmera) | servos / PCA9685 |
+| `servoController` | Controle de dois servos pelo teclado, direto na GPIO (gpiozero) | servos na GPIO |
 
 !!! note "Exemplos sem simulação"
-    Os projetos completos foram escritos para o Rover e criam `Camera` e `Robot` diretamente. Os que usam só motores rodam no PC em modo simulação; os que usam `Camera`, Lidar ou servos precisam do hardware.
+    Os projetos completos foram escritos para o Rover e criam `Camera` e `Robot` diretamente. Os que usam só motores rodam no PC em modo simulação; os que usam `Camera`, Lidar ou servos diretamente precisam do hardware. O `cameraTracking` usa a classe `Rover` e roda no PC com webcam e servos simulados.
