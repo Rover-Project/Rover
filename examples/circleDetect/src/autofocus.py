@@ -77,7 +77,7 @@ def smoothDetect():
             
             frame = openCv.resize(
                 frame, 
-                (HEIGHT, WIDTH),
+                shape,
                 interpolation=openCv.INTER_CUBIC
             )
 
