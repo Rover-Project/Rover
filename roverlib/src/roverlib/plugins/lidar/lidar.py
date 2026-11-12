@@ -49,12 +49,12 @@ class Lidar():
         Realiza a configuração inicial do Lidar.
 
         Args:
-            port = recebe o arquivo de dispositivo com os pinos da GPIO
-            baudrate = Define a velocidade do sinal. Ambos os dispositivos devem trabalhar na mesma velocidade
-            parity = Não adiciona bit de paridade
-            stopbits = Um bit de duração lógica alta ao final de cada pacote
-            bytesize = Tamanho de cada pacote
-            timeout = Tempo máximo de espera pelo próximo pacote (segundos)
+            port: recebe o arquivo de dispositivo com os pinos da GPIO
+            baudrate: Define a velocidade do sinal. Ambos os dispositivos devem trabalhar na mesma velocidade
+            parity: Não adiciona bit de paridade
+            stopbits: Um bit de duração lógica alta ao final de cada pacote
+            bytesize: Tamanho de cada pacote
+            timeout: Tempo máximo de espera pelo próximo pacote (segundos)
         """
 
         if not availableSerial:
@@ -112,7 +112,7 @@ class Lidar():
         """
         Verifica o estado do Lidar
 
-        Retorna:
+        Returns:
             Valor Bool: (True se ativo, false se nao)
         """
         return self.lidar is not None and self.lidar.is_open
@@ -178,7 +178,7 @@ class Lidar():
         """
         Getter das leituras do Lidar
 
-        Retorna:
+        Returns:
             Distância da superfície (cm), força do sinal e temperatura do chip (°C)
             Nessa ordem. Retorna (-1, -1, -1) enquanto nenhuma leitura foi feita.
         """
@@ -189,9 +189,9 @@ class Lidar():
         Retorna apenas a distância medida pelo Lidar.
 
         Args:
-            unit = Unidade da distância: "cm" (padrão), "m" ou "mm"
+            unit: Unidade da distância: "cm" (padrão), "m" ou "mm"
 
-        Retorna:
+        Returns:
             A distância na unidade escolhida, ou None se ainda não houver leitura
             ou se a leitura não for confiável (sinal fraco ou saturado).
         """
@@ -210,9 +210,9 @@ class Lidar():
         Indica se existe um obstáculo à frente, mais perto que o limite.
 
         Args:
-            limit_cm = Distância limite em centímetros (padrão: 30 cm)
+            limit_cm: Distância limite em centímetros (padrão: 30 cm)
 
-        Retorna:
+        Returns:
             True se houver uma leitura válida menor ou igual ao limite, False caso contrário.
         """
         distance = self.get_distance("cm")
@@ -239,10 +239,10 @@ class Lidar():
         Permite mudança nas configurações da porta serial do Lidar.
 
         Args:
-            **settings = Configurações a alterar (ex.: timeout=2, baudrate=115200).
+            **settings: Configurações a alterar (ex.: timeout=2, baudrate=115200).
                          Sem argumentos, apenas retorna as configurações atuais.
 
-        Retorna:
+        Returns:
             dict com as configurações atuais (após a alteração)
         """
         if not self.is_open():
@@ -279,7 +279,7 @@ class Lidar():
         """
         Adquire a quantidade de bytes no buffer de entrada do lidar
 
-        Retorna:
+        Returns:
             in_buffer: Quantidade de bytes no buffer de entrada
         """
         if self.is_open():
@@ -289,7 +289,7 @@ class Lidar():
         """
         Adquire a quantidade de bytes no buffer de saida do lidar
 
-        Retorna:
+        Returns:
             out_buffer: Quantidade de bytes no buffer de saida
         """
         if self.is_open():
@@ -301,10 +301,10 @@ class Lidar():
         (ou até o timeout). Uso avançado/depuração: enquanto a leitura em
         segundo plano estiver ativa, ela também consome os bytes da porta.
 
-        args:
-            quant = Quantidade de bytes esperados para encerrar a leitura
+        Args:
+            quant: Quantidade de bytes esperados para encerrar a leitura
 
-        Retorna:
+        Returns:
             Os bytes lidos até satisfeita a quantidade desejada
 
         Raises:

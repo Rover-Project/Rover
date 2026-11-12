@@ -1,0 +1,99 @@
+# Configuração (`config.yaml`)
+
+O `config.yaml` descreve o hardware do Rover. `Rover.from_config("config.yaml")` cria **apenas os componentes cujas seções estão presentes**:
+
+| Seção | Componente | Acesso |
+|---|---|---|
+| `motors:` | motores (ponte-H L298N) | `rover.move` |
+| `camera:` | Picamera2 ou webcam | `rover.camera` |
+| `lidar:` | Lidar TF-Luna | `rover.lidar` |
+
+Uma seção vazia (por exemplo, só `camera:`) usa os valores padrão.
+
+## Exemplo completo
+
+```yaml
+motors:
+  right: [17, 26]
+  left: [25, 16]
+  calibration:
+    right: 1
+    left: 1
+  pwm_frequency: 1000
+  simulate: auto
+
+camera:
+  width: 640
+  height: 480
+  fps: 30
+  index: 0
+  webcam: auto
+  vertical_flip: false
+  horizontal_flip: false
+  brightness: 0.0
+  contrast: 1.0
+  saturation: 1.0
+
+lidar:
+  port: /dev/ttyAMA0
+  baudrate: 115200
+```
+
+## `motors`
+
+| Opção | Padrão | Descrição |
+|---|---|---|
+| `right` | `[17, 26]` | Pinos GPIO (numeração BCM) ligados às entradas IN3 e IN4 da ponte-H (motor direito) |
+| `left` | `[25, 16]` | Pinos GPIO ligados às entradas IN1 e IN2 (motor esquerdo) |
+| `calibration.right` / `calibration.left` | `1` | Multiplicam a velocidade de cada lado. Se o Rover puxa para a esquerda em `forward()`, o motor direito está mais rápido: reduza `calibration.right` (ex.: `0.95`) |
+| `pwm_frequency` | `1000` | Frequência do PWM, em Hz |
+| `simulate` | `auto` | `auto`: simula quando não há GPIO (PC). `true`: sempre simula. `false`: exige o hardware e gera erro se a GPIO não estiver disponível |
+
+A variável de ambiente `ROVER_SIMULATE=1` força a simulação sem alterar o arquivo.
+
+## `camera`
+
+| Opção | Padrão | Descrição |
+|---|---|---|
+| `width`, `height` | `640`, `480` | Tamanho dos frames, em pixels |
+| `fps` | `30` | Quadros por segundo |
+| `index` | `0` | Qual câmera usar, se houver mais de uma |
+| `webcam` | `auto` | `auto`: Picamera2 na Raspberry Pi, webcam no PC. `true`: sempre webcam. `false`: exige a Picamera2 |
+| `vertical_flip`, `horizontal_flip` | `false` | Espelham a imagem. Com a câmera de cabeça para baixo, use os dois como `true` |
+| `brightness`, `contrast`, `saturation` | — | Ajustes de imagem (apenas Picamera2; ignorados na webcam) |
+
+Se a câmera não puder ser iniciada (por exemplo, PC sem webcam), aparece um aviso e o programa continua; usar `rover.camera` gera um erro explicando a falha.
+
+## `lidar`
+
+| Opção | Padrão | Descrição |
+|---|---|---|
+| `port` | `/dev/ttyAMA0` | Porta serial onde o TF-Luna está ligado |
+| `baudrate` | `115200` | Velocidade da comunicação serial |
+
+Assim como a câmera, uma falha ao iniciar o Lidar vira um aviso, e o restante do Rover continua funcionando.
+
+## Formato antigo dos exemplos
+
+Os exemplos da pasta `examples/` usam os motores dentro de `gpio: motor:`. `Rover.from_config` também aceita esse formato:
+
+```yaml
+gpio:
+  motor:
+    right: [17, 26]
+    left: [25, 16]
+    calibration:
+      right: 1
+      left: 1
+```
+
+## Lendo outras configurações
+
+Para guardar parâmetros do seu próprio programa (velocidades, ganhos do PID…) no mesmo arquivo, use `Config`:
+
+```python
+from roverlib import Config
+
+config = Config("config.yaml")
+pid = config.get("pid")      # ex.: {"kp": 0.4, "ki": 0, "kd": 0.1}
+```

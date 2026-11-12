@@ -36,7 +36,37 @@ markdown_extensions:
   - pymdownx.superfences 
   - pymdownx.tabbed: 
       alternate_style: true 
-  - admonition 
+  - admonition
+  - def_list
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [roverlib/src]          # lê as docstrings direto do código (sem importar OpenCV/GPIO)
+          options:
+            docstring_style: google
+            docstring_options:
+              warn_missing_types: false    # muitas docstrings não anotam tipos de retorno
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            filters: ["!^_"]               # oculta métodos privados
+
+nav:
+  - Início: index.md
+  - Primeiros passos:
+      - Instalação: instalacao.md
+      - Primeiro projeto: primeiro-projeto.md
+      - Configuração (config.yaml): configuracao.md
+  - Guia:
+      - Arquitetura: arquitetura.md
+      - Exemplos: exemplos.md
+  - Referência da API:
+      - Rover: api/rover.md
+      - Movimento: api/movimento.md
+      - Câmera: api/camera.md
+      - Sensores: api/sensores.md
+      - Visão e processamento: api/visao.md
