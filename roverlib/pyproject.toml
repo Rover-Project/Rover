@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -16,11 +16,11 @@ authors = [
   { name = "Hillan", email = "hillan1236@gmail.com"}
 ]
 
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: POSIX :: Linux",
   "Development Status :: 3 - Alpha",
   "Topic :: Scientific/Engineering :: Robotics",
@@ -58,10 +58,14 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[project.entry-points."rover.camera"]
-webcam = "roverlib.plugins.camera.webcam:Webcam"
-picamera2 = "roverlib.plugins.camera.picamera2:PiCamera2"
+# Arquivos que não são .py, mas precisam ir no pacote instalado
+[tool.setuptools.package-data]
+roverlib = [
+  "cli/templates/**/*",       # template usado pelo `rover new`
+  "plugins/pin/bin/*.so",     # módulo nativo do plugin pin (GPIO/PWM)
+  "**/*.md",                  # documentação dos plugins/módulos
+  "**/*.png",
+]
 
-[project.entry-points."rover.movement"]
-l298n = "roverlib.plugins.movement.gpio_l298n:L298NMotor"
-mock = "roverlib.plugins.movement.mock:MockMotor"
+[tool.setuptools.exclude-package-data]
+roverlib = ["**/__pycache__/*", "**/*.pyc", "**/.pytest_cache/**"]
