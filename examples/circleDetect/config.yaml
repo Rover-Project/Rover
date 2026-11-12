@@ -2,4 +2,5 @@ camera:
   fps: 30
   brigh: 0
   saturation: 1
-  contrast: 1
+  contrast: 
+  shape: [640, 640] 

@@ -1,6 +1,7 @@
 from roverlib.modules.vision.visionModule import VisionModule
 from roverlib.plugins.camera.autoFocus import AfCamera, AfModeEnum
 import cv2 as openCv
+from roverlib.utils.config_manager import Config
 from roverlib.modules.processing.processing_image import ProcessingImage
 from pathlib import Path
 import sys
@@ -43,24 +44,25 @@ def inInterval(last, current, LIMIAR):
     return True
 
 def smoothDetect():
-    HEIGHT = 640
-    WIDTH = 640
+    config = Config(Path(__file__).parent.parent / "config.yaml")
     
+    camera_config = config.get("camera")
+    shape = camera_config["shape"]
     
     camera = AfCamera(
-        HEIGHT, 
-        WIDTH, 
-        fps=30,
-        horizontalFlip=True,
-        verticalFlip=True,
+        shape[0], 
+        shape[1], 
+        fps=camera_config["fps"],
+        horizontalFlip=False,
+        verticalFlip=False,
         afMode=AfModeEnum.Continuous
     )
     camera.start()
     
     # Configuração base de captura
-    camera.set_brightness(0.5) # 0.5 de brilho fica muito bom
-    camera.set_contrast(1)
-    camera.set_saturation(1)
+    camera.set_brightness(camera_config["brigh"]) # 0.5 de brilho fica muito bom
+    camera.set_contrast(camera_config["contrast"])
+    camera.set_saturation(camera_config["saturation"])
 
     circleHistory = None  # média acumulada
     cont = 0
@@ -134,6 +136,7 @@ def smoothDetect():
             elif key == ord("s"):
                 openCv.imwrite(Path().home() / "Imagens" / "dataset_vc_lara" / (save_file + ".jpeg"), frame)
                 openCv.imwrite(Path().home() / "Imagens" / "dataset_vc_lara" / (save_file + "_maks.jpeg"), mask)
+                break
 
     camera.cleanup()
     openCv.destroyAllWindows()
