@@ -1,11 +1,13 @@
-class DirectionInvalidMotorError(Exception):
+from roverlib.exceptions import RoverLibError, HardwareNotAvailable
+
+
+class DirectionInvalidMotorError(RoverLibError, ValueError):
     """Direção inválida para a rotação dos motores."""
-    pass
 
-class UninitializedMotorError(Exception):
-    """Motor não inicializado."""
-    pass
 
-class MotorCreationError(Exception):
-    """GPIO não disponível."""
-    pass
+class UninitializedMotorError(RoverLibError, RuntimeError):
+    """Motor não inicializado: chame initialize() antes de movê-lo."""
+
+
+class MotorCreationError(HardwareNotAvailable, ImportError):
+    """GPIO não disponível (plugin pin ausente). Herda de ImportError por compatibilidade."""

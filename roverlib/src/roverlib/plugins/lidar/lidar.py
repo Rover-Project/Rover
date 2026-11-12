@@ -1,4 +1,4 @@
-from .exceptions import LidarNotStart, LidarDoNotRespond
+from .exceptions import LidarNotStart, LidarDoNotRespond, LidarNotAvailable
 from threading import Thread, current_thread
 import time
 try:
@@ -7,6 +7,9 @@ try:
 except (ImportError, ModuleNotFoundError):
     serial = None
     availableSerial = False
+
+# Nome padrão dos plugins (availableSerial é mantido por compatibilidade)
+HARDWARE_AVAILABLE = availableSerial
 
 # Constantes do quadro UART do TF-Luna (9 bytes: 0x59 0x59 Dist_L Dist_H Str_L Str_H Temp_L Temp_H Checksum)
 _FRAME_HEADER = 0x59
@@ -58,7 +61,7 @@ class Lidar():
         """
 
         if not availableSerial:
-            raise ModuleNotFoundError("Não foi possível importar o modulo serial. Instale com: pip install pyserial")
+            raise LidarNotAvailable("Não foi possível importar o modulo serial. Instale com: pip install pyserial")
 
         self.port = port # Portas onde o Lidar foi conectado
         self.baudrate = baudrate # Frequencia de operacao

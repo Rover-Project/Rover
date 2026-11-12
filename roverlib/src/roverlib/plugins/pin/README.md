@@ -18,10 +18,14 @@ pin/
 │   └── CMakeLists.txt      # Configuração de build
 │
 ├── bin/
-│   └── pin.so              # Módulo compilado  
+│   └── pin.so              # Módulo compilado
 │                           # (gerado pelo CMake)
-├── pin.py                  # Abstração Python 
-└── README.md               # (interface principal)
+├── pin.py                  # Abstração Python (interface principal)
+├── __init__.py             # API pública
+├── exceptions.py           # PinNotAvailable
+├── examples/               # scripts de demonstração (exigem a Raspberry Pi)
+├── tests/                  # testes (PC + hardware)
+└── README.md
 ```
 
 ---
@@ -56,7 +60,7 @@ O arquivo `pin.so` será gerado automaticamente em `pin/bin/`.
 ### Importação
 
 ```python
-from pin.pin import Pin, PinMode
+from roverlib.plugins.pin import Pin, PinMode
 ```
 
 ### Saída digital
@@ -179,3 +183,22 @@ sudo usermod -aG gpio $USER
 ```
 
 ---
+
+---
+
+## Simulação
+
+O plugin `pin` não tem versão simulada: ele é a base dos drivers de GPIO. Sem o módulo nativo (PC, ou Python diferente de 3.13 na Raspberry Pi), o plugin continua importável, `HARDWARE_AVAILABLE` vale `False` e criar um `Pin` gera `PinNotAvailable` (um `RuntimeError`). Quem simula são os plugins acima dele, como o `VirtualMotor`.
+
+---
+
+## Testes
+
+```bash
+python -m pytest src/roverlib/plugins/pin                                     # PC: módulo nativo falso
+ROVER_TEST_PIN=21 python -m pytest -m hardware src/roverlib/plugins/pin      # Raspberry Pi
+```
+
+Os testes de hardware só rodam com `ROVER_TEST_PIN` definido: use um pino **livre**, sem nada ligado (os pinos dos motores, como o 17, moveriam as rodas).
+
+Scripts de demonstração em `examples/` (na Raspberry Pi): `demo_digital.py`, `demo_hw_pwm.py`, `demo_soft_pwm.py` e `interactive.py`.

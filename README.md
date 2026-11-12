@@ -89,10 +89,12 @@ mkdocs serve
 ```bash
 cd roverlib
 pip install -e .[cli,dev]
-python -m pytest src/roverlib --ignore=src/roverlib/plugins/pin --ignore=src/roverlib/plugins/PCAServos
+python -m pytest                 # testes do PC (sem hardware)
+python -m pytest -m hardware     # na Raspberry Pi
 ```
 
-Os testes rodam sem hardware. Os de `pin` e `PCAServos` exigem a Raspberry Pi.
+Os testes que exigem a Raspberry Pi são marcados com `@pytest.mark.hardware` e ficam fora da execução padrão.
+Para criar um plugin novo, siga o [padrão de plugins](roverlib/src/roverlib/plugins/README.md).
 
 ## Licença
 

@@ -1,13 +1,13 @@
-class CameraNotStart(RuntimeError):
-    """
-    Execeção caso a câmera não esteja inicializada.
-    Args:
-        RuntimeError (_type_): _description_
-    """
-    pass
+from roverlib.exceptions import RoverLibError, HardwareNotAvailable
 
-class AutofocusModeInvalid(RuntimeError):
-    """
-    Execeção caso o mode de autofoco seja invalido para determinada operação
-    """
-    pass
+
+class CameraNotStart(RoverLibError, RuntimeError):
+    """A câmera não foi iniciada: chame start() antes de capturar."""
+
+
+class AutofocusModeInvalid(RoverLibError, RuntimeError):
+    """O modo de autofoco atual não permite essa operação."""
+
+
+class CameraNotAvailable(HardwareNotAvailable, ModuleNotFoundError):
+    """picamera2/libcamera indisponíveis (PC). Herda de ModuleNotFoundError por compatibilidade."""

@@ -91,10 +91,11 @@ O Lidar usa a UART da Raspberry Pi (`/dev/ttyAMA0`). Ative a porta serial em `su
 git clone https://github.com/Rover-Project/Rover.git
 cd Rover/roverlib
 pip install -e .[cli,dev]
-python -m pytest src/roverlib --ignore=src/roverlib/plugins/pin --ignore=src/roverlib/plugins/PCAServos
+python -m pytest                 # testes do PC (sem hardware)
+python -m pytest -m hardware     # na Raspberry Pi
 ```
 
-Os testes rodam no PC, sem hardware. Os testes de `pin` e `PCAServos` exigem a Raspberry Pi.
+Os testes que exigem a Raspberry Pi são marcados com `@pytest.mark.hardware` e só rodam com `-m hardware`.
 
 Para visualizar esta documentação localmente:
 

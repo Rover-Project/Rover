@@ -38,6 +38,8 @@ camera:
 lidar:
   port: /dev/ttyAMA0
   baudrate: 115200
+  simulate: auto
+  simulated_distance: 200
 
 pan_tilt:
   address: 0x40
@@ -86,8 +88,10 @@ Se a câmera não puder ser iniciada (por exemplo, PC sem webcam), aparece um av
 |---|---|---|
 | `port` | `/dev/ttyAMA0` | Porta serial onde o TF-Luna está ligado |
 | `baudrate` | `115200` | Velocidade da comunicação serial |
+| `simulate` | `auto` | `auto`: simula quando o `pyserial` ou a porta não existem (PC). `true`: sempre simula. `false`: exige o sensor |
+| `simulated_distance` | `200` | Distância, em cm, informada pelo Lidar simulado. Mude durante o programa com `rover.lidar.set_distance(cm)` |
 
-Assim como a câmera, uma falha ao iniciar o Lidar vira um aviso, e o restante do Rover continua funcionando.
+Assim como a câmera, uma falha ao iniciar o Lidar real vira um aviso, e o restante do Rover continua funcionando.
 
 ## `pan_tilt`
 

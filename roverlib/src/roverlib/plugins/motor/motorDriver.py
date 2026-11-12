@@ -4,15 +4,14 @@
 """
 
 from .motorInterface import MotorInterface
-from .exceptions import UninitializedMotorError, DirectionInvalidMotorError
+from .exceptions import UninitializedMotorError, DirectionInvalidMotorError, MotorCreationError
 
-try:
-    from roverlib.plugins.pin.pin import Pin, PinMode
-    PIN_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
-    # Sem o plugin pin (ex.: PC ou versão de Python sem o .so compilado).
-    # O Robot usa esse indicador para cair automaticamente no VirtualMotor.
-    PIN_AVAILABLE = False
+from roverlib.plugins.pin import Pin, PinMode
+from roverlib.plugins.pin import HARDWARE_AVAILABLE
+
+# Nome antigo, mantido por compatibilidade. Sem o plugin pin (PC ou versão de Python
+# sem o .so compilado), o Robot usa esse indicador para cair no VirtualMotor.
+PIN_AVAILABLE = HARDWARE_AVAILABLE
 
 
 class MotorDriver(MotorInterface):
@@ -22,7 +21,7 @@ class MotorDriver(MotorInterface):
 
     def __init__(self, pins: tuple[int, int], pwm_frequency=1000):
         if not PIN_AVAILABLE:
-            raise ImportError(
+            raise MotorCreationError(
                 "O plugin pin não está disponível. "
                 "Compile o módulo C++ e execute na Raspberry Pi."
             )

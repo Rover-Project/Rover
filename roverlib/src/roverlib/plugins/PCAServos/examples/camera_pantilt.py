@@ -1,110 +1,65 @@
 """
-examples/camera_pantilt.py
-===========================
-Exemplo de uso: Controle de câmera Pan/Tilt com dois servos.
+camera_pantilt.py
+==================
+Teste de movimento dos servos da câmera usando o plugin diretamente.
 
-Hardware esperado:
-  • Raspberry Pi 5
-  • PCA9685 no endereço padrão 0x40 (I2C bus 1)
-  • Servo PAN  → canal 0  (rotação horizontal)
-  • Servo TILT → canal 1  (inclinação vertical)
+Hardware do Rover:
+  • Raspberry Pi 5 + PCA9685 no endereço 0x40 (I²C bus 1)
+  • PAN  (horizontal) → canal 0, servo de ROTAÇÃO CONTÍNUA (360°): controlado por velocidade
+  • TILT (vertical)   → canal 1, servo de POSIÇÃO (180°): controlado por ângulo
 
-Nota sobre o Driver:
---------------------
-Este script utiliza a implementação nativa com Escrita Atômica (I2C Block Write).
-Isso garante que os 4 bytes do sinal PWM sejam atualizados no chip em um 
-único ciclo de clock do barramento, eliminando o "PWM Tearing" (pulos bruscos)
-e garantindo movimentos extremamente suaves e seguros para o hardware.
+Em programas, prefira o PanTilt (rover.pan_tilt), que acrescenta limites,
+trim, inversão de sentido e simulação no PC. Este script serve para testar
+o hardware isoladamente.
 
-Para executar na Raspberry Pi:
-  pip install smbus2
-  python examples/camera_pantilt.py
+Execute na Raspberry Pi:
+  python camera_pantilt.py
 """
-
 import time
-import logging
-import sys
-import os
 
-# Adiciona o diretório raiz do plugin ao path para permitir o import local
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from roverlib.plugins.PCAServos import PCAServos, Servo, ContinuousServo
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-
-try:
-    from pca9685 import PCAServos, Servo
-except ImportError as e:
-    print(f"Erro ao importar pca9685: {e}")
-    print("Execute: pip install smbus2")
-    sys.exit(1)
+TILT_MIN, TILT_MAX = 45, 135   # limites seguros do suporte (ajuste para o seu Rover)
 
 
-def varredura_horizontal(pan: Servo, steps: int = 9) -> None:
-    """Varre o servo PAN de 0° a 180° e volta ao centro."""
-    print("\n── Varredura horizontal (PAN) ──")
-    for grau in range(0, 181, 180 // steps):
-        pan.angle = grau
-        print(f"  PAN: {grau}°")
-        # O delay permite que o servo alcance a posição fisicamente
-        time.sleep(0.4) 
-    pan.center()
-    print("  PAN: 90° (centro)")
+def teste_pan(pan: ContinuousServo) -> None:
+    """Gira o PAN para um lado e para o outro, em velocidades crescentes."""
+    print("\n── PAN (servo 360°): velocidade ──")
+    for velocidade in (0.2, 0.4, -0.2, -0.4):
+        sentido = "direita" if velocidade > 0 else "esquerda"
+        print(f"  {sentido}, velocidade {abs(velocidade):.1f} por 1 s")
+        pan.throttle = velocidade
+        time.sleep(1.0)
+        pan.stop()
+        time.sleep(0.5)
+    print("  parado (se ainda girar devagar, ajuste o 'trim' do pan_tilt no config.yaml)")
 
 
-def varredura_vertical(tilt: Servo, min_grau: int = 45, max_grau: int = 135) -> None:
-    """Varre o servo TILT entre os ângulos informados."""
-    print("\n── Varredura vertical (TILT) ──")
-    for grau in range(min_grau, max_grau + 1, 10):
+def teste_tilt(tilt: Servo) -> None:
+    """Varre o TILT entre os limites e volta ao centro."""
+    print("\n── TILT (servo 180°): ângulo ──")
+    for grau in list(range(TILT_MIN, TILT_MAX + 1, 15)) + [90]:
         tilt.angle = grau
         print(f"  TILT: {grau}°")
-        time.sleep(0.3)
-    tilt.center()
-    print("  TILT: 90° (centro)")
-
-
-def posicao_inicial(pan: Servo, tilt: Servo) -> None:
-    """Move ambos os servos para o centro simultaneamente."""
-    print("\n── Posição inicial (centro) ──")
-    pan.center()
-    tilt.center()
-    time.sleep(0.5)
+        time.sleep(0.4)
 
 
 def main() -> None:
-    print("=" * 50)
-    print("  Rover – Controle de Câmera Pan/Tilt")
-    print("  PCA9685 Plugin próprio (Escrita Atômica I2C)")
-    print("=" * 50)
+    print("Rover – teste dos servos da câmera (PCA9685)")
 
-    # O uso do 'with' garante que os motores sejam desligados ao sair (close automático)
-    with PCAServos(address=0x40, bus=1, frequency=50) as pca:
-        pan  = Servo(pca, channel=0, min_pulse_us=500, max_pulse_us=2500)
-        tilt = Servo(pca, channel=1, min_pulse_us=600, max_pulse_us=2400)
+    # O 'with' garante que os sinais sejam desligados ao sair
+    with PCAServos(address=0x40, frequency=50) as pca:
+        pan = ContinuousServo(pca, channel=0)
+        tilt = Servo(pca, channel=1, min_pulse_us=500, max_pulse_us=2500)
 
-        posicao_inicial(pan, tilt)
-
-        print(f"\nPAN  atual: {pan.angle}°")
-        print(f"TILT atual: {tilt.angle}°")
-
-        varredura_horizontal(pan)
+        pan.stop()
+        tilt.center()
         time.sleep(0.5)
 
-        varredura_vertical(tilt)
-        time.sleep(0.5)
+        teste_tilt(tilt)
+        teste_pan(pan)
 
-        # Aponta para canto específico
-        print("\n── Posição personalizada ──")
-        pan.angle  = 45
-        tilt.angle = 60
-        print(f"  PAN={pan.angle}°  TILT={tilt.angle}°")
-        time.sleep(1.0)
-
-        posicao_inicial(pan, tilt)
-
-    print("\nDemo finalizado. Servos desativados com segurança.")
+    print("\nTeste finalizado. Servos desligados com segurança.")
 
 
 if __name__ == "__main__":

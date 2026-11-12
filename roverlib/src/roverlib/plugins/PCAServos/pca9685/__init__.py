@@ -12,9 +12,12 @@ Módulos disponíveis:
     - VirtualServo / VirtualContinuousServo: versões simuladas (PC, sem I²C)
 """
 
-from .servos import PCAServos, Servo, ContinuousServo, PCA_AVAILABLE
+from .servos import PCAServos, Servo, ContinuousServo, PCA_AVAILABLE, HARDWARE_AVAILABLE
 from .virtual import VirtualServo, VirtualContinuousServo
 
-__all__ = ["PCAServos", "Servo", "ContinuousServo", "VirtualServo", "VirtualContinuousServo", "PCA_AVAILABLE"]
+__all__ = [
+    "PCAServos", "Servo", "ContinuousServo", "VirtualServo", "VirtualContinuousServo",
+    "PCA_AVAILABLE", "HARDWARE_AVAILABLE",
+]
 __version__ = "1.0.0"
 __author__  = "Rover IC Project"

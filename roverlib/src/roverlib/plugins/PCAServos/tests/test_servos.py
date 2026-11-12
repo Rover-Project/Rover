@@ -67,3 +67,18 @@ def test_virtual_continuous_servo_limita_velocidade():
     assert s.throttle == -0.5
     s.stop()
     assert s.throttle == 0.0
+
+
+# ---------- padrão do plugin ----------
+
+def test_api_publica_do_pacote():
+    from roverlib.plugins import PCAServos as pacote
+    assert {"PCAServos", "Servo", "ContinuousServo", "VirtualServo", "HARDWARE_AVAILABLE"} <= set(pacote.__all__)
+    assert pacote.Servo is servos_mod.Servo
+
+
+def test_excecoes_compativeis():
+    from roverlib.exceptions import RoverLibError
+    from roverlib.plugins.PCAServos import PCANotAvailable, ServoAngleError
+    assert issubclass(PCANotAvailable, RuntimeError) and issubclass(PCANotAvailable, RoverLibError)
+    assert issubclass(ServoAngleError, ValueError) and issubclass(ServoAngleError, RoverLibError)

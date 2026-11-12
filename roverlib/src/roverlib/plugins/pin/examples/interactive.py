@@ -1,5 +1,4 @@
-import _path  # noqa
-from pin import Pin, PinMode
+from roverlib.plugins.pin import Pin, PinMode
 
 def main():
     pino = int(input("GPIO BCM [18]: ") or "18")

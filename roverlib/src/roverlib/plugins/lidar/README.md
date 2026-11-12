@@ -1,4 +1,19 @@
-## Documentação Técnica - LIDAR TF-Luna
+# Plugin Lidar (TF-Luna)
+
+Sensor de distância de um ponto (0,2 m a 8 m) via UART. Pelo `Rover`, é acessado como `rover.lidar`.
+
+## Estrutura
+
+```
+lidar/
+├── __init__.py      # API pública
+├── lidar.py         # Lidar: driver real (pySerial)
+├── virtual.py       # VirtualLidar: versão simulada
+├── exceptions.py    # LidarNotStart, LidarDoNotRespond, LidarNotAvailable
+└── tests/
+```
+
+## Documentação Técnica
 
 ### 1. Especificações de Operação
 
@@ -120,3 +135,36 @@ Em resumo, se lermos apenas 9 bytes enquanto o Lidar envia 100, muitas coisas fi
 `if uart_lidar.in_waiting > 500:`
 
 Garante que se a quantidade de dados que estiverem esperando forem maior que 500 bytes (valor sugerido), é possível limpar, ou armazenar esses dados sobressalentes, resolvendo o problema de overflow.
+
+### 6. Simulação
+
+O `VirtualLidar` tem a mesma interface do `Lidar` e informa a distância que você definir:
+
+```python
+from roverlib.plugins.lidar import VirtualLidar
+
+with VirtualLidar(distance=200) as lidar:
+    lidar.is_obstacle(30)     # False
+    lidar.set_distance(20)    # simula um obstáculo a 20 cm
+    lidar.is_obstacle(30)     # True
+```
+
+O `rover.lidar` usa o `VirtualLidar` automaticamente quando o `pyserial` ou a porta serial não estão disponíveis (PC), com `simulate: true` na seção `lidar:` ou com `ROVER_SIMULATE=1`. A distância inicial vem de `simulated_distance` (padrão 200 cm).
+
+### 7. Exceções
+
+Todas herdam de `RoverLibError`:
+
+| Exceção | Quando | Também é um |
+|---|---|---|
+| `LidarNotStart` | a porta serial não abre | `RuntimeError` |
+| `LidarDoNotRespond` | o sensor não envia dados | `RuntimeError` |
+| `LidarNotAvailable` | `pyserial` não instalado | `ModuleNotFoundError` |
+
+### 8. Testes
+
+```bash
+python -m pytest src/roverlib/plugins/lidar
+```
+
+Os testes rodam no PC, sem hardware. O `Lidar` é testado com uma porta serial simulada que envia quadros do TF-Luna.

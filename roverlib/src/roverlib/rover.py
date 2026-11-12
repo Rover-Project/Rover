@@ -62,7 +62,7 @@ class Rover:
             motors (dict): right, left, calibration {right, left}, pwm_frequency, simulate
             camera (dict): width, height, fps, index, webcam, horizontal_flip, vertical_flip,
                            brightness, contrast, saturation
-            lidar (dict): port, baudrate
+            lidar (dict): port, baudrate, simulate, simulated_distance
             pan_tilt (dict): address, simulate, pan {channel, trim, invert, time_per_turn},
                              tilt {channel, min, max, center, invert}
         """
@@ -185,12 +185,22 @@ class Rover:
 
     @staticmethod
     def _build_lidar(options: dict):
-        from roverlib.plugins.lidar.lidar import Lidar
+        import os
+        from roverlib.plugins.lidar import lidar as lidar_module
+        from roverlib.plugins.lidar.virtual import VirtualLidar
+        from roverlib.utils.simulation import resolve_simulate
 
-        lidar = Lidar(
-            port=options.get("port", "/dev/ttyAMA0"),
-            baudrate=options.get("baudrate", 115200),
+        port = options.get("port", "/dev/ttyAMA0")
+        hardware_available = lidar_module.availableSerial and os.path.exists(port)
+        simulate = resolve_simulate(
+            _auto_bool(options.get("simulate")), hardware_available,
+            "Lidar", "'simulate: false' na seção lidar", simulated_name="Lidar simulado",
         )
+
+        if simulate:
+            lidar = VirtualLidar(distance=options.get("simulated_distance", 200))
+        else:
+            lidar = lidar_module.Lidar(port=port, baudrate=options.get("baudrate", 115200))
         lidar.start()
         return lidar
 
@@ -294,7 +304,8 @@ class Rover:
         if self._camera is not None:
             parts.append(type(self._camera).__name__)
         if self._lidar is not None:
-            parts.append("lidar")
+            simulated = type(self._lidar).__name__ == "VirtualLidar"
+            parts.append("lidar simulado" if simulated else "lidar")
         if self._pan_tilt is not None:
             parts.append("pan-tilt simulado" if self._pan_tilt.simulated else "pan-tilt")
         return f"Rover({', '.join(parts) or 'sem componentes'})"

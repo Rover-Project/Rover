@@ -2,7 +2,7 @@ import sys
 import tty
 import termios
 import time
-from roverlib.plugins.PCAServos.pca9685.servos import PCAServos, Servo
+from roverlib.plugins.PCAServos import PCAServos, Servo
 
 def get_key():
     """Lê uma tecla do terminal sem precisar pressionar Enter."""

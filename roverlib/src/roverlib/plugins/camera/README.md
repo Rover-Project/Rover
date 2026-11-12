@@ -27,11 +27,14 @@ Todas as câmeras seguem a mesma interface (`CameraInterface`), então um códig
 
 ```
 roverlib/plugins/camera/
+├── __init__.py         # API pública
 ├── cameraInterface.py  # Classe abstrata com o contrato comum
 ├── camera.py           # Camera: Picamera2/libcamera (Raspberry Pi) + enum CameraFormat
-├── autofocus.py        # AfCamera: extensão com controle de autofoco + enums AfModeEnum e AfSpeedEnum
-├── webcam.py           # Webcam: captura via cv2.VideoCapture
-└── exceptions.py       # CameraNotStart e AutofocusModeInvalid
+├── autoFocus.py        # AfCamera: extensão com controle de autofoco + enums AfModeEnum e AfSpeedEnum
+├── webcam.py           # Webcam: captura via cv2.VideoCapture (versão de PC)
+├── factory.py          # open_camera(): escolhe Camera ou Webcam automaticamente
+├── exceptions.py       # CameraNotStart, AutofocusModeInvalid, CameraNotAvailable
+└── tests/
 ```
 
 ---
@@ -42,7 +45,7 @@ roverlib/plugins/camera/
 |--------|---------|-----|
 | `CameraInterface` | `cameraInterface.py` | Classe base abstrata (`ABC`). Define os métodos obrigatórios `get_frame`, `start`, `stop` e `cleanup` |
 | `Camera` | `camera.py` | Câmera da Raspberry Pi via Picamera2. Controle de exposição, brilho, contraste, saturação, FPS, corte (ROI), foto e vídeo H.264 |
-| `AfCamera` | `autofocus.py` | Herda de `Camera` e adiciona controle de autofoco para módulos com lente motorizada (ex.: Camera Module 3 / IMX708, Arducam IMX519) |
+| `AfCamera` | `autoFocus.py` | Herda de `Camera` e adiciona controle de autofoco para módulos com lente motorizada (ex.: Camera Module 3 / IMX708, Arducam IMX519) |
 | `Webcam` | `webcam.py` | Captura simples via OpenCV. Implementa só o contrato da interface |
 
 ---
@@ -63,7 +66,7 @@ roverlib/plugins/camera/
 - `opencv-python`
 - Uma webcam reconhecida como dispositivo `0`
 
-Se `picamera2` ou `libcamera` não estiverem disponíveis, o construtor de `Camera` lança `ModuleNotFoundError`. Para usar a webcam automaticamente nesses casos, use `open_camera()` (veja [Exemplos](#escolhendo-a-câmera-automaticamente)).
+Se `picamera2` ou `libcamera` não estiverem disponíveis, `HARDWARE_AVAILABLE` vale `False` e o construtor de `Camera` lança `CameraNotAvailable` (que também é um `ModuleNotFoundError`). Para usar a webcam automaticamente nesses casos, use `open_camera()` (veja [Exemplos](#escolhendo-a-câmera-automaticamente)).
 
 ---
 
@@ -71,7 +74,7 @@ Se `picamera2` ou `libcamera` não estiverem disponíveis, o construtor de `Came
 
 ```python
 import cv2
-from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera import Camera
 
 cam = Camera(height=480, width=640, fps=30)
 cam.start()
@@ -225,10 +228,11 @@ Ajustes de ISP, ROI, foto e vídeo são exclusivos da `Camera`. Chamá-los na `W
 
 ### Exceções
 
-Definidas em `exceptions.py`, ambas herdam de `RuntimeError`:
+Definidas em `exceptions.py`. Todas herdam de `RoverLibError`; `CameraNotStart` e `AutofocusModeInvalid` também de `RuntimeError`, e `CameraNotAvailable` de `ModuleNotFoundError`:
 
 | Exceção | Quando é lançada |
 |---------|------------------|
+| `CameraNotAvailable` | Ao criar `Camera`/`AfCamera` sem `picamera2`/`libcamera` (PC) |
 | `CameraNotStart` | Ao chamar `get_frame`, `get_frame_time`, `get_picture`, `get_video` ou os métodos de foco da `AfCamera` antes de `start()` |
 | `AutofocusModeInvalid` | Ao chamar `stop_autofocus_cycle()` fora do modo `AfModeEnum.Auto` |
 
@@ -241,7 +245,7 @@ Definidas em `exceptions.py`, ambas herdam de `RuntimeError`:
 `open_camera()` usa a Picamera2 na Raspberry Pi e a webcam no PC, e já devolve a câmera iniciada:
 
 ```python
-from roverlib.plugins.camera.factory import open_camera
+from roverlib.plugins.camera import open_camera
 
 cam = open_camera(height=480, width=640)   # Camera na RPi, Webcam no PC
 frame = cam.get_frame()
@@ -253,7 +257,7 @@ Use `open_camera(use_webcam=True)` para forçar a webcam, ou `use_webcam=False` 
 ### Ajustes de imagem e ROI
 
 ```python
-from roverlib.plugins.camera.camera import Camera
+from roverlib.plugins.camera import Camera
 
 cam = Camera(height=720, width=1280, fps=30, verticalFlip=True)
 cam.start()
@@ -298,7 +302,7 @@ O vídeo é salvo como stream H.264 bruto. Para gerar um `.mp4`: `ffmpeg -i vide
 ### Autofoco
 
 ```python
-from roverlib.plugins.camera.autofocus import AfCamera, AfModeEnum, AfSpeedEnum
+from roverlib.plugins.camera import AfCamera, AfModeEnum, AfSpeedEnum
 
 cam = AfCamera(height=720, width=1280, afSpeed=AfSpeedEnum.Fast)
 cam.start()  # começa em foco contínuo
@@ -318,4 +322,18 @@ cam.unlock_focus()
 cam.cleanup()
 ```
 
+---
 
+## Simulação
+
+No PC, a `Webcam` faz o papel de câmera: `open_camera()` (e o `rover.camera`) a usa automaticamente quando `HARDWARE_AVAILABLE` é `False`. O módulo `autoFocus` também é importável no PC (os enums de foco usam os mesmos valores do libcamera).
+
+---
+
+## Testes
+
+```bash
+python -m pytest src/roverlib/plugins/camera
+```
+
+Os testes rodam no PC, sem hardware. A escolha entre `Camera` e `Webcam` é testada com uma webcam falsa.

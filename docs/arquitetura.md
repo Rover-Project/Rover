@@ -19,7 +19,7 @@ A RoverLib é organizada em camadas. As de baixo conversam com o hardware; as de
 │  plugins/               drivers, um por peça de hardware         │
 │   ├ motor/      MotorInterface → MotorDriver | VirtualMotor      │
 │   ├ camera/     CameraInterface → Camera | AfCamera | Webcam     │
-│   ├ lidar/      Lidar (TF-Luna via UART)                         │
+│   ├ lidar/      Lidar | VirtualLidar (TF-Luna via UART)          │
 │   ├ PCAServos/  Servo | ContinuousServo | Virtual* (PCA9685)     │
 │   └ pin/        Pin: GPIO e PWM em C++ (pybind11)                │
 ├──────────────────────────────────────────────────────────────────┤
@@ -39,7 +39,7 @@ Cada plugin encapsula **uma peça de hardware** e esconde o protocolo usado por 
 - **`pin`** é a base de tudo que usa GPIO. É um módulo nativo em C++ (pybind11) com escrita digital, PWM por hardware e PWM por software. Os drivers de motor e de servo são construídos sobre ele.
 - **`motor`** controla um motor DC ligado a uma ponte-H L298N. `MotorDriver` escreve nos pinos de verdade; `VirtualMotor` apenas registra e imprime os comandos.
 - **`camera`** captura frames. `Camera` usa a Picamera2 (Raspberry Pi); `AfCamera` acrescenta controle de foco (Camera Module 3); `Webcam` usa o OpenCV (PC ou câmera USB).
-- **`lidar`** lê o TF-Luna em uma thread em segundo plano e mantém sempre a última medida disponível.
+- **`lidar`** lê o TF-Luna em uma thread em segundo plano e mantém sempre a última medida disponível. `VirtualLidar` é a versão simulada.
 - **`PCAServos`** controla servos por um PCA9685 (I²C), com as bibliotecas da Adafruit: `Servo` (posição, 0–180°) e `ContinuousServo` (rotação contínua). `VirtualServo` e `VirtualContinuousServo` são as versões simuladas.
 
 Plugins do mesmo tipo seguem uma **interface comum** (`MotorInterface`, `CameraInterface`). É isso que permite trocar o motor real pelo simulado, ou a Picamera2 pela webcam, sem mudar o código que os utiliza.
@@ -75,13 +75,16 @@ O `Rover` não acrescenta lógica de controle; ele **monta e entrega** os compon
 ## Decisões de projeto
 
 **Mesmo código no PC e no Rover.**
-Sem GPIO, o `Robot` usa o `VirtualMotor`; sem I²C, o `PanTilt` usa servos virtuais; sem Picamera2, `open_camera()` usa a webcam. O aluno desenvolve e testa a lógica no computador e leva o mesmo projeto para o robô. A simulação também pode ser forçada (`simulate: true` ou `ROVER_SIMULATE=1`) para testar na Raspberry Pi sem mover as rodas nem os servos.
+Sem GPIO, o `Robot` usa o `VirtualMotor`; sem I²C, o `PanTilt` usa servos virtuais; sem porta serial, o `rover.lidar` usa o `VirtualLidar`; sem Picamera2, `open_camera()` usa a webcam. O aluno desenvolve e testa a lógica no computador e leva o mesmo projeto para o robô. A simulação também pode ser forçada (`simulate: true` ou `ROVER_SIMULATE=1`) para testar na Raspberry Pi sem mover as rodas nem os servos.
 
 **Configuração fora do código.**
 Pinos, calibração e parâmetros da câmera ficam no `config.yaml`. Trocar a fiação ou o Rover não exige alterar o programa.
 
 **Mensagens de erro voltadas ao aluno.**
 Usar um componente não configurado gera, por exemplo, *"rover.camera não foi configurado. Adicione a seção 'camera:' ao config.yaml."*. Uma falha ao iniciar a câmera ou o Lidar vira um aviso, e o resto do Rover continua funcionando.
+
+**Um tipo de erro para toda a biblioteca.**
+Todas as exceções herdam de `RoverLibError` (em `roverlib.exceptions`), além da exceção padrão do Python correspondente (`RuntimeError`, `ValueError`...). O aluno pode tratar qualquer erro do Rover com um único `except RoverLibError`. Erros de hardware ausente são `HardwareNotAvailable`.
 
 **Liberação de recursos garantida.**
 `Rover`, `Robot`, `PanTilt` e `Lidar` funcionam com `with`: ao sair do bloco, inclusive por erro ou Ctrl+C, os motores param e as portas são fechadas.
@@ -136,9 +139,23 @@ Cada plugin e módulo tem um `README.md` próprio com detalhes de hardware e exe
 
 ## Estendendo a biblioteca
 
+Todo plugin segue o mesmo padrão, descrito no [guia de plugins](https://github.com/Rover-Project/Rover/blob/main/roverlib/src/roverlib/plugins/README.md):
+
+```
+plugins/<nome>/
+├── __init__.py      # API pública (from roverlib.plugins.<nome> import ...)
+├── README.md        # Hardware · Ligação · Uso · Simulação · Exceções · Testes
+├── <driver>.py      # driver real: import tolerante + HARDWARE_AVAILABLE
+├── virtual.py       # versão simulada, com a mesma interface
+├── interface.py     # (opcional) classe abstrata
+├── exceptions.py    # exceções herdando de RoverLibError
+├── examples/        # (opcional) scripts para testar o hardware
+└── tests/           # rodam no PC; os de hardware com @pytest.mark.hardware
+```
+
 Para adicionar um novo sensor ou atuador:
 
-1. Crie o driver em `plugins/<sensor>/`, com métodos `start()`/`stop()` e leituras de alto nível (como `get_distance()` no Lidar).
-2. Se o sensor tiver variantes, defina uma interface comum, como `MotorInterface`.
+1. Crie o plugin seguindo o padrão acima (o guia tem um checklist).
+2. Dê a ele leituras ou comandos de alto nível, como `get_distance()` e `is_obstacle()` no Lidar.
 3. Escreva testes que simulem o hardware (veja `plugins/lidar/tests/`, que simula a porta serial).
 4. Para disponibilizá-lo pelo `Rover`, adicione a seção correspondente em `Rover.__init__` e em `from_config`, e documente a seção em [Configuração](configuracao.md).

@@ -6,7 +6,7 @@ Pythônica com nomes em português e validações adicionais.
 
 Uso rápido
 ----------
-from pin.pin import Pin, PinMode
+from roverlib.plugins.pin import Pin, PinMode
 
 led = Pin(17, PinMode.DIGITAL_OUT)
 led.on()
@@ -25,6 +25,9 @@ from __future__ import annotations
 
 import sys as _sys
 import os as _os
+from enum import IntEnum as _IntEnum
+
+from .exceptions import PinNotAvailable
 
 # Adiciona pin/bin/ ao path para que o pin.so seja encontrado
 # independente de onde o script de teste está sendo executado
@@ -32,10 +35,22 @@ _BIN_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "bin")
 if _BIN_DIR not in _sys.path:
     _sys.path.insert(0, _BIN_DIR)
 
-import _pin_native as _native  # importa o _pin_native.so compilado
+try:
+    import _pin_native as _native  # importa o _pin_native.so compilado
+    HARDWARE_AVAILABLE = True
+    # Re-exporta o enum nativo para que o usuário possa fazer `from roverlib.plugins.pin import PinMode`
+    PinMode = _native.PinMode
+except ImportError:
+    # PC, ou Raspberry Pi com uma versão de Python sem o .so compilado.
+    # O módulo continua importável; criar um Pin gera PinNotAvailable.
+    _native = None
+    HARDWARE_AVAILABLE = False
 
-# Re-exporta o enum para que o usuário possa fazer `from pin.pin import PinMode`
-PinMode = _native.PinMode
+    class PinMode(_IntEnum):
+        """Modos de operação do pino (substituto usado quando o módulo nativo não está disponível)."""
+        DIGITAL_IN = 0
+        DIGITAL_OUT = 1
+        PWM = 2
 
 
 class Pin:
@@ -76,6 +91,12 @@ class Pin:
     """
 
     def __init__(self, number: int, mode: PinMode) -> None:
+        if not HARDWARE_AVAILABLE:
+            raise PinNotAvailable(
+                "O módulo nativo do plugin pin não está disponível. Ele requer a Raspberry Pi "
+                f"e foi compilado para Python 3.13 (ARM64); este é o Python {_sys.version_info.major}."
+                f"{_sys.version_info.minor}."
+            )
         self._pin = _native.Pin(number, mode)
 
     # ------------------------------------------------------------------ #

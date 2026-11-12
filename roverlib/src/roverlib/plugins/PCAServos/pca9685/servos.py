@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
 
+from roverlib.plugins.PCAServos.exceptions import PCANotAvailable, ServoAngleError
+
 try:
     # Bibliotecas da Adafruit: só funcionam com I²C disponível (Raspberry Pi)
     import board
@@ -10,6 +12,9 @@ try:
     PCA_AVAILABLE = True
 except Exception:  # ImportError no PC; NotImplementedError/RuntimeError do Blinka sem I²C
     PCA_AVAILABLE = False
+
+# Nome padrão dos plugins (PCA_AVAILABLE é mantido por compatibilidade)
+HARDWARE_AVAILABLE = PCA_AVAILABLE
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +37,7 @@ class PCAServos:
         frequency: float = _DEFAULT_FREQ_HZ,
     ) -> None:
         if not PCA_AVAILABLE:
-            raise RuntimeError(
+            raise PCANotAvailable(
                 "PCA9685 indisponível: as bibliotecas da Adafruit (I²C) não puderam ser carregadas. "
                 "Este driver requer a Raspberry Pi; no PC, use os servos simulados."
             )
@@ -43,7 +48,7 @@ class PCAServos:
             self.servos_instances = {}
             logger.info(f"PCAServos Adafruit iniciado | addr=0x{address:02X} freq={frequency} Hz")
         except Exception as e:
-            raise RuntimeError(f"Falha ao inicializar o PCA9685 da Adafruit: {e}")
+            raise PCANotAvailable(f"Falha ao inicializar o PCA9685 da Adafruit: {e}") from e
 
     def get_servo(self, channel: int, min_pulse: int = _DEFAULT_MIN_PULSE, max_pulse: int = _DEFAULT_MAX_PULSE):
         """Retorna a instância do servo Adafruit para o canal especificado."""
@@ -95,7 +100,7 @@ class Servo:
     def angle(self, degrees: float) -> None:
         degrees = float(degrees)
         if not (0.0 <= degrees <= 180.0):
-            raise ValueError(f"Ângulo inválido: {degrees}. O valor deve estar entre 0.0 e 180.0 graus para proteger o motor.")
+            raise ServoAngleError(f"Ângulo inválido: {degrees}. O valor deve estar entre 0.0 e 180.0 graus para proteger o motor.")
         self._adafruit_servo.angle = degrees
 
     def detach(self) -> None:

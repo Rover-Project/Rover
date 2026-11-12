@@ -13,3 +13,14 @@ with Lidar() as lidar:
 ```
 
 ::: roverlib.plugins.lidar.lidar.Lidar
+
+## Lidar simulado
+
+Usado pelo `rover.lidar` fora da Raspberry Pi. A distância é a que você definir com `set_distance()`.
+
+```python
+rover.lidar.set_distance(20)     # simula um obstáculo a 20 cm
+rover.lidar.is_obstacle(30)      # True
+```
+
+::: roverlib.plugins.lidar.virtual.VirtualLidar

@@ -1,6 +1,6 @@
 from .camera import Camera
 from time import sleep
-from .exceptions import CameraNotStart, AutofocusModeInvalid
+from .exceptions import CameraNotStart, AutofocusModeInvalid, CameraNotAvailable
 from enum import IntEnum 
 
 try: 
@@ -9,21 +9,32 @@ try:
     availableLibcamera = True
 except (ImportError, ModuleNotFoundError):
     availableLibcamera = False
-    
+
+# Valores dos controles de foco. Na Raspberry Pi vêm do libcamera; no PC usam os
+# mesmos números definidos pelo libcamera, para que o módulo continue importável.
+if availableLibcamera:
+    _AF_MODE = (controls.AfModeEnum.Manual, controls.AfModeEnum.Auto, controls.AfModeEnum.Continuous)
+    _AF_SPEED = (controls.AfSpeedEnum.Normal, controls.AfSpeedEnum.Fast)
+else:
+    _AF_MODE = (0, 1, 2)
+    _AF_SPEED = (0, 1)
+
+
 class AfModeEnum(IntEnum):
     """
     Enum para guarda os valores possiveis para o modo do autofoco
     """
-    Continuous = controls.AfModeEnum.Continuous
-    Manual = controls.AfModeEnum.Manual 
-    Auto = controls.AfModeEnum.Auto
-    
+    Continuous = _AF_MODE[2]
+    Manual = _AF_MODE[0]
+    Auto = _AF_MODE[1]
+
+
 class AfSpeedEnum(IntEnum):
     """
     Enum para guarda os valores possiveis para a velocidade do autofoco
     """
-    Fast = controls.AfSpeedEnum.Fast
-    Normal = controls.AfSpeedEnum.Normal
+    Fast = _AF_SPEED[1]
+    Normal = _AF_SPEED[0]
     
 class AfCamera(Camera):
     """
@@ -44,7 +55,7 @@ class AfCamera(Camera):
     ):
         
         if not availableLibcamera:
-            raise ModuleNotFoundError("libcamera não disponível")
+            raise CameraNotAvailable("libcamera não disponível")
         
         super().__init__(
             height, 

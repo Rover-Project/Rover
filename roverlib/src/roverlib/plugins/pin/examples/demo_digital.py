@@ -1,6 +1,5 @@
-import _path  
 import time
-from pin import Pin, PinMode
+from roverlib.plugins.pin import Pin, PinMode
 
 with Pin(17, PinMode.DIGITAL_OUT) as led:
 

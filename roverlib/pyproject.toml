@@ -69,3 +69,12 @@ roverlib = [
 
 [tool.setuptools.exclude-package-data]
 roverlib = ["**/__pycache__/*", "**/*.pyc", "**/.pytest_cache/**"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/roverlib"]
+# Testes que exigem a Raspberry Pi levam @pytest.mark.hardware e ficam fora da execução padrão.
+# Na Raspberry Pi:  python -m pytest -m hardware
+addopts = "-m 'not hardware'"
+markers = [
+  "hardware: exige a Raspberry Pi e o hardware real (rode com: pytest -m hardware)",
+]

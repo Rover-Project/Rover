@@ -16,4 +16,4 @@ Usados internamente pelo `Robot`. Só é preciso usá-los diretamente para contr
 
 ::: roverlib.plugins.motor.motorDriver.MotorDriver
 
-::: roverlib.plugins.motor.vitualMotor.VirtualMotor
+::: roverlib.plugins.motor.virtual.VirtualMotor

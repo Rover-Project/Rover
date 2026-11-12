@@ -12,7 +12,8 @@ def env_simulate() -> bool:
     return os.environ.get(SIMULATE_ENV, "").strip().lower() in ("1", "true", "yes", "sim")
 
 
-def resolve_simulate(simulate, hardware_available: bool, component: str, how_to_require: str) -> bool:
+def resolve_simulate(simulate, hardware_available: bool, component: str, how_to_require: str,
+                     simulated_name: str = None) -> bool:
     """
     Decide se um componente deve ser simulado.
 
@@ -21,6 +22,7 @@ def resolve_simulate(simulate, hardware_available: bool, component: str, how_to_
         hardware_available: se o driver real pode ser usado neste computador.
         component: nome do componente, usado no aviso (ex.: "motores").
         how_to_require: como exigir o hardware, usado no aviso (ex.: "Robot(..., simulate=False)").
+        simulated_name: como chamar a versão simulada no aviso. Padrão: "<component> simulados".
 
     Returns:
         True se o componente deve ser simulado.
@@ -30,7 +32,8 @@ def resolve_simulate(simulate, hardware_available: bool, component: str, how_to_
     if env_simulate():
         return True
     if not hardware_available:
-        print(f"AVISO: hardware de {component} não disponível. Usando {component} simulados. "
+        simulated_name = simulated_name or f"{component} simulados"
+        print(f"AVISO: hardware de {component} não disponível. Usando {simulated_name}. "
               f"Use {how_to_require} para exigir o hardware.")
         return True
     return False

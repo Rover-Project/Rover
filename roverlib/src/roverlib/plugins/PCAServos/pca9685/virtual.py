@@ -4,6 +4,8 @@ Usados automaticamente fora da Raspberry Pi (ou quando a simulação é pedida).
 """
 from typing import Optional
 
+from roverlib.plugins.PCAServos.exceptions import ServoAngleError
+
 
 class VirtualServo:
     """Simula um servo de posição (0° a 180°)."""
@@ -26,7 +28,7 @@ class VirtualServo:
     def angle(self, degrees: float) -> None:
         degrees = float(degrees)
         if not (0.0 <= degrees <= 180.0):
-            raise ValueError(f"Ângulo inválido: {degrees}. O valor deve estar entre 0.0 e 180.0 graus para proteger o motor.")
+            raise ServoAngleError(f"Ângulo inválido: {degrees}. O valor deve estar entre 0.0 e 180.0 graus para proteger o motor.")
         if degrees != self._angle:
             self._log(f"[simulação] {self.name} (canal {self._channel}): {degrees:g}°")
         self._angle = degrees

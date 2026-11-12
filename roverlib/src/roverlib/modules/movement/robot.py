@@ -7,7 +7,7 @@ import time
 
 from roverlib.plugins.motor import motorDriver
 from roverlib.plugins.motor.motorDriver import MotorDriver
-from roverlib.plugins.motor.vitualMotor import VirtualMotor
+from roverlib.plugins.motor.virtual import VirtualMotor
 from roverlib.utils.simulation import SIMULATE_ENV, resolve_simulate  # noqa: F401 (SIMULATE_ENV reexportado)
 from .motorCalibration import Calibration
 

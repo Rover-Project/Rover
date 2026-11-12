@@ -36,11 +36,13 @@ O plugin motor fornece uma abstração para controle de motores DC conectados a 
 
 ```
 motor/
-├── __init__.py
+├── __init__.py         # API pública
 ├── motorInterface.py   # Classe base abstrata
 ├── motorDriver.py      # Driver real (requer Raspberry Pi + plugin pin)
-├── virtualMotor.py     # Driver de simulação
-└── exceptions.py       # Exceções customizadas
+├── virtual.py          # Driver de simulação (VirtualMotor)
+├── vitualMotor.py      # Nome antigo de virtual.py, mantido por compatibilidade
+├── exceptions.py       # Exceções do plugin
+└── tests/
 ```
 
 ---
@@ -52,7 +54,7 @@ motor/
 Não exige dependências externas. Funciona em qualquer sistema com Python 3.10+.
 
 ```python
-from roverlib.plugins.motor.virtualMotor import VirtualMotor
+from roverlib.plugins.motor import VirtualMotor
 ```
 
 ### Modo Real (Raspberry Pi)
@@ -62,17 +64,17 @@ Requer:
 - Plugin `pin` compilado (`roverlib.plugins.pin`)
 
 ```python
-from roverlib.plugins.motor.motorDriver import MotorDriver
+from roverlib.plugins.motor import MotorDriver
 ```
 
-> ⚠️ Se o plugin `pin` não estiver disponível, a importação de `MotorDriver` levantará `ImportError` com uma mensagem explicativa.
+> ⚠️ Se o plugin `pin` não estiver disponível, `HARDWARE_AVAILABLE` vale `False` e criar um `MotorDriver` levanta `MotorCreationError` (que também é um `ImportError`).
 
 ---
 
 ## Uso Rápido
 
 ```python
-from roverlib.plugins.motor.virtualMotor import VirtualMotor
+from roverlib.plugins.motor import VirtualMotor
 
 # Instancia o motor com os pinos GPIO e uma tag identificadora
 motor = VirtualMotor(pins=(17, 18), tag="motor_esquerdo")
@@ -202,9 +204,9 @@ MotorDriver motor_esquerdo: recursos liberados.
 
 | Exceção | Herda de | Quando é levantada |
 |---|---|---|
-| `UninitializedMotorError` | `Exception` | Ao chamar `set_movement()` ou `stop()` antes de `initialize()` |
-| `DirectionInvalidMotorError` | `Exception` | Ao passar uma direção inválida para `set_movement()` |
-| `MotorCreationError` | `Exception` | Falha na criação do motor (e.g. GPIO indisponível) |
+| `UninitializedMotorError` | `RoverLibError`, `RuntimeError` | Ao chamar `set_movement()` ou `stop()` antes de `initialize()` |
+| `DirectionInvalidMotorError` | `RoverLibError`, `ValueError` | Ao passar uma direção inválida para `set_movement()` |
+| `MotorCreationError` | `HardwareNotAvailable`, `ImportError` | Ao criar um `MotorDriver` sem GPIO (plugin `pin` indisponível) |
 
 ---
 
@@ -252,7 +254,7 @@ motor.cleanup()
 ### Tratamento de Exceções
 
 ```python
-from roverlib.plugins.motor.virtualMotor import VirtualMotor
+from roverlib.plugins.motor import VirtualMotor
 from roverlib.plugins.motor.exceptions import UninitializedMotorError, DirectionInvalidMotorError
 
 motor = VirtualMotor(pins=(17, 18), tag="motor_teste")
@@ -273,7 +275,7 @@ except DirectionInvalidMotorError as e:
 ### Dois motores em paralelo
 
 ```python
-from roverlib.plugins.motor.virtualMotor import VirtualMotor
+from roverlib.plugins.motor import VirtualMotor
 
 left  = VirtualMotor(pins=(17, 18), tag="esquerdo")
 right = VirtualMotor(pins=(22, 23), tag="direito")
@@ -296,3 +298,19 @@ right.stop()
 for motor in (left, right):
     motor.cleanup()
 ```
+
+---
+
+## Simulação
+
+O `VirtualMotor` tem a mesma interface do `MotorDriver`: imprime os comandos no terminal (só quando o movimento muda) e guarda o estado em `speed` e `direction`. O `Robot` (`rover.move`) o usa automaticamente quando `HARDWARE_AVAILABLE` é `False`, com `simulate=True` ou com `ROVER_SIMULATE=1`.
+
+---
+
+## Testes
+
+```bash
+python -m pytest src/roverlib/plugins/motor
+```
+
+Os testes rodam no PC, sem hardware. O `MotorDriver` é testado com um `Pin` falso, conferindo o PWM aplicado em cada entrada da ponte-H.

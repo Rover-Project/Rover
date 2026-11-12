@@ -49,6 +49,7 @@ def sem_hardware(monkeypatch):
 
     monkeypatch.setattr(factory, "open_camera", lambda **kw: FakeCamera(**kw))
     monkeypatch.setattr(lidar, "Lidar", FakeLidar)
+    monkeypatch.setattr(lidar, "availableSerial", True)
 
 
 def escrever_config(tmp_path, texto):
@@ -73,6 +74,7 @@ def test_config_completo(tmp_path):
           vertical_flip: true
         lidar:
           port: /dev/ttyUSB0
+          simulate: false
     """)
     with Rover.from_config(path) as rover:
         assert rover.simulated
@@ -161,7 +163,7 @@ def test_falha_em_componente_opcional_nao_derruba_o_rover(monkeypatch, capsys):
             raise RuntimeError("porta serial não encontrada")
 
     monkeypatch.setattr(lidar, "Lidar", LidarQuebrado)
-    rover = Rover(motors={}, lidar={})
+    rover = Rover(motors={}, lidar={"simulate": False})
     assert "lidar não pôde ser iniciado" in capsys.readouterr().out
     rover.move.forward(30)  # o resto continua funcionando
     with pytest.raises(ComponentNotAvailable, match="porta serial"):
@@ -223,3 +225,27 @@ def test_atalhos_do_pacote():
     from roverlib import Robot, PID, open_camera, Lidar, PanTilt, ProcessingImage, VisionModule  # noqa: F401
     with pytest.raises(AttributeError):
         roverlib.NaoExiste
+
+
+# ---------- Lidar simulado ----------
+
+def test_lidar_simulado_por_padrao_no_pc(tmp_path):
+    from roverlib.plugins.lidar import VirtualLidar
+    path = escrever_config(tmp_path, """
+        lidar:
+          simulated_distance: 25
+    """)
+    with Rover.from_config(path) as rover:
+        assert isinstance(rover.lidar, VirtualLidar)
+        assert rover.lidar.get_distance() == 25
+        assert rover.lidar.is_obstacle(30)
+        rover.lidar.set_distance(150)
+        assert not rover.lidar.is_obstacle(30)
+
+
+def test_lidar_auto_sem_porta_simula(monkeypatch, capsys):
+    from roverlib.plugins.lidar import VirtualLidar
+    monkeypatch.delenv(robot_module.SIMULATE_ENV)
+    rover = Rover(lidar={"port": "/dev/porta_que_nao_existe"})
+    assert isinstance(rover.lidar, VirtualLidar)
+    assert "Lidar simulado" in capsys.readouterr().out

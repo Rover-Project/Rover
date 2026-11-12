@@ -1,6 +1,6 @@
 import cv2 as openCV
 from .cameraInterface import CameraInterface
-from .exceptions import CameraNotStart
+from .exceptions import CameraNotStart, CameraNotAvailable
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time, sleep
 from enum import IntEnum 
@@ -20,6 +20,9 @@ try:
     availablePicamera2 = True
 except (ImportError, ModuleNotFoundError):
     availablePicamera2 = False
+
+# Nome padrão dos plugins: a câmera da Raspberry Pi precisa das duas bibliotecas
+HARDWARE_AVAILABLE = availablePicamera2 and availableLibcamera
     
 class CameraFormat(IntEnum):
     """
@@ -63,10 +66,10 @@ class Camera(CameraInterface):
         """
         
         if not availablePicamera2:
-            raise ModuleNotFoundError("Não foi possivel importa o modulo picamera2")
+            raise CameraNotAvailable("Não foi possivel importar o modulo picamera2")
         
         if not availableLibcamera:
-            raise ModuleNotFoundError("Não foi possivel importar o modulo libcamera")
+            raise CameraNotAvailable("Não foi possivel importar o modulo libcamera")
         
         self.size = (width, height) # tamanho da imagem
         self.fps = fps # taxa de frames

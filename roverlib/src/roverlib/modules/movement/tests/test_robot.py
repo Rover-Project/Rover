@@ -9,7 +9,7 @@ from roverlib.modules.movement import robot as robot_module
 from roverlib.modules.movement.robot import Robot
 from roverlib.modules.movement.motorCalibration import Calibration
 from roverlib.plugins.motor import motorDriver
-from roverlib.plugins.motor.vitualMotor import VirtualMotor
+from roverlib.plugins.motor.virtual import VirtualMotor
 
 
 @pytest.fixture(autouse=True)
