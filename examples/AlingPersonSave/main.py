@@ -203,7 +203,7 @@ if __name__ == "__main__":
                 pause = False
                 
             elif key == ord("s"):
-                opencv.imwrite(Path.home() / "Imagens" / "Guris" / save_file)
+                opencv.imwrite(Path.home() / "Imagens" / "Guris" / save_file, frame)
 
     camera.cleanup()
     opencv.destroyAllWindows()
