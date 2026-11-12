@@ -1,0 +1,27 @@
+# Configuração do seu Rover
+# Só os componentes com seção ativa (sem "#") são criados.
+# Fora da Raspberry Pi, os motores são simulados e a câmera usa a webcam do PC.
+
+# ---------- Motores (ponte-H L298N) ----------
+motors:
+  right: [17, 26]        # pinos GPIO do motor direito (in3, in4)
+  left: [25, 16]         # pinos GPIO do motor esquerdo (in1, in2)
+  calibration:           # multiplica a velocidade de cada lado (ex.: 0.95 se um motor for mais rápido)
+    right: 1
+    left: 1
+  simulate: auto         # auto: simula se não houver GPIO | true: sempre simula | false: exige o hardware
+
+# ---------- Câmera ----------
+# Remova os "#" abaixo para usar a câmera (rover.camera).
+#camera:
+#  width: 640
+#  height: 480
+#  fps: 30
+#  webcam: auto           # auto: Picamera2 na RPi, webcam no PC | true: sempre webcam
+#  vertical_flip: false   # true se a câmera estiver de cabeça para baixo
+#  horizontal_flip: false
+
+# ---------- Lidar TF-Luna ----------
+# Remova os "#" abaixo para usar o Lidar (rover.lidar). Requer o sensor ligado na UART.
+#lidar:
+#  port: /dev/ttyAMA0
