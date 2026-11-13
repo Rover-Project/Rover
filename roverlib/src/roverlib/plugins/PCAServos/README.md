@@ -59,7 +59,7 @@ with PCAServos(address=0x40) as pca:
 
 | Classe | Controle | Métodos e propriedades |
 |---|---|---|
-| `PCAServos` | placa PCA9685 | `get_servo(channel)`, `close()`, uso com `with` |
+| `PCAServos` | placa PCA9685 | `get_servo(channel)`, `close(keep_channels=())` (canais em `keep_channels` seguem com sinal após fechar), uso com `with` |
 | `Servo` | ângulo (0–180°) | `angle`, `center()`, `detach()` |
 | `ContinuousServo` | velocidade (-1 a 1) | `throttle`, `stop()`, `detach()` |
 

@@ -63,8 +63,9 @@ class Rover:
             camera (dict): width, height, fps, index, webcam, horizontal_flip, vertical_flip,
                            brightness, contrast, saturation
             lidar (dict): port, baudrate, simulate, simulated_distance
-            pan_tilt (dict): address, simulate, pan {channel, trim, invert, time_per_turn},
-                             tilt {channel, min, max, center, invert}
+            pan_tilt (dict): address, simulate,
+                             pan {channel, trim, invert, min, max, degrees_per_second, calibration_speed},
+                             tilt {channel, min, max, center, invert, hold}
         """
         self._move = None
         self._camera = None
@@ -220,9 +221,13 @@ class Rover:
             tilt_invert=bool(tilt.get("invert", False)),
             pan_trim=pan.get("trim", 0.0),
             pan_invert=bool(pan.get("invert", False)),
-            pan_time_per_turn=pan.get("time_per_turn", 2.0),
+            pan_min=pan.get("min", -50),
+            pan_max=pan.get("max", 50),
+            pan_degrees_per_second=pan.get("degrees_per_second", 125),
+            pan_calibration_speed=pan.get("calibration_speed", 20),
             pan_pulse=tuple(pan.get("pulse", (500, 2500))),
             tilt_pulse=tuple(tilt.get("pulse", (500, 2500))),
+            hold_tilt=bool(tilt.get("hold", True)),
             simulate=_auto_bool(options.get("simulate")),
         )
 

@@ -47,8 +47,11 @@ pan_tilt:
   pan:
     channel: 0
     trim: 0
-    invert: false
-    time_per_turn: 2.0
+    invert: true
+    min: -50
+    max: 50
+    degrees_per_second: [125, 100]
+    calibration_speed: 20
   tilt:
     channel: 1
     min: 45
@@ -104,16 +107,21 @@ Os dois servos que movem a câmera, ligados a um PCA9685 (I²C).
 | `pan.channel` | `0` | Canal do PCA9685 do servo **PAN** (horizontal, **360°**, rotação contínua) |
 | `pan.trim` | `0` | Velocidade (-1.0 a 1.0) em que o PAN fica realmente parado. Ajuste se a câmera girar devagar sozinha após `stop_pan()` (ex.: `0.03`) |
 | `pan.invert` | `false` | Inverte o sentido, se `pan_right()` girar para a esquerda |
-| `pan.time_per_turn` | `2.0` | Segundos para uma volta completa com velocidade 100. Usado por `pan_degrees()`: meça no seu Rover |
+| `pan.min`, `pan.max` | `-50`, `50` | Limites do giro, em graus (0° = câmera de frente; positivo = direita). O PAN para sozinho ao chegar neles. No Rover, protegem o cabo flat da câmera |
+| `pan.degrees_per_second` | `125` | Graus por segundo do PAN na velocidade `calibration_speed`. Um número ou `[direita, esquerda]`, se um sentido for mais rápido. Usado para estimar a posição: meça no seu Rover |
+| `pan.calibration_speed` | `20` | Velocidade (0 a 100) usada na medição acima; é também a velocidade padrão de `pan_to()` |
 | `pan.pulse` | `[500, 2500]` | Pulsos mínimo e máximo do servo, em µs |
 | `tilt.channel` | `1` | Canal do servo **TILT** (vertical, **180°**, posição) |
 | `tilt.min`, `tilt.max` | `0`, `180` | Limites de ângulo, para não forçar o suporte da câmera |
 | `tilt.center` | `90` | Ângulo com a câmera olhando para frente (usado por `center()`) |
 | `tilt.invert` | `false` | Inverte o sentido, se `tilt_up()` abaixar a câmera |
+| `tilt.hold` | `true` | Ao encerrar, o TILT continua segurando a câmera no centro (sem sinal, o peso da câmera a faria cair) |
 | `tilt.pulse` | `[500, 2500]` | Pulsos mínimo e máximo do servo, em µs |
 
-!!! note "Por que o PAN não tem ângulo?"
-    O servo de 360° gira continuamente e não informa sua posição: ele é controlado por **velocidade** (como as rodas). `pan_degrees()` estima o ângulo pelo tempo de giro, por isso depende de `time_per_turn` estar medido.
+!!! note "Como o PAN sabe onde está?"
+    O servo de 360° gira continuamente e não informa sua posição: ele é controlado por **velocidade** (como as rodas). O `PanTilt` **estima** o ângulo multiplicando a velocidade pelo tempo de giro, considerando que o programa começa com a câmera de frente (0°). É assim que ele respeita `pan.min`/`pan.max`, e que `pan_to()`, `pan_degrees()` e `center()` funcionam. Ao encerrar, a câmera volta para a frente. Se a estimativa se perder, alinhe a câmera e chame `reset_pan_position()`.
+
+    Para medir `degrees_per_second`: com a câmera em um limite, gire com velocidade 20 até o outro limite e cronometre; divida o ângulo entre os limites pelo tempo. Repita no outro sentido.
 
 ## Formato antigo dos exemplos
 

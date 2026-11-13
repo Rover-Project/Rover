@@ -56,7 +56,7 @@ with Rover.from_config("config.yaml") as rover:
     rover.lidar.get_distance()             # distância em cm
     rover.lidar.is_obstacle(30)            # True se houver algo a 30 cm ou menos
 
-    rover.pan_tilt.pan_right(30, duration=0.5)  # gira a câmera (servo 360°)
+    rover.pan_tilt.pan_to(30)              # gira a câmera até ~30° à direita (servo 360°)
     rover.pan_tilt.tilt_to(60)             # inclina a câmera (servo 180°)
     rover.pan_tilt.center()
 ```

@@ -26,7 +26,7 @@ Na janela da imagem: `q` encerra e `c` centraliza a câmera.
 2. Os **momentos** da máscara (`cv2.moments`) dão a área e o centro do objeto.
 3. O erro é a distância do objeto ao centro da imagem, normalizada entre -1 e 1.
 4. Os dois servos corrigem esse erro de formas diferentes:
-   - **PAN (360°)** não tem posição: o erro define a **velocidade** do giro (`pan(kp_pan * erro_x)`). Perto do centro, dentro da `deadzone`, o giro para.
+   - **PAN (360°)** é controlado por velocidade: o erro define a **velocidade** do giro (`pan(kp_pan * erro_x)`). Perto do centro, dentro da `deadzone`, o giro para. O `PanTilt` estima a posição do PAN e o para nos limites `pan.min`/`pan.max`, protegendo o cabo da câmera.
    - **TILT (180°)** tem posição: a cada frame, o **ângulo** anda um pouco na direção do objeto (`tilt_up(-kp_tilt * erro_y)`), respeitando os limites `min` e `max`.
 
 É um exemplo de **controle proporcional**: quanto mais longe do centro, mais forte a correção.
@@ -41,4 +41,5 @@ Na janela da imagem: `q` encerra e `c` centraliza a câmera.
 | `tracking.min_area` | Tamanho mínimo da região vermelha para ser considerada um objeto |
 | `pan_tilt.pan.trim` | Corrige o PAN girando sozinho quando deveria estar parado |
 | `pan_tilt.pan.invert` / `pan_tilt.tilt.invert` | Invertem o sentido, se a câmera fugir do objeto em vez de segui-lo |
+| `pan_tilt.pan.min` / `max` | Limites do giro do PAN, em graus (0 = frente), para não forçar o cabo flat |
 | `pan_tilt.tilt.min` / `max` | Limites do TILT para não forçar o suporte |

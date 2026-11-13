@@ -60,10 +60,18 @@ class PCAServos:
             )
         return self.servos_instances[channel]
 
-    def close(self) -> None:
-        """Fecha o barramento I2C e desliga os canais."""
-        for ch in self.servos_instances.values():
-            ch.fraction = None # Desliga o PWM
+    def close(self, keep_channels=()) -> None:
+        """
+        Fecha o barramento I2C e desliga os canais.
+
+        Args:
+            keep_channels: canais que continuam recebendo o sinal após o fechamento
+                (o PCA9685 segue gerando o PWM sozinho). Útil para um servo de posição
+                continuar segurando uma carga, como o TILT da câmera.
+        """
+        for channel, ch in self.servos_instances.items():
+            if channel not in keep_channels:
+                ch.fraction = None # Desliga o PWM
         self.pca.deinit()
         self.i2c.deinit()
 

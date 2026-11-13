@@ -32,6 +32,11 @@ motors:
 #  pan:                   # servo 360° (horizontal): controlado por velocidade
 #    channel: 0
 #    trim: 0              # ajuste se a câmera girar sozinha quando deveria estar parada
+#    invert: true         # no Rover, o servo gira ao contrário
+#    min: -50             # limites do giro em graus (0 = frente): não force o cabo flat
+#    max: 50
+#    degrees_per_second: [125, 100]  # [direita, esquerda] com a velocidade 20
+#    calibration_speed: 20
 #  tilt:                  # servo 180° (vertical): controlado por ângulo
 #    channel: 1
 #    min: 45              # limites para não forçar o suporte

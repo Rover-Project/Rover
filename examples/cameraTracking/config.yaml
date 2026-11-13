@@ -10,7 +10,11 @@ pan_tilt:
   pan:              # servo 360° (horizontal)
     channel: 0
     trim: 0         # ajuste se a câmera girar sozinha quando deveria estar parada
-    invert: false   # true se a câmera girar para o lado contrário do objeto
+    invert: true    # no Rover, o servo gira ao contrário (troque se a câmera fugir do objeto)
+    min: -50        # limites do giro em graus (0 = frente): o cabo flat não pode ser forçado
+    max: 50
+    degrees_per_second: [125, 100]  # [direita, esquerda] medidos com a velocidade abaixo
+    calibration_speed: 20
   tilt:             # servo 180° (vertical)
     channel: 1
     min: 45

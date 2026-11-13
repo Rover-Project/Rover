@@ -191,7 +191,10 @@ def test_pan_tilt_pelo_config(tmp_path, monkeypatch):
             channel: 2
             trim: 0.03
             invert: true
-            time_per_turn: 3.5
+            min: -40
+            max: 60
+            degrees_per_second: [125, 100]
+            calibration_speed: 20
           tilt:
             channel: 3
             min: 40
@@ -202,7 +205,9 @@ def test_pan_tilt_pelo_config(tmp_path, monkeypatch):
         pt = rover.pan_tilt
         assert pt.simulated                    # ROVER_SIMULATE=1 na fixture
         assert pt._pan._channel == 2 and pt._tilt._channel == 3
-        assert (pt.pan_trim, pt.pan_invert, pt.pan_time_per_turn) == (0.03, True, 3.5)
+        assert (pt.pan_trim, pt.pan_invert, pt.pan_min, pt.pan_max) == (0.03, True, -40, 60)
+        assert pt.pan_degrees_per_second == (125, 100) and pt.pan_calibration_speed == 20
+        assert pt.hold_tilt
         assert (pt.tilt_min, pt.tilt_max, pt.tilt_center) == (40, 140, 85)
         pt.pan_right(50)
         rover.stop()                           # stop() também para o PAN

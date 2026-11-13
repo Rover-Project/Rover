@@ -57,7 +57,22 @@ def test_hardware_real_usa_canais_e_pulsos(monkeypatch):
     cont.assert_called_once_with(pca, 2, 500, 2500)
     pos.assert_called_once_with(pca, 3, 600, 2400)
     p.cleanup()
-    pca.close.assert_called_once()
+    pca.close.assert_called_once_with(keep_channels=(3,))   # TILT segura a câmera
+    pos.return_value.detach.assert_not_called()
+    cont.return_value.detach.assert_called_once()
+
+
+def test_cleanup_sem_hold_desliga_o_tilt(monkeypatch):
+    monkeypatch.setattr(pca_module, "PCA_AVAILABLE", True)
+    pca = MagicMock()
+    monkeypatch.setattr(pca_module, "PCAServos", MagicMock(return_value=pca))
+    monkeypatch.setattr(pca_module, "ContinuousServo", MagicMock())
+    pos = MagicMock()
+    monkeypatch.setattr(pca_module, "Servo", pos)
+    p = PanTilt(hold_tilt=False)
+    p.cleanup()
+    pca.close.assert_called_once_with(keep_channels=())
+    pos.return_value.detach.assert_called_once()
 
 
 def test_angulos_do_tilt_invalidos():
@@ -96,28 +111,77 @@ def test_pan_trim_e_invert():
 
 
 def test_pan_com_duracao_para_ao_final(sem_espera):
-    p = criar()
+    p = criar(pan_max=None)                # sem limite: espera a duração inteira
     p.pan_right(30, duration=0.5)
     assert sem_espera == [0.5]
     assert p._pan.throttle == 0
 
 
 @pytest.mark.parametrize("graus, velocidade, duracao, sentido", [
-    (90, 100, 0.5, 1),     # volta completa em 2 s a 100 -> 90° = 0,5 s
-    (-180, 50, 2.0, -1),   # a 50, a volta leva 4 s -> 180° = 2 s
+    (25, 20, 0.2, 1),      # 125°/s a 20 -> 25° = 0,2 s
+    (-40, 40, 0.2, -1),    # esquerda: 100°/s a 20 -> 200°/s a 40 -> 40° = 0,2 s
 ])
-def test_pan_degrees(sem_espera, monkeypatch, graus, velocidade, duracao, sentido):
-    p = criar(pan_time_per_turn=2.0)
-    aplicados = []
-    monkeypatch.setattr(p, "pan", lambda speed, duration=None: aplicados.append((speed, duration)))
-    p.pan_degrees(graus, speed=velocidade)
-    assert aplicados == [(sentido * velocidade, pytest.approx(duracao))]
+def test_pan_degrees_usa_a_velocidade_de_cada_sentido(sem_espera, graus, velocidade, duracao, sentido):
+    p = criar(pan_degrees_per_second=(125, 100), pan_calibration_speed=20)
+    assert p.pan_degrees(graus, speed=velocidade) == graus
+    assert sem_espera == [pytest.approx(duracao)]
+    assert p.pan_position == graus
+    assert p._pan.throttle == 0
 
 
 def test_pan_degrees_zero_nao_gira(sem_espera):
     p = criar()
     p.pan_degrees(0)
     assert sem_espera == []
+
+
+def test_pan_to_respeita_os_limites(sem_espera):
+    p = criar(pan_min=-50, pan_max=50, pan_degrees_per_second=100, pan_calibration_speed=20)
+    assert p.pan_to(80) == 50              # limitado
+    assert sem_espera == [pytest.approx(0.5)]
+    assert p.pan_position == 50
+    p.pan_right(30, duration=1)            # já no limite: não gira
+    assert sem_espera == [pytest.approx(0.5)]
+    p.center()
+    assert p.pan_position == 0
+
+
+def test_pan_com_duracao_para_no_limite(sem_espera):
+    p = criar(pan_max=10, pan_degrees_per_second=100, pan_calibration_speed=20)
+    p.pan_right(20, duration=5)            # 10° a 100°/s -> para em 0,1 s
+    assert sem_espera == [pytest.approx(0.1)]
+
+
+def test_posicao_estimada_pelo_tempo(monkeypatch):
+    agora = [100.0]
+    monkeypatch.setattr(pt_module.time, "monotonic", lambda: agora[0])
+    p = criar(pan_degrees_per_second=(125, 100), pan_calibration_speed=20)
+    p.pan_right(20)                        # sem duração: segue girando
+    agora[0] += 0.2
+    assert p.pan_position == pytest.approx(25)
+    p.pan_left(40)
+    agora[0] += 0.1
+    p.stop_pan()
+    assert p.pan_position == pytest.approx(5)
+    agora[0] += 5                          # parado: não muda
+    assert p.pan_position == pytest.approx(5)
+    p.reset_pan_position()
+    assert p.pan_position == 0
+
+
+def test_giro_continuo_para_sozinho_no_limite():
+    p = criar(pan_max=1, pan_degrees_per_second=100, pan_calibration_speed=100)
+    p.pan_right(100)                       # 1° a 100°/s -> para em ~10 ms
+    p._limit_timer.join(1)
+    assert p.pan_speed == 0
+    assert p.pan_position == pytest.approx(1)
+
+
+def test_limites_invalidos():
+    with pytest.raises(ValueError):
+        PanTilt(simulate=True, pan_min=10)
+    with pytest.raises(ValueError):
+        PanTilt(simulate=True, pan_degrees_per_second=0)
 
 
 # ---------- TILT (180°) ----------
@@ -156,14 +220,18 @@ def test_tilt_suave_passo_a_passo(sem_espera):
     assert sem_espera == [0.01, 0.01, 0.01]
 
 
-def test_center_e_cleanup():
+def test_center_e_cleanup(sem_espera):
     p = criar()
-    p.pan_right(50)
+    p.pan_degrees(-30)
     p.tilt_to(30)
     p.center()
     assert p._pan.throttle == 0
+    assert p.pan_position == 0
     assert p.tilt_angle == 90
-    p.cleanup()
+    p.pan_degrees(20)
+    p.tilt_to(40)
+    p.cleanup()                            # volta a câmera para a frente
+    assert (p.pan_position, p.tilt_angle) == (0, 90)
     p.cleanup()
 
 
