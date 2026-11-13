@@ -15,7 +15,11 @@ class ContinuousFocusApp:
             from roverlib.plugins.camera.autoFocus import AfCamera
             
             # Instancia a câmera com foco contínuo automático por padrão na classe AfCamera
-            self.camera = AfCamera(height=self.height, width=self.width, verticalFlip=True)
+            self.camera = AfCamera(
+                height=self.height, width=self.width,
+                horizontalFlip=cam_config.get("horizontal_flip", False),
+                verticalFlip=cam_config.get("vertical_flip", False),
+            )
             self.camera.start()
             
             # Aplica configurações visuais se suportado

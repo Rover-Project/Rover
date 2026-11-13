@@ -1,5 +1,7 @@
 camera:
   fps: 30
+  vertical_flip: false    # true se a imagem aparecer de cabeça para baixo
+  horizontal_flip: false  # true se a imagem aparecer espelhada
   brigh: 0.25
   saturation: 1
   contrast: 1

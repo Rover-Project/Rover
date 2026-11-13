@@ -15,6 +15,8 @@ class ManualFocusController:
             self.camera = AfCamera(
                 height=cam_config["resolution"]["h"],
                 width=cam_config["resolution"]["w"],
+                horizontalFlip=cam_config.get("horizontal_flip", False),
+                verticalFlip=cam_config.get("vertical_flip", False),
                 afMode=AfModeEnum.Manual,
                 afSpeed=AfSpeedEnum.Normal
             )

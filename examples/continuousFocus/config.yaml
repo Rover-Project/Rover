@@ -1,7 +1,9 @@
 camera:
   resolution:
-    h: 1080
-    w: 1080
+    h: 720
+    w: 1280
+  vertical_flip: false    # true se a imagem aparecer de cabeça para baixo
+  horizontal_flip: false  # true se a imagem aparecer espelhada
   brigh: 0.25
   contrast: 1
   saturation: 1

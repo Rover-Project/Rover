@@ -1,8 +1,10 @@
 camera:
   fps: 30
   resolution:
-    h: 4656
-    w: 3496
+    h: 720
+    w: 1280
+  vertical_flip: false    # true se a imagem aparecer de cabeça para baixo
+  horizontal_flip: false  # true se a imagem aparecer espelhada
   brigh: 0 # Brilho
   contrast: 1 # Contraste 
   saturation: 1 # Saturação

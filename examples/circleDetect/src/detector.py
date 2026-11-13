@@ -22,32 +22,34 @@ class CircleDetector:
         h = cam_config.get("resolution", {}).get("h", 640)
         w = cam_config.get("resolution", {}).get("w", 640)
         fps = cam_config.get("fps", 30)
+        hflip = cam_config.get("horizontal_flip", False)
+        vflip = cam_config.get("vertical_flip", False)
 
         # Tentativa 1: Câmara com Autofoco (Picamera2)
         try:
             from roverlib.plugins.camera.autoFocus import AfCamera, AfModeEnum
-            cam = AfCamera(height=h, width=w, fps=fps, horizontalFlip=True, verticalFlip=True, afMode=AfModeEnum.Continuous)
+            cam = AfCamera(height=h, width=w, fps=fps, horizontalFlip=hflip, verticalFlip=vflip, afMode=AfModeEnum.Continuous)
             cam.start()
             cam.set_brightness(cam_config.get("brigh", 0.25))
             cam.set_contrast(cam_config.get("contrast", 1))
             cam.set_saturation(cam_config.get("saturation", 1))
             print("Câmara Autofoco (Picamera2) iniciada.")
             return cam
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Câmara com autofoco indisponível ({e}). Tentando a câmara fixa...")
 
         # Tentativa 2: Câmara Fixa (Picamera2)
         try:
             from roverlib.plugins.camera.camera import Camera
-            cam = Camera(height=h, width=w, fps=fps)
+            cam = Camera(height=h, width=w, fps=fps, horizontalFlip=hflip, verticalFlip=vflip)
             cam.start()
             cam.set_brightness(cam_config.get("brigh", 0.25))
             cam.set_contrast(cam_config.get("contrast", 1))
             cam.set_saturation(cam_config.get("saturation", 1))
             print("Câmara Fixa (Picamera2) iniciada.")
             return cam
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Câmara fixa indisponível ({e}). Tentando a webcam...")
 
         # Tentativa 3: Webcam (Fallback PC)
         try:
