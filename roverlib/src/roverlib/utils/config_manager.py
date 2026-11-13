@@ -1,7 +1,8 @@
 import yaml
 
+
 class Config:
-    
+
     def __init__(self, path):
         """
         Carrega dados do arquivo de configuração.
@@ -11,35 +12,35 @@ class Config:
         """
         self.config_path = path
 
-    def load(self):
-        """Ler o arquivo de configuração"""
-        with open(self.config_path, "r") as file:
+    def load(self) -> dict:
+        """Lê o arquivo de configuração. Um arquivo vazio vira um dicionário vazio."""
+        with open(self.config_path, "r", encoding="utf-8") as file:
             config = yaml.safe_load(file)
-            
-        return config
 
-    def get(self, key: str):
-        """Acessa um campo do arquivo de configuração"""
-        config = self.load()
-        return config.get(key)
- 
+        return config or {}
+
+    def get(self, key: str, default=None):
+        """
+        Acessa um campo do arquivo de configuração.
+
+        Args:
+            key (str): nome do campo (ex.: "camera").
+            default: valor retornado se o campo não existir. Padrão: None.
+        """
+        return self.load().get(key, default)
+
     def setConfig(self, config_write: dict):
         """
-        Adicona novas configuracoes no arquivo de config
+        Adiciona novas configurações no arquivo de configuração.
+
         Args:
             config_write (dict): nova configuração que deve ser escrita.
         """
-        
         config = dict(self.load())
-        
-        #print(config)
-        
+
         # Adiciona as novas configurações
-        for key, value in config_write.items():
-            
-            print(key, value)
-            config[key] = value
-        
+        config.update(config_write)
+
         # Escreve as novas configurações no arquivo
-        with open(self.config_path, "w") as file:
-            yaml.safe_dump(config, file, default_flow_style=False)
+        with open(self.config_path, "w", encoding="utf-8") as file:
+            yaml.safe_dump(config, file, default_flow_style=False, allow_unicode=True)

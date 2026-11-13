@@ -18,7 +18,11 @@ class LidarMonitorApp:
         self.strength_data = []
         self.temp_data = []
 
-        self.lidar = Lidar()
+        lidar_config = self.config.get("lidar", {})
+        self.lidar = Lidar(
+            port=lidar_config.get("port", "/dev/ttyAMA0"),
+            baudrate=lidar_config.get("baudrate", 115200),
+        )
         try:
             self.lidar.start()
         except Exception as e:

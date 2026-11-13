@@ -1,5 +1,5 @@
 lidar:
-  port: "/dev/serial0"
+  port: "/dev/ttyAMA0"   # UART dos GPIO 14/15 (na Pi 5, /dev/serial0 aponta para a porta de depuração)
   baudrate: 115200
 graph:
   max_points: 50
