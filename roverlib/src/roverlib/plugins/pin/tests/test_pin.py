@@ -33,7 +33,8 @@ def nativo_falso(monkeypatch):
 def test_api_publica_do_pacote():
     assert pin_package.Pin is pin_module.Pin
     assert {"Pin", "PinMode", "HARDWARE_AVAILABLE", "PinNotAvailable"} <= set(pin_package.__all__)
-    assert {"DIGITAL_IN", "DIGITAL_OUT", "PWM"} <= {m.name for m in PinMode}
+    # Vale tanto para o enum nativo (pybind11, não iterável) quanto para o substituto do PC
+    assert all(hasattr(PinMode, nome) for nome in ("DIGITAL_IN", "DIGITAL_OUT", "PWM"))
 
 
 def test_sem_modulo_nativo_gera_erro_claro(monkeypatch):
