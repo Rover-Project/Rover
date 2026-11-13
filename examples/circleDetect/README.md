@@ -5,6 +5,10 @@ O projeto utiliza segmentação por cor, Transformada de Hough, detecção por c
 
 A detecção é suavizada ao longo do tempo utilizando um histórico da posição do círculo, reduzindo ruídos entre frames.
 
+**Detecta apenas objetos VERMELHOS** (a segmentação por cor usa a faixa do vermelho no HSV). Use, por exemplo, uma tampa, bola ou disco vermelho.
+
+Durante a execução, `s` salva `frame.jpg` e `mascara.jpg` (útil para entender falhas de detecção) e `q` encerra.
+
 # Estrutura 
 ```bash
 circleDetect/

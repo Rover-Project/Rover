@@ -37,15 +37,16 @@ class VisionModule:
             minDist=minDist,
             param1=canny,
             param2=accumulation,
-            minRadius=minDist,
+            minRadius=minRadius,
             maxRadius=maxRadius
         )
 
-        # Reconhece o maior ciculo
+        # O OpenCV ordena os círculos pelo número de votos: o primeiro é o mais confiável.
+        # (Escolher o de maior raio pegava círculos falsos, maiores que o objeto.)
         if circles is not None:
-            circles = numpy.uint16(numpy.around(circles[0]))
-            circles = sorted(circles, key=lambda c: c[2], reverse=True) # type:ignore
-            return tuple(circles[0]), edges_ellipse # retorna os dados do circulo e segmentação
+            # int comum (e não uint16) para não estourar em subtrações feitas pelo usuário
+            best = numpy.around(circles[0][0]).astype(int)
+            return tuple(int(v) for v in best), edges_ellipse # retorna os dados do circulo e segmentação
 
         return None, edges_ellipse
     

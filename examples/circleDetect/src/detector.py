@@ -73,7 +73,7 @@ class CircleDetector:
         return abs(np.sum(v1 - v2)) <= thres
 
     def run(self):
-        print("Iniciando deteção de círculos. Pressione 'q' para sair.")
+        print("Iniciando deteção de círculos VERMELHOS. Pressione 's' para salvar a imagem e a máscara, 'q' para sair.")
         while True:
             frame = self.camera.get_frame()
             if frame is None:
@@ -83,8 +83,8 @@ class CircleDetector:
             hough, _ = VisionModule.houghCircleDetect(mask)
             contour = VisionModule.circleCannyDetect(mask)
 
-            hough = np.array(hough) if hough is not None else None
-            contour = np.array(contour) if contour is not None else None
+            hough = np.array(hough, dtype=int) if hough is not None else None
+            contour = np.array(contour, dtype=int) if contour is not None else None
 
             det = None
             if hough is not None and contour is not None:
@@ -107,7 +107,7 @@ class CircleDetector:
 
             txt = "Nenhum circulo detectado"
             if self.circle_history is not None:
-                x, y, r = self.circle_history
+                x, y, r = (int(v) for v in self.circle_history)
                 openCv.circle(frame, (x, y), r, (0, 255, 0), 3)
                 openCv.circle(frame, (x, y), 3, (0, 255, 255), -1)
                 txt = f"X={x}  Y={y}  R={r}"
@@ -116,8 +116,13 @@ class CircleDetector:
             openCv.imshow("Deteccao Final", frame)
             openCv.imshow("Mascara", mask)
 
-            if openCv.waitKey(10) & 0xFF == ord('q'):
+            key = openCv.waitKey(10) & 0xFF
+            if key == ord('q'):
                 break
+            if key == ord('s'):
+                openCv.imwrite("frame.jpg", frame)
+                openCv.imwrite("mascara.jpg", mask)
+                print("Imagens salvas: frame.jpg e mascara.jpg")
 
     def cleanup(self):
         print("\nA encerrar o sistema de visão...")

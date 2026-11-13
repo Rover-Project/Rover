@@ -101,6 +101,7 @@ class ProcessingImage:
         """
             Aplica segmentacao por cor, utilizando os tons de cores passados como parametro.
             Por padrão segmenta a cor vemelha. Realiza segmentacao dupla, para diferentes niveis de brilho de acordo com o gamma passado.
+            A mascara retornada tem o mesmo tamanho da imagem de entrada.
         Args:
             img (_type_): _description_
             gamma (float, optional): _description_. Defaults to 2.3.
@@ -113,10 +114,11 @@ class ProcessingImage:
             _type_: _description_
         """
         
-        frame = openCv.resize(img, (640, 640))
-        
-        # Aplica filtro para escurecer a imagem
-        dark = ProcessingImage.ligh_adjustment(frame, 2.5)
+        # A máscara tem o mesmo tamanho da imagem recebida, para as coordenadas baterem com o frame
+        frame = img
+
+        # Aplica filtro para escurecer a imagem (gamma > 1 escurece)
+        dark = ProcessingImage.ligh_adjustment(frame, gamma)
 
         mask_red_dark = ProcessingImage.color_segmentation(dark) # Aplica segmentação por cor na mascara escurecida
         mask_red_normal = ProcessingImage.color_segmentation(frame) # Aplica segmentação por cor na mascara normal
