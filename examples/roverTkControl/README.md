@@ -16,7 +16,7 @@ O código foi dividido em duas classes com responsabilidades bem definidas:
 
 **Responsabilidade**: Gerenciar a interação direta com os pinos GPIO e o controle dos motores **(Lógica de Baixo Nível)**.
 
-- Utiliza a biblioteca **gpiozero.Robot** para abstrair o controle dos motores.
+- Utiliza o `Robot` da RoverLib para controlar os motores (simulados no PC, reais na Raspberry Pi).
 - Encapsula as funções básicas de movimento (`forward()`, `backward()`, `left()`, `right()`, `stop()`).
 - Gerencia a **velocidade** atual dos motores.
 

@@ -50,7 +50,6 @@ python main.py
 |---|---|---|
 | `roverKeypadControl` | Dirige o Rover pelo teclado, com visualização da câmera | motores + câmera |
 | `roverTkControl` | Interface gráfica (Tkinter) para testar os motores | motores |
-| `servoController` | Controle de dois servos pelo teclado, direto na GPIO (gpiozero). Exemplo antigo: os servos do Rover hoje usam o PCA9685 (veja `cameraTracking`) | servos na GPIO |
 
 !!! note "YOLO e MediaPipe na Raspberry Pi"
     `objectDetection` e `mediaPiper` dependem de bibliotecas grandes (`ultralytics`, `mediapipe`). Confira se há versão delas para o Python da sua Raspberry Pi antes de instalar o extra `[ai]`; o README de cada exemplo traz os passos.

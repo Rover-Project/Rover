@@ -2,7 +2,7 @@ from roverlib.modules.movement.robot import Robot
 
 class Motor:
     """
-    Classe para controlar os motores usando gpiozero.Robot.
+    Classe para controlar os motores usando o Robot da RoverLib.
     """
     def __init__(self, left_pins, right_pins, initial_speed=5):
         """

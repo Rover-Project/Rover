@@ -34,7 +34,6 @@ dependencies = [
   "PyYAML",
   "pyserial",
   "matplotlib",
-  "gpiozero",
   "adafruit-blinka",
   "adafruit-circuitpython-pca9685",
   "adafruit-circuitpython-motor"
