@@ -68,7 +68,7 @@ class AfCamera(Camera):
             width (int): largura dos frames, em pixels.
             fps (int): quadros por segundo. Padrão 30.
             index (int): qual câmera usar, se houver mais de uma. Padrão 0.
-            format (CameraFormat, optional): conversão de cor dos frames. Padrão: nenhuma (BGR).
+            format (CameraFormat | str, optional): formato de cor dos frames. Padrão: BGR (sem conversão).
             horizontalFlip (bool): espelha a imagem na horizontal. Padrão False.
             verticalFlip (bool): espelha a imagem na vertical. Padrão False.
             afMode (AfModeEnum): modo de foco inicial. Padrão `Continuous`.

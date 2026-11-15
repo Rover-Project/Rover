@@ -17,10 +17,14 @@ class FakeCamera:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.brightness = None
+        self.format = None
         self.cleaned = False
 
     def set_brightness(self, value):
         self.brightness = value
+
+    def set_format(self, value):
+        self.format = value
 
     def cleanup(self):
         self.cleaned = True
@@ -260,3 +264,12 @@ def test_component_not_available_e_erro_da_roverlib():
     from roverlib.exceptions import RoverLibError
     assert issubclass(ComponentNotAvailable, RoverLibError)
     assert issubclass(ComponentNotAvailable, RuntimeError)   # compatível com quem tratava RuntimeError
+
+
+def test_formato_da_camera_pelo_config(tmp_path):
+    rover = Rover.from_config(escrever_config(tmp_path, """
+        camera:
+          format: rgb
+    """))
+    assert rover.camera.format == "rgb"
+    rover.cleanup()

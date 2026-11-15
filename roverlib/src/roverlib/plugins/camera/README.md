@@ -29,7 +29,8 @@ Todas as câmeras seguem a mesma interface (`CameraInterface`), então um códig
 roverlib/plugins/camera/
 ├── __init__.py         # API pública
 ├── cameraInterface.py  # Classe abstrata com o contrato comum
-├── camera.py           # Camera: Picamera2/libcamera (Raspberry Pi) + enum CameraFormat
+├── camera.py           # Camera: Picamera2/libcamera (Raspberry Pi)
+├── formats.py          # CameraFormat e conversão de cor dos frames
 ├── autoFocus.py        # AfCamera: extensão com controle de autofoco + enums AfModeEnum e AfSpeedEnum
 ├── webcam.py           # Webcam: captura via cv2.VideoCapture (versão de PC)
 ├── factory.py          # open_camera(): escolhe Camera ou Webcam automaticamente
@@ -169,7 +170,7 @@ Valores fora do intervalo lançam `ValueError`. Para visão computacional, ajust
 |--------|-----------|
 | `set_region_interest((x, y, largura, altura))` | Define um corte aplicado a cada `get_frame` |
 | `clear_region_interest()` | Remove o corte |
-| `set_format(format)` | Define a conversão de cor (`CameraFormat`) |
+| `set_format(format)` | Formato de cor dos frames: `CameraFormat.BGR` (padrão), `.RGB`, `.Gray` ou `.HSV` (ou `"bgr"`, `"rgb"`, `"gray"`, `"hsv"`). Também existe na `Webcam` |
 
 ### AfCamera
 

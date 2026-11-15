@@ -11,3 +11,5 @@ Mais detalhes e exemplos no [README do plugin de câmera](https://github.com/Rov
 ::: roverlib.plugins.camera.autoFocus.AfCamera
 
 ::: roverlib.plugins.camera.webcam.Webcam
+
+::: roverlib.plugins.camera.formats.CameraFormat

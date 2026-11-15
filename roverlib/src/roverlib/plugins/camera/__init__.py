@@ -3,12 +3,13 @@ Plugin camera: captura de imagens.
 
     from roverlib.plugins.camera import open_camera, Camera, AfCamera, Webcam, HARDWARE_AVAILABLE
 
-- Camera / AfCamera: câmera da Raspberry Pi (picamera2); AfCamera controla o foco (Camera Module 3).
+- Camera / AfCamera: câmera da Raspberry Pi (picamera2); AfCamera controla o foco (Arducam IMX519 no Rover).
 - Webcam: webcam do PC ou câmera USB (OpenCV); é a "versão de PC" deste plugin.
 - open_camera(): escolhe automaticamente entre Camera e Webcam.
 """
 from .cameraInterface import CameraInterface
-from .camera import Camera, CameraFormat, HARDWARE_AVAILABLE
+from .camera import Camera, HARDWARE_AVAILABLE
+from .formats import CameraFormat
 from .autoFocus import AfCamera, AfModeEnum, AfSpeedEnum
 from .webcam import Webcam
 from .factory import open_camera, picamera_available

@@ -31,6 +31,7 @@ camera:
   webcam: auto
   vertical_flip: false
   horizontal_flip: false
+  format: bgr
   brightness: 0.0
   contrast: 1.0
   saturation: 1.0
@@ -81,6 +82,7 @@ A variável de ambiente `ROVER_SIMULATE=1` força a simulação sem alterar o ar
 | `index` | `0` | Qual câmera usar, se houver mais de uma |
 | `webcam` | `auto` | `auto`: Picamera2 na Raspberry Pi, webcam no PC. `true`: sempre webcam. `false`: exige a Picamera2 |
 | `vertical_flip`, `horizontal_flip` | `false` | Espelham a imagem. Com a câmera de cabeça para baixo, use os dois como `true` |
+| `format` | `bgr` | Formato de cor dos frames: `bgr` (padrão do OpenCV, use com `cv2.imshow()` e `ProcessingImage`), `rgb` (MediaPipe, PIL, Matplotlib), `gray` (tons de cinza) ou `hsv` |
 | `brightness` | — | Brilho, de -1.0 a 1.0. É um ajuste forte: soma cerca de 255 × valor a cada pixel, então ±0.1 já muda bastante (apenas Picamera2) |
 | `contrast`, `saturation` | — | Contraste e saturação, de 0 a 32; 1.0 mantém a imagem original (apenas Picamera2) |
 

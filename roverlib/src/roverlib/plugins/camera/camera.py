@@ -3,7 +3,7 @@ from .cameraInterface import CameraInterface
 from .exceptions import CameraNotStart, CameraNotAvailable
 from roverlib.modules.processing.processing_image import ProcessingImage
 from time import time, sleep
-from enum import IntEnum
+from .formats import CameraFormat, convert_frame, parse_format
 
 try:
     # tenta importa a biblioteca libcamera, especifica da Raspbarry Pi
@@ -23,12 +23,6 @@ except (ImportError, ModuleNotFoundError):
 
 # Nome padrão dos plugins: a câmera da Raspberry Pi precisa das duas bibliotecas
 HARDWARE_AVAILABLE = availablePicamera2 and availableLibcamera
-
-class CameraFormat(IntEnum):
-    """Conversões de cor do OpenCV aceitas por `Camera.set_format()`."""
-    BGR = openCV.COLOR_RGB2BGR
-    Gray = openCV.COLOR_RGB2GRAY
-    HSV = openCV.COLOR_RGB2HSV
 
 class Camera(CameraInterface):
     """
@@ -69,7 +63,8 @@ class Camera(CameraInterface):
             width (int): largura dos frames, em pixels.
             fps (int): quadros por segundo. Padrão 30.
             index (int): qual câmera usar, se houver mais de uma. Padrão 0.
-            format (CameraFormat, optional): conversão de cor aplicada aos frames. Padrão: nenhuma (BGR).
+            format (CameraFormat | str, optional): formato de cor dos frames (`CameraFormat.RGB`,
+                `"gray"`...). Padrão: BGR, sem conversão. Veja `set_format()`.
             horizontalFlip (bool): espelha a imagem na horizontal. Padrão False.
             verticalFlip (bool): espelha a imagem na vertical. Padrão False.
                 Com a câmera de cabeça para baixo, use os dois flips.
@@ -86,7 +81,7 @@ class Camera(CameraInterface):
 
         self.size = (width, height) # tamanho da imagem
         self.fps = fps # taxa de frames
-        self.format = format # formato das imagens capturadas
+        self.format = parse_format(format) # formato de cor entregue por get_frame()
         self.index = index # index da câmera que deseja usar
         self.region_interest = None # Região de interesse na captura
         self.runing = False # Controla se a câmera estar em funcionamento
@@ -252,21 +247,34 @@ class Camera(CameraInterface):
         """Remove o recorte definido por `set_region_interest()`."""
         self.region_interest = None
 
-    def set_format(self, format: CameraFormat):
+    def set_format(self, format):
         """
-        Define uma conversão de cor para os frames.
+        Escolhe o formato de cor dos próximos frames.
 
         Args:
-            format (CameraFormat): conversão do OpenCV (`CameraFormat.BGR`, `.Gray` ou `.HSV`).
+            format (CameraFormat | str | None): `CameraFormat.BGR` (padrão do OpenCV, sem conversão),
+                `.RGB`, `.Gray` (um canal) ou `.HSV`. Também aceita os nomes `"bgr"`, `"rgb"`,
+                `"gray"` e `"hsv"`. None volta ao BGR.
+
+        Raises:
+            ValueError: formato desconhecido.
+
+        Exemplo:
+
+        ```python
+        cam.set_format("hsv")
+        hsv = cam.get_frame()      # pronto para cv2.inRange()
+        ```
         """
-        self.format = format
+        self.format = parse_format(format)
 
     def get_frame(self):
         """
         Captura um frame.
 
         Returns:
-            numpy.ndarray: imagem `(altura, largura, 3)` em **BGR**, já recortada pela região de interesse, se houver.
+            numpy.ndarray: imagem em **BGR** `(altura, largura, 3)`, ou no formato escolhido em
+                `set_format()`; já recortada pela região de interesse, se houver.
 
         Raises:
             CameraNotStart: a câmera não foi iniciada com `start()`.
@@ -280,10 +288,8 @@ class Camera(CameraInterface):
         if self.region_interest is not None:
             frame = ProcessingImage.cutImage(frame, self.region_interest) # Corta frame na região de interesse
 
-        if self.format is not None:
-            openCV.cvtColor(frame, self.format) # type: ignore
-
-        return frame
+        # A Picamera2 entrega "RGB888" com os bytes na ordem B, G, R (BGR do OpenCV)
+        return convert_frame(frame, self.format)
 
     def get_frame_time(self):
         """

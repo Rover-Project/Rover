@@ -69,7 +69,7 @@ class Rover:
         Args:
             motors (dict): right, left, calibration {right, left}, pwm_frequency, simulate
             camera (dict): width, height, fps, index, webcam, horizontal_flip, vertical_flip,
-                           brightness, contrast, saturation
+                           format, brightness, contrast, saturation
             lidar (dict): port, baudrate, simulate, simulated_distance
             pan_tilt (dict): address, simulate,
                              pan {channel, trim, invert, min, max, degrees_per_second, calibration_speed},
@@ -182,6 +182,10 @@ class Rover:
             horizontalFlip=bool(options.get("horizontal_flip", False)),
             verticalFlip=bool(options.get("vertical_flip", False)),
         )
+
+        # Formato de cor (Camera e Webcam): bgr (padrão), rgb, gray ou hsv
+        if options.get("format") is not None:
+            cam.set_format(options["format"])
 
         # Ajustes de imagem existem apenas na câmera da Raspberry Pi
         for key, method in (("brightness", "set_brightness"),
