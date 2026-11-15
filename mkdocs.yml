@@ -30,6 +30,10 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js
+
 markdown_extensions:
   - pymdownx.highlight: 
       anchor_linenums: true
@@ -38,6 +42,8 @@ markdown_extensions:
       alternate_style: true 
   - admonition
   - def_list
+  - pymdownx.arithmatex:          # fórmulas em LaTeX ($...$) na trilha Aprender
+      generic: true
 
 plugins:
   - search
@@ -66,6 +72,14 @@ nav:
   - Guia:
       - Arquitetura: arquitetura.md
       - Exemplos: exemplos.md
+  - Aprender:
+      - Visão geral: aprender/index.md
+      - 1. Locomoção diferencial: aprender/aula1-locomocao.md
+      - 2. Sensores e estados: aprender/aula2-sensores.md
+      - 3. Imagem e cor: aprender/aula3-imagem.md
+      - 4. Detecção de objetos: aprender/aula4-deteccao.md
+      - 5. Controle por visão: aprender/aula5-controle.md
+      - 6. Projeto integrador: aprender/aula6-projeto.md
   - Referência da API:
       - Rover: api/rover.md
       - Movimento: api/movimento.md

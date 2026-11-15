@@ -50,6 +50,7 @@ rover run
 4. [Exemplos](exemplos.md): seguir linha, seguir bola, câmera que acompanha objetos, desviar de obstáculos, YOLO e outros.
 5. [Arquitetura](arquitetura.md): como a biblioteca é organizada e como estendê-la.
 6. [Referência da API](api/rover.md): todos os comandos, gerada a partir do código.
+7. [Aprender com o Rover](aprender/index.md): trilha de seis aulas de visão computacional, robótica e controle, com exercícios.
 
 ## Hardware do Rover
 

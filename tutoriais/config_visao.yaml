@@ -1,0 +1,18 @@
+# Configuração das aulas 3 a 6: motores, Lidar e câmera.
+# No PC, a câmera é a webcam (se houver); no Rover, a câmera do robô.
+
+motors:
+  right: [17, 26]
+  left: [25, 16]
+  calibration:
+    right: 1
+    left: 1
+
+lidar:
+  port: /dev/ttyAMA0
+  simulated_distance: 200
+
+camera:
+  width: 640
+  height: 480
+  fps: 30

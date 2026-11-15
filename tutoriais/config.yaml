@@ -1,0 +1,13 @@
+# Configuração das aulas 1 e 2 (motores e Lidar).
+# No PC, motores e Lidar são simulados. No Rover, o mesmo arquivo usa o hardware real.
+
+motors:
+  right: [17, 26]
+  left: [25, 16]
+  calibration:
+    right: 1
+    left: 1
+
+lidar:
+  port: /dev/ttyAMA0
+  simulated_distance: 200
