@@ -58,9 +58,12 @@ class ObstacleAvoider:
         )
 
         # Controlador PID
+        # ki=0: com o PID antigo, a integral deste exemplo ficava sempre em zero
+        # (o erro aqui é negativo e a integral não aceitava valores negativos).
+        # Mantém o comportamento já testado; experimente ki > 0 com cuidado.
         self.pid_x = PID(
-            kp=(self.x_speed / self.max_dist), 
-            ki=1, 
+            kp=(self.x_speed / self.max_dist),
+            ki=0,
             kd=1
         )
 

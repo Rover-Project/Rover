@@ -75,6 +75,7 @@ Branch: `integration/merge-branches` (526 commits desde a 0.1.0).
 - `Config.get()` sem valor padrão quebrava os exemplos `lidarGraph` e `continuousFocus`; a porta do Lidar no `lidarGraph` passou a vir do config (`/dev/ttyAMA0`).
 - Detecção de círculos: o Hough usava a distância mínima entre círculos (50 px) como raio mínimo, então círculos pequenos nunca eram detectados.
 - `Camera.set_format()` não tinha efeito, e as conversões de cor supunham frames em RGB (eles chegam em BGR).
+- `PID`: `controller_PD()` calculava P + I em vez de P + D, não atualizava o tempo entre chamadas, e a integral não aceitava valores negativos. Agora a integral fica entre `-max_I` e `max_I`, `controller_PD()` e `controller_PID()` aceitam o `dt` como argumento (útil em simulações) e `reset()` reinicia o controlador. O exemplo `lidarAvoidance`, cuja integral ficava sempre em zero, passa a usar `ki=0` para manter o comportamento.
 - `autoFocus.py` não importava no PC (enums dependiam da `libcamera`).
 
 ### Removido
@@ -91,6 +92,7 @@ Durante o desenvolvimento da 0.2.0 também foram criados e depois retirados, sem
 - `Robot.turn_degrees()` passou a girar o ângulo pedido; programas que compensavam o cálculo antigo precisam ser revistos. Os exemplos do repositório já foram ajustados.
 - `CameraFormat` mudou de valores (antes eram códigos do OpenCV) e ganhou `RGB`; como `set_format()` não funcionava, nenhum programa dependia deles.
 - `houghCircleDetect()` devolve `int` em vez de `numpy.uint16`.
+- `PID.controller_PID()` passa a acumular erros negativos na integral: programas com `ki > 0` e erros negativos podem responder de forma diferente. Na primeira chamada, `controller_PD()` e `controller_PID()` devolvem a parcela proporcional (antes devolviam 0).
 - O template do `rover new` mudou de lugar (`roverlib/cli/templates/project`).
 
 ### Pendente antes do lançamento

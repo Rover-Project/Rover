@@ -42,7 +42,7 @@ $$
 | Integral $K_i$ | acumula o erro passado e elimina o erro que sobra | lentidão para "esvaziar" a integral (*windup*), oscilação lenta |
 | Derivativa $K_d$ | antecipa a tendência e amortece | amplifica o ruído da medida |
 
-Na implementação discreta, a cada quadro (passo $\Delta t$): a integral é a soma $\sum e_k \Delta t$ e a derivada é $(e_k - e_{k-1}) / \Delta t$. O controlador da aula (`tutoriais/aula5_controle/controlador.py`) recebe o $\Delta t$ explicitamente, satura a saída e limita a integral (**anti-windup**).
+Na implementação discreta, a cada quadro (passo $\Delta t$): a integral é a soma $\sum e_k \Delta t$ e a derivada é $(e_k - e_{k-1}) / \Delta t$. O controlador da aula (`tutoriais/aula5_controle/controlador.py`) recebe o $\Delta t$ explicitamente, satura a saída e limita a integral (**anti-windup**). Ele é curto de propósito, para ser lido e modificado nos exercícios. A RoverLib tem uma classe equivalente, [`PID`](../api/movimento.md), com `controller_P()`, `controller_PD()` e `controller_PID(erro, dt)`; a diferença é que ela não satura a saída, o que fica a cargo do programa.
 
 ### Não linearidades do Rover
 
