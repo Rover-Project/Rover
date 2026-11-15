@@ -37,3 +37,6 @@ Thumbs.db
 # Permitir que os binários compilados entrem no repositório
 !*.so
 !roverlib/src/roverlib/plugins/pin/bin/**/*.so
+# Módulo nativo do plugin pin compilado pelo pip (o de bin/ é versionado como reserva)
+roverlib/src/roverlib/plugins/pin/_pin_native*.so
+roverlib/src/roverlib/plugins/pin/src/build/

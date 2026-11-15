@@ -32,15 +32,44 @@ def nativo_falso(monkeypatch):
 
 def test_api_publica_do_pacote():
     assert pin_package.Pin is pin_module.Pin
-    assert {"Pin", "PinMode", "HARDWARE_AVAILABLE", "PinNotAvailable"} <= set(pin_package.__all__)
+    assert {"Pin", "PinMode", "HARDWARE_AVAILABLE", "PinNotAvailable", "gpio_base"} <= set(pin_package.__all__)
     # Vale tanto para o enum nativo (pybind11, não iterável) quanto para o substituto do PC
     assert all(hasattr(PinMode, nome) for nome in ("DIGITAL_IN", "DIGITAL_OUT", "PWM"))
 
 
 def test_sem_modulo_nativo_gera_erro_claro(monkeypatch):
     monkeypatch.setattr(pin_module, "HARDWARE_AVAILABLE", False)
-    with pytest.raises(PinNotAvailable, match="Raspberry Pi"):
+    with pytest.raises(PinNotAvailable):
         Pin(17, PinMode.DIGITAL_OUT)
+
+
+def test_mensagem_no_pc_sugere_simulacao(monkeypatch):
+    monkeypatch.setattr(pin_module, "HARDWARE_AVAILABLE", False)
+    monkeypatch.setattr(pin_module, "is_raspberry_pi", lambda: False)
+    with pytest.raises(PinNotAvailable, match="simulação"):
+        Pin(17, PinMode.DIGITAL_OUT)
+
+
+def test_mensagem_na_pi_explica_como_compilar(monkeypatch):
+    monkeypatch.setattr(pin_module, "HARDWARE_AVAILABLE", False)
+    monkeypatch.setattr(pin_module, "is_raspberry_pi", lambda: True)
+    monkeypatch.setattr(pin_module, "NATIVE_IMPORT_ERROR", ImportError("No module named '_pin_native'"))
+    with pytest.raises(PinNotAvailable) as erro:
+        Pin(17, PinMode.DIGITAL_OUT)
+    mensagem = str(erro.value)
+    assert "python3-dev" in mensagem and "--force-reinstall" in mensagem
+    assert "_pin_native" in mensagem          # mostra o erro original
+
+
+def test_gpio_base_vem_do_modulo_nativo(nativo_falso):
+    nativo_falso.gpio_base.return_value = 571
+    assert pin_package.gpio_base() == 571
+
+
+def test_gpio_base_sem_nativo(monkeypatch):
+    monkeypatch.setattr(pin_module, "HARDWARE_AVAILABLE", False)
+    with pytest.raises(PinNotAvailable):
+        pin_package.gpio_base()
 
 
 def test_excecao_herda_das_bases():
@@ -107,6 +136,7 @@ def test_hardware_saida_digital():
     with Pin(int(_TEST_PIN), PinMode.DIGITAL_OUT) as pino:
         assert pino.active
         assert pino.number == int(_TEST_PIN)
+        assert pin_package.gpio_base() > 0          # base descoberta pelo label do gpiochip
         pino.on()
         pino.off()
 

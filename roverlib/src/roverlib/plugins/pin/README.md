@@ -15,11 +15,10 @@ pin/
 │   ├── src/                # classe Pin
 │   │   └── pin.cpp         # Implementação C++
 │   ├── binds.cpp           # Bindings pybind11
-│   └── CMakeLists.txt      # Configuração de build
+│   └── CMakeLists.txt      # Build manual (CMake), opcional
 │
-├── bin/
-│   └── pin.so              # Módulo compilado
-│                           # (gerado pelo CMake)
+├── _pin_native*.so         # Módulo compilado pelo `pip install` (não versionado)
+├── bin/                    # Módulo compilado à mão com CMake (reserva)
 ├── pin.py                  # Abstração Python (interface principal)
 ├── __init__.py             # API pública
 ├── exceptions.py           # PinNotAvailable
@@ -30,28 +29,42 @@ pin/
 
 ---
 
-## Dependências
-
-| Ferramenta | Versão mínima | Instalação |
-|---|---|---|
-| CMake | 3.15 | `sudo apt install cmake` |
-| GCC / Clang | C++17 | `sudo apt install build-essential` |
-| Python | 3.8+ | — |
-| pybind11 | 2.10+ | `pip install pybind11` |
-
----
-
 ## Compilação
 
+### Automática (normal)
+
+O módulo nativo é compilado pelo próprio `pip install` da RoverLib (ver `roverlib/setup.py`), **na Raspberry Pi e para a versão de Python em uso**. Não há passo manual: o `rover_setup.sh` já instala o necessário.
+
+| Requisito | Instalação |
+|---|---|
+| Compilador C++17 | `sudo apt install build-essential` |
+| Cabeçalhos do Python | `sudo apt install python3-dev` |
+| pybind11 | instalado sozinho pelo `pip` durante o build |
+
+- **No PC** (Windows, macOS, Linux x86) a extensão não é compilada e a RoverLib funciona em modo simulação.
+- **A extensão é opcional:** se a compilação falhar, a instalação termina mesmo assim; ao importar o plugin na Raspberry Pi aparece um aviso com o motivo e os comandos para resolver.
+- Para recompilar (por exemplo, depois de trocar de versão do Python):
+
 ```bash
-# A partir da raiz do repositório, dentro de pin/src/
-cd pin/src
+pip install -e roverlib --no-deps --force-reinstall -v
+```
+
+Variáveis de ambiente do build: `ROVER_BUILD_NATIVE=1` compila em qualquer Linux (útil para testar a compilação no PC); `ROVER_BUILD_NATIVE=0` nunca compila.
+
+### Endereço dos pinos (offset da GPIO)
+
+No sysfs, o pino BCM *n* é o número *base + n*, e a base muda com o modelo e o kernel (Pi 5: 571; Pi 4: 512). O módulo descobre a base lendo `/sys/class/gpio/gpiochip*/label` (`pinctrl-rp1`, `pinctrl-bcm2711` ou `pinctrl-bcm2835`). Para conferir: `python -c "from roverlib.plugins.pin import gpio_base; print(gpio_base())"`. Se a detecção falhar, force o valor com a variável `ROVER_GPIO_BASE`.
+
+### Manual com CMake (opcional)
+
+```bash
+cd roverlib/src/roverlib/plugins/pin/src
 mkdir build && cd build
 cmake ..
 make -j$(nproc)
 ```
 
-O arquivo `pin.so` será gerado automaticamente em `pin/bin/`.
+O módulo é gerado em `pin/bin/`, usado quando não há um módulo compilado pelo `pip`.
 
 ---
 
@@ -188,7 +201,7 @@ sudo usermod -aG gpio $USER
 
 ## Simulação
 
-O plugin `pin` não tem versão simulada: ele é a base dos drivers de GPIO. Sem o módulo nativo (PC, ou Python diferente de 3.13 na Raspberry Pi), o plugin continua importável, `HARDWARE_AVAILABLE` vale `False` e criar um `Pin` gera `PinNotAvailable` (um `RuntimeError`). Quem simula são os plugins acima dele, como o `VirtualMotor`.
+O plugin `pin` não tem versão simulada: ele é a base dos drivers de GPIO. Sem o módulo nativo (PC, ou Raspberry Pi em que a compilação falhou), o plugin continua importável, `HARDWARE_AVAILABLE` vale `False` e criar um `Pin` gera `PinNotAvailable` (um `RuntimeError`). Quem simula são os plugins acima dele, como o `VirtualMotor`.
 
 ---
 

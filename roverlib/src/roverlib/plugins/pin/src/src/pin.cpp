@@ -7,15 +7,60 @@
 #include <filesystem>
 #include <stdexcept>
 #include <cmath>
+#include <cstdlib>
 
 // ========================================================================== //
 //  Utilitários estáticos                                                     //
 // ========================================================================== //
 
+// Número do primeiro pino do controlador GPIO do conector de 40 pinos no sysfs.
+// Muda com o modelo da Raspberry Pi e com a versão do kernel (ex.: Pi 5 = 571, Pi 4 = 512),
+// por isso é descoberto em tempo de execução lendo /sys/class/gpio/gpiochip*/label.
+static int discoverGpioBase()
+{
+    // Permite forçar o valor se a detecção falhar
+    if (const char* env = std::getenv("ROVER_GPIO_BASE"))
+    {
+        try { return std::stoi(env); } catch (...) {}
+    }
+
+    // Controladores do conector de 40 pinos, em ordem de preferência
+    const char* labels[] = {"pinctrl-rp1", "pinctrl-bcm2711", "pinctrl-bcm2835"};
+    const std::string root = "/sys/class/gpio";
+
+    for (const char* wanted : labels)
+    {
+        std::error_code ec;
+        for (const auto& entry : std::filesystem::directory_iterator(root, ec))
+        {
+            const std::string name = entry.path().filename().string();
+            if (name.rfind("gpiochip", 0) != 0)
+                continue;
+
+            std::ifstream labelFile(entry.path() / "label");
+            std::string label;
+            if (!(labelFile >> label) || label != wanted)
+                continue;
+
+            std::ifstream baseFile(entry.path() / "base");
+            int base;
+            if (baseFile >> base)
+                return base;
+        }
+    }
+
+    return 571;  // padrão da Raspberry Pi 5 (kernels 6.6+), se nada for encontrado
+}
+
+int Pin::gpioBase()
+{
+    static const int base = discoverGpioBase();  // calculado uma vez (thread-safe em C++11)
+    return base;
+}
+
 int Pin::bcmToKernel(int bcm)
 {
-    // Offset padrão para Raspberry Pi 5; ajuste se usar RPi 4 (offset = 512)
-    return bcm + 571;
+    return bcm + gpioBase();
 }
 
 bool Pin::pathExists(const std::string& path)

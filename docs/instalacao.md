@@ -107,7 +107,14 @@ mkdocs serve
 ## Problemas comuns
 
 **Na Raspberry Pi aparece "hardware de motores não disponível. Usando motores simulados."**
-:   O módulo nativo do plugin `pin` incluído no pacote foi compilado para **Python 3.13 (ARM64)**. Confira a versão com `python --version`. Em outra versão, é preciso recompilar o plugin (fontes em `roverlib/src/roverlib/plugins/pin/src`).
+:   O módulo nativo do plugin `pin` (C++) não foi compilado. Ele é compilado automaticamente pelo `pip install` na Raspberry Pi, para a versão de Python em uso, e precisa de um compilador e dos cabeçalhos do Python. Ao importar a RoverLib aparece um aviso com o motivo. Para recompilar:
+
+    ```bash
+    sudo apt install build-essential python3-dev
+    pip install -e roverlib --no-deps --force-reinstall -v
+    ```
+
+    Com `-v`, a saída mostra o resultado da compilação. Para conferir: `python -c "from roverlib.plugins.pin import HARDWARE_AVAILABLE, gpio_base; print(HARDWARE_AVAILABLE, gpio_base())"` deve mostrar `True 571` na Pi 5.
 
 **"câmera da Raspberry Pi (picamera2) não disponível. Usando a webcam."**
 :   No PC, é o comportamento esperado. Na Raspberry Pi, instale `python3-picamera2` pelo `apt` e crie o ambiente virtual com `--system-site-packages`.

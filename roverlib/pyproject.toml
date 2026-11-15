@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=77.0"]
+# pybind11: compila o módulo nativo do plugin pin na Raspberry Pi (ver setup.py)
+requires = ["setuptools>=77.0", "pybind11>=2.10"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -62,7 +63,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 roverlib = [
   "cli/templates/**/*",       # template usado pelo `rover new`
-  "plugins/pin/bin/*.so",     # módulo nativo do plugin pin (GPIO/PWM)
+  "plugins/pin/bin/*.so",     # módulo nativo pré-compilado (reserva; o normal é compilar na instalação)
   "**/*.md",                  # documentação dos plugins/módulos
   "**/*.png",
 ]

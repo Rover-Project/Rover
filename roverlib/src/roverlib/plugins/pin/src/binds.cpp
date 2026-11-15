@@ -100,4 +100,11 @@ PYBIND11_MODULE(_pin_native, m)
                    " mode="    + modeStr +
                    " active="  + (p.isActive() ? "True" : "False") + ">";
         });
+
+    // ---------------------------------------------------------------------- //
+    //  Diagnóstico                                                            //
+    // ---------------------------------------------------------------------- //
+    m.def("gpio_base", &Pin::gpioBase,
+          "Número do pino BCM 0 no sysfs (Pi 5: 571; Pi 4: 512). "
+          "Descoberto pelo label do gpiochip; pode ser forçado com ROVER_GPIO_BASE.");
 }

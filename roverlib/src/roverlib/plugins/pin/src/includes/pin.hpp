@@ -128,6 +128,14 @@ public:
      */
     bool isActive() const;
 
+    /**
+     * @brief Número do pino BCM 0 no sysfs (/sys/class/gpio).
+     *
+     * Descoberto lendo /sys/class/gpio/gpiochip*\/label (Pi 5: pinctrl-rp1,
+     * Pi 4: pinctrl-bcm2711). Pode ser forçado com a variável ROVER_GPIO_BASE.
+     */
+    static int gpioBase();
+
 private:
     // ------------------------------------------------------------------ //
     //  Estado interno                                                     //

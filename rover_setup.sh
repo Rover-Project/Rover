@@ -42,6 +42,7 @@ APT_PACKAGES=(
   curl
   python3-pip
   python3-venv
+  python3-dev
   libssl-dev
   zlib1g-dev
   libbz2-dev

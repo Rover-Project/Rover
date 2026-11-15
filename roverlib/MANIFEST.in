@@ -1,0 +1,2 @@
+# Fontes C++ do plugin pin, necessárias para compilar o módulo nativo a partir do sdist
+recursive-include src/roverlib/plugins/pin/src *.cpp *.hpp CMakeLists.txt

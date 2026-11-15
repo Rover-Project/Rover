@@ -1,7 +1,7 @@
 """
 pin.py — Camada de abstração Python para controle GPIO (roverlib).
 
-Importa o módulo nativo compilado (pin.so) e expõe uma interface
+Importa o módulo nativo compilado (_pin_native, compilado na instalação) e expõe uma interface
 Pythônica com nomes em português e validações adicionais.
 
 Uso rápido
@@ -29,28 +29,77 @@ from enum import IntEnum as _IntEnum
 
 from .exceptions import PinNotAvailable
 
-# Adiciona pin/bin/ ao path para que o pin.so seja encontrado
-# independente de onde o script de teste está sendo executado
+# Onde o módulo nativo (_pin_native) pode estar:
+#   1. roverlib/plugins/pin/_pin_native*.so -> compilado pelo `pip install` na Raspberry Pi (normal)
+#   2. roverlib/plugins/pin/bin/            -> compilado à mão com CMake (ver src/CMakeLists.txt)
 _BIN_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "bin")
 if _BIN_DIR not in _sys.path:
-    _sys.path.insert(0, _BIN_DIR)
+    _sys.path.append(_BIN_DIR)
+
+NATIVE_IMPORT_ERROR = None   # motivo da falha ao carregar o módulo nativo (diagnóstico)
 
 try:
-    import _pin_native as _native  # importa o _pin_native.so compilado
+    try:
+        from . import _pin_native as _native
+    except ImportError:
+        import _pin_native as _native
     HARDWARE_AVAILABLE = True
     # Re-exporta o enum nativo para que o usuário possa fazer `from roverlib.plugins.pin import PinMode`
     PinMode = _native.PinMode
-except ImportError:
-    # PC, ou Raspberry Pi com uma versão de Python sem o .so compilado.
+except ImportError as _error:
+    # PC, ou Raspberry Pi em que o módulo não foi compilado.
     # O módulo continua importável; criar um Pin gera PinNotAvailable.
     _native = None
     HARDWARE_AVAILABLE = False
+    NATIVE_IMPORT_ERROR = _error
 
     class PinMode(_IntEnum):
         """Modos de operação do pino (substituto usado quando o módulo nativo não está disponível)."""
         DIGITAL_IN = 0
         DIGITAL_OUT = 1
         PWM = 2
+
+
+def is_raspberry_pi() -> bool:
+    """Indica se o código está rodando em uma Raspberry Pi."""
+    try:
+        with open("/proc/device-tree/model", encoding="utf-8", errors="ignore") as f:
+            return "raspberry pi" in f.read().lower()
+    except OSError:
+        return False
+
+
+def _unavailable_message() -> str:
+    """Explica por que a GPIO não está disponível e como resolver."""
+    if not is_raspberry_pi():
+        return ("O controle de GPIO só funciona na Raspberry Pi. "
+                "No computador, use o modo simulação (o Robot e o Rover fazem isso sozinhos).")
+    python = f"{_sys.version_info.major}.{_sys.version_info.minor}"
+    return (
+        f"O módulo nativo do plugin pin não foi compilado para este Python ({python}). "
+        "Ele é compilado durante a instalação da RoverLib e precisa de um compilador C++ "
+        "e dos cabeçalhos do Python. Para resolver, na pasta do repositório:\n"
+        "    sudo apt install build-essential python3-dev\n"
+        "    pip install -e roverlib --no-deps --force-reinstall -v\n"
+        f"Erro original: {NATIVE_IMPORT_ERROR}"
+    )
+
+
+# Na Raspberry Pi, a falta do módulo nativo é um problema de instalação: avisa logo na importação,
+# em vez de deixar o Robot cair na simulação sem explicação.
+if not HARDWARE_AVAILABLE and is_raspberry_pi():
+    import warnings as _warnings
+    _warnings.warn(_unavailable_message(), RuntimeWarning, stacklevel=2)
+
+
+def gpio_base() -> int:
+    """
+    Número do pino BCM 0 no sysfs (Pi 5: 571; Pi 4: 512), descoberto pelo módulo nativo.
+    Pode ser forçado com a variável de ambiente ROVER_GPIO_BASE.
+    """
+    if not HARDWARE_AVAILABLE:
+        raise PinNotAvailable(_unavailable_message())
+    return _native.gpio_base()
 
 
 class Pin:
@@ -92,11 +141,7 @@ class Pin:
 
     def __init__(self, number: int, mode: PinMode) -> None:
         if not HARDWARE_AVAILABLE:
-            raise PinNotAvailable(
-                "O módulo nativo do plugin pin não está disponível. Ele requer a Raspberry Pi "
-                f"e foi compilado para Python 3.13 (ARM64); este é o Python {_sys.version_info.major}."
-                f"{_sys.version_info.minor}."
-            )
+            raise PinNotAvailable(_unavailable_message())
         self._pin = _native.Pin(number, mode)
 
     # ------------------------------------------------------------------ #
