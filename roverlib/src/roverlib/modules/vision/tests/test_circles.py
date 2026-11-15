@@ -51,3 +51,13 @@ def test_sem_vermelho_nao_detecta():
     mask = ProcessingImage.color_dual_segmentation(img)
     assert VisionModule.houghCircleDetect(mask)[0] is None
     assert VisionModule.circleCannyDetect(mask) is None
+
+
+def test_segmentacao_dupla_aceita_outra_cor():
+    img = np.full((480, 640, 3), 200, np.uint8)
+    cv2.circle(img, (320, 240), 60, (200, 60, 30), -1)   # círculo AZUL
+    azul = dict(low_color1=(100, 120, 70), upper_color1=(130, 255, 255),
+                low_color2=(100, 120, 70), upper_color2=(130, 255, 255))
+    mask = ProcessingImage.color_dual_segmentation(img, **azul)
+    x, y, r = VisionModule.circleCannyDetect(mask)
+    assert (abs(x - 320), abs(y - 240), abs(r - 60)) <= (3, 3, 6)

@@ -33,7 +33,7 @@ Corta um frame em uma **região de interesse** definida pelo usuário.
 
 **Uso:**
 ```python
-from rover_lib.modules.processing.processing_image import ProcessingImage
+from roverlib.modules.processing.processing_image import ProcessingImage
 
 roi = (100, 50, 300, 200)  # x_start, y_start, width, height
 cropped = ProcessingImage.cutImage(frame, roi)

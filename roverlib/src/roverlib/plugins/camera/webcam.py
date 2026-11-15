@@ -5,17 +5,20 @@ from .cameraInterface import CameraInterface
 
 class Webcam(CameraInterface):
     """
-        Usa uma webcam (USB ou integrada ao PC) para ler frames via OpenCV.
-        Os frames são retornados no formato BGR.
+    Webcam (USB ou integrada ao PC), lida pelo OpenCV.
+
+    Tem os mesmos métodos básicos da `Camera` (`get_frame()`, `start()`, `stop()`, `cleanup()`),
+    por isso um programa escrito para o Rover roda no PC sem mudanças. Os frames vêm em BGR.
+    A webcam começa a capturar ao ser criada; `start()` e `stop()` existem só por compatibilidade.
     """
 
     def __init__(self, height, width, fps: int = 30, index: int = 0):
         """
         Args:
-            height (int): altura dos frames
-            width (int): largura dos frames
-            fps (int, optional): taxa de quadros desejada. Valor padrão 30.
-            index (int, optional): índice da webcam. Valor padrão 0.
+            height (int): altura desejada dos frames (a webcam pode escolher o tamanho mais próximo).
+            width (int): largura desejada dos frames.
+            fps (int): quadros por segundo desejados. Padrão 30.
+            index (int): qual webcam usar, se houver mais de uma. Padrão 0.
         """
         self.size = (width, height)
         self.fps = fps
@@ -27,10 +30,10 @@ class Webcam(CameraInterface):
 
     def get_frame(self):
         """
-        Captura um único frame.
+        Captura um frame.
 
-        Retorna:
-            numpy.array (BGR) ou None se nenhum frame estiver disponível.
+        Returns:
+            numpy.ndarray | None: imagem em BGR, ou None se a webcam não entregou um frame.
         """
         available, frame = self.camera.read()
 
@@ -41,21 +44,30 @@ class Webcam(CameraInterface):
 
     def get_frame_time(self):
         """
-        Captura um frame e retorna o momento em que ele foi capturado
+        Captura um frame e o instante da captura.
+
         Returns:
-            (numpy array, time): tupla com o frame e o momento de captura.
+            tuple: `(frame, instante)`, com o instante em segundos (`time.time()`).
         """
         return self.get_frame(), time()
 
     def isRunning(self) -> bool:
-        """Retorna se a webcam está aberta."""
+        """
+        Indica se a webcam está aberta.
+
+        Returns:
+            bool: True enquanto a webcam estiver disponível.
+        """
         return self.camera.isOpened()
 
     def start(self):
+        """Não faz nada: a webcam já captura desde a criação (existe por compatibilidade com `Camera`)."""
         pass
 
     def stop(self):
+        """Não faz nada (existe por compatibilidade com `Camera`). Para liberar a webcam, use `cleanup()`."""
         pass
 
     def cleanup(self):
+        """Libera a webcam."""
         self.camera.release() # libera o objeto camera

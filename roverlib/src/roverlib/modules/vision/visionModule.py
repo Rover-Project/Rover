@@ -4,14 +4,26 @@ from roverlib.modules.processing.processing_image import ProcessingImage
 
 class VisionModule:
     """
-    Módulo responsável por processar frames da câmera e extrair informações
-    para a navegação do Rover.
+    Detecção de formas e objetos em imagens: círculos, linha a seguir e obstáculos coloridos.
+
+    `houghCircleDetect()` e `circleCannyDetect()` são métodos de classe (use sem criar objeto) e
+    recebem uma **máscara** (por exemplo, de `ProcessingImage.color_segmentation()`).
+    `process_frame_for_line_following()` e `detect_obstacle()` precisam de um objeto criado com a
+    resolução dos frames.
+
+    Exemplo:
+
+    ```python
+    mascara = ProcessingImage.color_segmentation(frame)
+    circulo, _ = VisionModule.houghCircleDetect(mascara)
+    if circulo is not None:
+        x, y, raio = circulo
+    ```
     """
     def __init__(self, resolution):
         """
-        Inicializa o módulo de visão.
         Args:
-            resolution (tuple): Resolução (largura, altura) dos frames de entrada.
+            resolution (tuple): `(largura, altura)` dos frames que serão processados.
         """
         self.width, self.height = resolution[0], resolution[1]
         print(f"Módulo de Visão inicializado. Resolução esperada: {self.width}x{self.height}")
@@ -19,7 +31,24 @@ class VisionModule:
     @classmethod
     def houghCircleDetect(cls, img, dp=1.3, minDist=50, canny=100, accumulation=40, minRadius=5, maxRadius=300):
         """
-            Transformada de hough mais completa ultilizando alguns filtros para aproximar ilipses de ciculos
+        Detecta o círculo mais evidente em uma máscara usando a Transformada de Hough.
+
+        Antes do Hough, as bordas da máscara são extraídas (Canny) e fechadas com um filtro
+        elíptico, o que ajuda a reconhecer objetos redondos vistos um pouco de lado.
+
+        Args:
+            img (numpy.ndarray): máscara binária (branco = objeto).
+            dp (float): resolução do acumulador do Hough (1 = resolução da imagem). Padrão 1.3.
+            minDist (int): distância mínima entre centros de círculos, em pixels. Padrão 50.
+            canny (int): limiar superior do Canny interno do Hough. Padrão 100.
+            accumulation (int): votos necessários para aceitar um círculo; menor encontra mais
+                círculos, inclusive falsos. Padrão 40.
+            minRadius (int): menor raio procurado, em pixels. Padrão 5.
+            maxRadius (int): maior raio procurado, em pixels. Padrão 300.
+
+        Returns:
+            tuple: `(circulo, bordas)`. `circulo` é `(x, y, raio)` em pixels (inteiros) do círculo
+                mais votado, ou None se nenhum for encontrado; `bordas` é a imagem de bordas usada.
         """
         
         edges = ProcessingImage.edge_filter(img) # Aplica filtro de segmentacao de bordas
@@ -52,7 +81,23 @@ class VisionModule:
     
     @classmethod
     def circleCannyDetect(cls, img, MINRADIUS=3, MINAREA=300, canny=(70, 150)):
-        """Deteccao de circulos via contorno e coeficiente de circularidade, por meio das bordas"""
+        """
+        Detecta o contorno mais redondo de uma máscara.
+
+        Para cada contorno, compara a área real com a do círculo que o envolve: quanto mais
+        parecidas, mais redondo é o objeto. Complementa o `houghCircleDetect()` (os exemplos
+        combinam os dois por votação).
+
+        Args:
+            img (numpy.ndarray): máscara binária (branco = objeto).
+            MINRADIUS (int): raio mínimo aceito, em pixels. Padrão 3.
+            MINAREA (int): área mínima do contorno, em pixels². Padrão 300.
+            canny (tuple): limiares `(inferior, superior)` do filtro de Canny. Padrão `(70, 150)`.
+
+        Returns:
+            tuple | None: `(x, y, raio)` em pixels do contorno mais circular (erro de área abaixo
+                de 35%), ou None.
+        """
         
         # Aplica canny para reconhecimento de bordas
         edges = openCv.Canny(img, canny[0], canny[1])
@@ -87,16 +132,17 @@ class VisionModule:
 
     def process_frame_for_line_following(self, frame):
         """
-        Processa o frame para detectar uma linha e calcular o desvio do centro.
+        Calcula o desvio de uma linha **branca** em relação ao centro da imagem.
+
+        Só a faixa inferior da imagem (20% de baixo, logo à frente do Rover) é analisada.
 
         Args:
-            frame (numpy.array): Frame de entrada no formato BGR.
+            frame (numpy.ndarray): imagem em BGR.
 
-        Retorna:
-            tuple: (desvio, frame_processado)
-                desvio (float): Valor entre -1.0 (totalmente à esquerda) e 1.0 (totalmente à direita).
-                                0.0 significa que a linha está centralizada.
-                frame_processado (numpy.array): Frame com as marcações de processamento (opcional, para debug).
+        Returns:
+            tuple: `(desvio, frame_processado)`. `desvio` vai de -1.0 (linha toda à esquerda)
+                a 1.0 (toda à direita); 0.0 significa linha centralizada ou não encontrada.
+                `frame_processado` é uma cópia com as marcações, para visualização.
         """
         if frame is None:
             return 0.0, None
@@ -141,18 +187,17 @@ class VisionModule:
 
     def detect_obstacle(self, frame, min_area_threshold=5000, color_range=None):
         """
-        Detecta um obstáculo na frente do Rover com base na cor e tamanho.
+        Detecta um objeto colorido grande o bastante para ser considerado um obstáculo.
 
         Args:
-            frame (numpy.array): Frame de entrada no formato BGR.
-            min_area_threshold (int): Área mínima (em pixels) para considerar um objeto como obstáculo.
-            color_range (tuple, optional): Tupla (lower_hsv, upper_hsv) para a cor do obstáculo.
-                                           Padrão: Vermelho (cor comum para cones ou barreiras).
+            frame (numpy.ndarray): imagem em BGR.
+            min_area_threshold (int): área mínima do objeto, em pixels, para contar como obstáculo. Padrão 5000.
+            color_range (tuple, optional): `(hsv_inferior, hsv_superior)` da cor procurada.
+                Padrão: vermelho.
 
-        Retorna:
-            tuple: (obstacle_detected, frame_processado)
-                obstacle_detected (bool): True se um obstáculo for detectado.
-                frame_processado (numpy.array): Frame com as marcações de detecção (para debug).
+        Returns:
+            tuple: `(detectado, frame_processado)`. `detectado` é True se houver obstáculo;
+                `frame_processado` é uma cópia com o objeto marcado, para visualização.
         """
         if frame is None:
             return False, None

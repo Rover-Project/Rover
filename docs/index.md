@@ -36,6 +36,14 @@ cd meu_projeto
 rover run
 ```
 
+!!! warning "Ainda não publicada no PyPI"
+    Enquanto a RoverLib não estiver no PyPI, o `pip install roverlib[cli]` não funciona. Instale a partir do repositório:
+
+    ```bash
+    git clone https://github.com/Rover-Project/Rover.git
+    pip install "./Rover/roverlib[cli]"
+    ```
+
 1. [Instalação](instalacao.md): no PC e na Raspberry Pi.
 2. [Primeiro projeto](primeiro-projeto.md): tutorial de 10 minutos, sem precisar do robô.
 3. [Configuração](configuracao.md): todas as opções do `config.yaml`.
@@ -49,7 +57,7 @@ rover run
 |---|---|---|
 | Computador | Raspberry Pi 5 | — |
 | Motores DC | ponte-H L298N | `plugins/motor` |
-| Câmera | Raspberry Pi Camera (Picamera2), Camera Module 3 com foco | `plugins/camera` |
+| Câmera | Arducam IMX519 (16 MP, autofoco), pela Picamera2 | `plugins/camera` |
 | Distância | Lidar TF-Luna (UART) | `plugins/lidar` |
 | Servos da câmera (pan-tilt) | PAN 360° + TILT 180° via PCA9685 (I²C) | `modules/pan_tilt`, `plugins/PCAServos` |
 

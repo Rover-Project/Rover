@@ -30,7 +30,7 @@ Classe responsável por **processar frames da câmera** e gerar informações co
 ## 🚀 Inicialização
 
 ```python
-from rover_lib.modules.vision.visionModule import VisionModule
+from roverlib.modules.vision.visionModule import VisionModule
 
 vision = VisionModule(resolution=(640, 480))
 ```
@@ -113,7 +113,7 @@ obstacle, _ = vision.detect_obstacle(frame, color_range=(lower, upper))
 
 O módulo de visão utiliza diretamente:
 ```python
-from rover_lib.modules.processing.processing_image import ProcessingImage
+from roverlib.modules.processing.processing_image import ProcessingImage
 ```
 
 Funções utilizadas:

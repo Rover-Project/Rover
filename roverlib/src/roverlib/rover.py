@@ -6,24 +6,32 @@ A classe Rover lê o config.yaml do projeto e monta os componentes configurados
 fora da Raspberry Pi.
 
 Exemplo:
-    from roverlib import Rover
 
-    with Rover.from_config("config.yaml") as rover:
-        rover.move.forward(50, duration=2)
-        frame = rover.camera.get_frame()
-        if rover.lidar.is_obstacle(30):
-            rover.move.stop()
+```python
+from roverlib import Rover
+
+with Rover.from_config("config.yaml") as rover:
+    rover.move.forward(50, duration=2)
+    frame = rover.camera.get_frame()
+    if rover.lidar.is_obstacle(30):
+        rover.move.stop()
+```
 """
 from pathlib import Path
 
 import yaml
 
+from roverlib.exceptions import RoverLibError
 from roverlib.modules.movement.robot import Robot
 from roverlib.modules.movement.motorCalibration import Calibration
 
 
-class ComponentNotAvailable(RuntimeError):
-    """O componente não foi configurado ou não pôde ser iniciado."""
+class ComponentNotAvailable(RoverLibError, RuntimeError):
+    """
+    O componente pedido (`rover.camera`, `rover.lidar`...) não foi configurado ou não pôde ser iniciado.
+
+    A mensagem diz o que fazer, por exemplo: *"Adicione a seção 'camera:' ao config.yaml."*
+    """
 
 
 # Pinos padrão do Rover (mesmos usados nos exemplos)

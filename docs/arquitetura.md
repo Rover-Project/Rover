@@ -36,9 +36,9 @@ A RoverLib é organizada em camadas. As de baixo conversam com o hardware; as de
 
 Cada plugin encapsula **uma peça de hardware** e esconde o protocolo usado por ela (PWM, UART, I²C, libcamera).
 
-- **`pin`** é a base de tudo que usa GPIO. É um módulo nativo em C++ (pybind11) com escrita digital, PWM por hardware e PWM por software. Os drivers de motor e de servo são construídos sobre ele.
+- **`pin`** é a base de tudo que usa GPIO. É um módulo nativo em C++ (pybind11), compilado pelo `pip install` na Raspberry Pi, com escrita digital, PWM por hardware e PWM por software. Os drivers de motor e de servo são construídos sobre ele.
 - **`motor`** controla um motor DC ligado a uma ponte-H L298N. `MotorDriver` escreve nos pinos de verdade; `VirtualMotor` apenas registra e imprime os comandos.
-- **`camera`** captura frames. `Camera` usa a Picamera2 (Raspberry Pi); `AfCamera` acrescenta controle de foco (Camera Module 3); `Webcam` usa o OpenCV (PC ou câmera USB).
+- **`camera`** captura frames. `Camera` usa a Picamera2 (Raspberry Pi); `AfCamera` acrescenta controle de foco (câmeras com autofoco, como a Arducam IMX519 do Rover); `Webcam` usa o OpenCV (PC ou câmera USB).
 - **`lidar`** lê o TF-Luna em uma thread em segundo plano e mantém sempre a última medida disponível. `VirtualLidar` é a versão simulada.
 - **`PCAServos`** controla servos por um PCA9685 (I²C), com as bibliotecas da Adafruit: `Servo` (posição, 0–180°) e `ContinuousServo` (rotação contínua). `VirtualServo` e `VirtualContinuousServo` são as versões simuladas.
 

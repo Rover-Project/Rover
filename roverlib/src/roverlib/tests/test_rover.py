@@ -254,3 +254,9 @@ def test_lidar_auto_sem_porta_simula(monkeypatch, capsys):
     rover = Rover(lidar={"port": "/dev/porta_que_nao_existe"})
     assert isinstance(rover.lidar, VirtualLidar)
     assert "Lidar simulado" in capsys.readouterr().out
+
+
+def test_component_not_available_e_erro_da_roverlib():
+    from roverlib.exceptions import RoverLibError
+    assert issubclass(ComponentNotAvailable, RoverLibError)
+    assert issubclass(ComponentNotAvailable, RuntimeError)   # compatível com quem tratava RuntimeError

@@ -37,6 +37,8 @@ cd meu_projeto
 rover run
 ```
 
+> Enquanto a RoverLib não estiver no PyPI, instale pelo repositório: `git clone https://github.com/Rover-Project/Rover.git` e `pip install "./Rover/roverlib[cli]"`.
+
 No PC, a saída mostra os motores simulados. Na Raspberry Pi, o mesmo projeto move o Rover. Para testar na Raspberry Pi sem mover as rodas: `ROVER_SIMULATE=1 rover run`.
 
 Instalação na Raspberry Pi (câmera, GPIO, UART): veja o guia de [Instalação](docs/instalacao.md) ou use o script `rover_setup.sh`.
@@ -47,7 +49,7 @@ Instalação na Raspberry Pi (câmera, GPIO, UART): veja o guia de [Instalação
 |---|---|
 | Computador | Raspberry Pi 5 |
 | Motores | 2 motores DC com ponte-H L298N |
-| Câmera | Picamera2 (Camera Module 3 para foco automático) |
+| Câmera | Arducam IMX519 (16 MP, autofoco), pela Picamera2 |
 | Distância | Lidar TF-Luna (UART) |
 | Servos da câmera (pan-tilt) | PAN 360° + TILT 180° via PCA9685 (I²C) |
 

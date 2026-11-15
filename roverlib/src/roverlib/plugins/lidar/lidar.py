@@ -32,10 +32,13 @@ class Lidar():
     entre 0,2 m e 8 m.
 
     Exemplo:
-        with Lidar() as lidar:
-            print(lidar.get_distance())
-            if lidar.is_obstacle(30):
-                print("Obstáculo a menos de 30 cm!")
+
+    ```python
+    with Lidar() as lidar:
+        print(lidar.get_distance())
+        if lidar.is_obstacle(30):
+            print("Obstáculo a menos de 30 cm!")
+    ```
     """
 
     def __init__(

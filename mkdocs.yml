@@ -42,6 +42,8 @@ markdown_extensions:
 plugins:
   - search
   - mkdocstrings:
+      custom_templates: docs/templates   # tradução dos títulos da API (docs/templates/python/material/languages/pt.html.jinja)
+      locale: pt
       handlers:
         python:
           paths: [roverlib/src]          # lê as docstrings direto do código (sem importar OpenCV/GPIO)
@@ -71,3 +73,4 @@ nav:
       - Pan-tilt da câmera: api/pan_tilt.md
       - Sensores: api/sensores.md
       - Visão e processamento: api/visao.md
+      - Configuração e erros: api/utilitarios.md

@@ -81,7 +81,8 @@ A variável de ambiente `ROVER_SIMULATE=1` força a simulação sem alterar o ar
 | `index` | `0` | Qual câmera usar, se houver mais de uma |
 | `webcam` | `auto` | `auto`: Picamera2 na Raspberry Pi, webcam no PC. `true`: sempre webcam. `false`: exige a Picamera2 |
 | `vertical_flip`, `horizontal_flip` | `false` | Espelham a imagem. Com a câmera de cabeça para baixo, use os dois como `true` |
-| `brightness`, `contrast`, `saturation` | — | Ajustes de imagem (apenas Picamera2; ignorados na webcam) |
+| `brightness` | — | Brilho, de -1.0 a 1.0. É um ajuste forte: soma cerca de 255 × valor a cada pixel, então ±0.1 já muda bastante (apenas Picamera2) |
+| `contrast`, `saturation` | — | Contraste e saturação, de 0 a 32; 1.0 mantém a imagem original (apenas Picamera2) |
 
 Se a câmera não puder ser iniciada (por exemplo, PC sem webcam), aparece um aviso e o programa continua; usar `rover.camera` gera um erro explicando a falha.
 
@@ -117,6 +118,9 @@ Os dois servos que movem a câmera, ligados a um PCA9685 (I²C).
 | `tilt.invert` | `false` | Inverte o sentido, se `tilt_up()` abaixar a câmera |
 | `tilt.hold` | `true` | Ao encerrar, o TILT continua segurando a câmera no centro (sem sinal, o peso da câmera a faria cair) |
 | `tilt.pulse` | `[500, 2500]` | Pulsos mínimo e máximo do servo, em µs |
+
+!!! warning "Posição do PAN ainda em validação"
+    Nos testes com o Rover, a posição estimada do servo de 360° se mostrou imprecisa: a velocidade real do servo varia com a tensão, com o esforço do cabo da câmera e com o tempo de partida. Use os giros por tempo (`pan_left()`, `pan_right()` com `duration`) com cuidado e confira visualmente os limites. Está em estudo a troca do PAN por um servo de posição (180°).
 
 !!! note "Como o PAN sabe onde está?"
     O servo de 360° gira continuamente e não informa sua posição: ele é controlado por **velocidade** (como as rodas). O `PanTilt` **estima** o ângulo multiplicando a velocidade pelo tempo de giro, considerando que o programa começa com a câmera de frente (0°). É assim que ele respeita `pan.min`/`pan.max`, e que `pan_to()`, `pan_degrees()` e `center()` funcionam. Ao encerrar, a câmera volta para a frente. Se a estimativa se perder, alinhe a câmera e chame `reset_pan_position()`.

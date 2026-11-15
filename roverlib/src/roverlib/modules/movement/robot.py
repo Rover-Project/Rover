@@ -152,9 +152,10 @@ class Robot:
         Velocidade negativa indica rotação para trás.
         
         Args:
-            speed_right (float): Velocidade do motor direito.
-            speed_left (float): _description_
-            duration (_type_, optional): Duração do movimento. Se for None o movimento é por tempo indefinido.
+            speed_right (float): velocidade do motor direito, de -100 a 100.
+            speed_left (float): velocidade do motor esquerdo, de -100 a 100.
+            duration (float, optional): duração do movimento, em segundos; ao final, os motores param.
+                Se None (padrão), o movimento continua até o próximo comando.
         """
         
         # determina direção e velocidade para cada motor

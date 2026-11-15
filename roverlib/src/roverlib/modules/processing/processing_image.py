@@ -3,20 +3,30 @@ import numpy
 
 class ProcessingImage:
     """
-        Modulo reposavel pelo pre-processamento de imagens, com metodos para aplicacao de filtros, segmentacao 
-        entre outras ferramentas de pre-processamento
+    Funções de pré-processamento de imagem: recorte, ajuste de brilho, segmentação por cor e bordas.
+
+    Todas são métodos de classe: chame direto, sem criar objeto. Recebem frames em BGR
+    (como os da câmera do Rover e da webcam).
+
+    Exemplo:
+
+    ```python
+    mascara = ProcessingImage.color_segmentation(frame)   # vermelho em branco, resto em preto
+    ```
     """
     
     @classmethod
     def cutImage(cls, frame, region_interest: tuple[int, int, int, int]):
         """
-        Corta um frame em uma dada região de interesse.
+        Recorta uma região retangular da imagem.
+
         Args:
-            frame (numpy array): numpy array da imagem.
-            region_interest (tuple[int, int, int, int]): coordenadas de corte 0 = x_start, 1 = y_start, 2 = x_end, 3 = y_end
+            frame (numpy.ndarray): imagem de entrada.
+            region_interest (tuple[int, int, int, int]): `(x, y, largura, altura)` da região, em pixels,
+                a partir do canto superior esquerdo `(x, y)`.
 
         Returns:
-            numpy array: frame cortado na região de interesse
+            numpy.ndarray: a região recortada.
         """
     
         x_start, y_start, x_end, y_end = region_interest
@@ -26,12 +36,14 @@ class ProcessingImage:
     @classmethod 
     def ligh_adjustment(cls, img, gamma=1.9):
         """
-            Realiza o ajuste do brilho de um frame deacordo com o gamma passado como parametro
+        Ajusta o brilho por correção gama (os tons escuros e claros mudam de forma diferente).
+
         Args:
-            frame (numpy array): imagem que se deseja ajustar o brilho.
-            gamma (float, optional): valor de ajuste. gamma > 1: escurece o frame. gamma < 1 clareia o frame Defaults to 1.9.
-        
-        returns (numpy array): imagem com o brilho ajustado.
+            img (numpy.ndarray): imagem de entrada.
+            gamma (float): maior que 1 escurece; menor que 1 clareia; 1 não muda. Padrão 1.9.
+
+        Returns:
+            numpy.ndarray: imagem com o brilho ajustado, do mesmo tamanho.
         """
         
         # tabela de correção (0–255), faz uma nova quantização das cores
@@ -50,16 +62,25 @@ class ProcessingImage:
     @classmethod
     def color_segmentation(cls, img, low_color1=(0, 120, 70), upper_color1=(10, 255, 255), low_color2=(170, 120, 70), upper_color2=(180, 255, 255)):
         """
-            Aplica segmentacao por cor, utilizando os tons de cores passados como parametro.
-            Por padrão segmenta a cor vemelha
+        Separa os pixels de uma cor: a máscara fica branca (255) onde está a cor e preta (0) no resto.
+
+        A imagem é convertida para HSV e filtrada por dois intervalos de cor, porque o vermelho
+        fica nas duas pontas da escala de matiz (0–10 e 170–180). Depois, a máscara é limpa
+        (remoção de ruído, preenchimento de buracos) e suavizada.
+
+        Por padrão, segmenta o **vermelho**. Para outra cor, passe os intervalos HSV do OpenCV
+        (matiz 0–180, saturação e valor 0–255); por exemplo, para azul use
+        `low_color1=(100, 120, 70), upper_color1=(130, 255, 255)` e repita os mesmos valores no segundo par.
+
         Args:
-            frame (numpy array): Imagem que se deseja segmentar.
-            low_color1 (tuple, optional): Nivel baixo da cor. Defaults to (0, 120, 70).
-            upper_color1 (tuple, optional): Nivel altor da cor. Defaults to (10, 255, 255).
-            low_color2 (tuple, optional): Nivel baixo da cor. Defaults to (170, 120, 70).
-            upper_color2 (tuple, optional): Nivel alto da cor. Defaults to (180, 255, 255).
-        
-        return (numpy array): imagem com a cor segmentada.
+            img (numpy.ndarray): imagem em BGR.
+            low_color1 (tuple): limite inferior HSV do primeiro intervalo. Padrão `(0, 120, 70)`.
+            upper_color1 (tuple): limite superior HSV do primeiro intervalo. Padrão `(10, 255, 255)`.
+            low_color2 (tuple): limite inferior HSV do segundo intervalo. Padrão `(170, 120, 70)`.
+            upper_color2 (tuple): limite superior HSV do segundo intervalo. Padrão `(180, 255, 255)`.
+
+        Returns:
+            numpy.ndarray: máscara em tons de cinza, do mesmo tamanho da imagem.
         """
         
         # Converte a escala de por par HSV
@@ -99,19 +120,22 @@ class ProcessingImage:
     @classmethod
     def color_dual_segmentation(cls, img, gamma=2.3, low_color1=(0, 120, 70), upper_color1=(10, 255, 255), low_color2=(170, 120, 70), upper_color2=(180, 255, 255)):
         """
-            Aplica segmentacao por cor, utilizando os tons de cores passados como parametro.
-            Por padrão segmenta a cor vemelha. Realiza segmentacao dupla, para diferentes niveis de brilho de acordo com o gamma passado.
-            A mascara retornada tem o mesmo tamanho da imagem de entrada.
+        Segmentação por cor mais tolerante à iluminação: combina a máscara da imagem original
+        com a de uma cópia escurecida por correção gama.
+
+        Ajuda quando o objeto tem partes muito iluminadas (reflexos), que perderiam a cor na
+        imagem original. Usada pelos exemplos `circleDetect` e `folowCircle`.
+
         Args:
-            img (_type_): _description_
-            gamma (float, optional): _description_. Defaults to 2.3.
-            low_color1 (tuple, optional): _description_. Defaults to (0, 120, 70).
-            upper_color1 (tuple, optional): _description_. Defaults to (10, 255, 255).
-            low_color2 (tuple, optional): _description_. Defaults to (170, 120, 70).
-            upper_color2 (tuple, optional): _description_. Defaults to (180, 255, 255).
+            img (numpy.ndarray): imagem em BGR.
+            gamma (float): quanto escurecer a cópia (maior = mais escura). Padrão 2.3.
+            low_color1 (tuple): limite inferior HSV do primeiro intervalo. Padrão `(0, 120, 70)`.
+            upper_color1 (tuple): limite superior HSV do primeiro intervalo. Padrão `(10, 255, 255)`.
+            low_color2 (tuple): limite inferior HSV do segundo intervalo. Padrão `(170, 120, 70)`.
+            upper_color2 (tuple): limite superior HSV do segundo intervalo. Padrão `(180, 255, 255)`.
 
         Returns:
-            _type_: _description_
+            numpy.ndarray: máscara do mesmo tamanho da imagem (branco = cor encontrada).
         """
         
         # A máscara tem o mesmo tamanho da imagem recebida, para as coordenadas baterem com o frame
@@ -120,8 +144,9 @@ class ProcessingImage:
         # Aplica filtro para escurecer a imagem (gamma > 1 escurece)
         dark = ProcessingImage.ligh_adjustment(frame, gamma)
 
-        mask_red_dark = ProcessingImage.color_segmentation(dark) # Aplica segmentação por cor na mascara escurecida
-        mask_red_normal = ProcessingImage.color_segmentation(frame) # Aplica segmentação por cor na mascara normal
+        colors = (low_color1, upper_color1, low_color2, upper_color2)
+        mask_red_dark = ProcessingImage.color_segmentation(dark, *colors) # Aplica segmentação por cor na mascara escurecida
+        mask_red_normal = ProcessingImage.color_segmentation(frame, *colors) # Aplica segmentação por cor na mascara normal
         
         # Mescla as duas mascaras
         mask_final = openCv.bitwise_or(mask_red_dark, mask_red_normal)
@@ -131,14 +156,15 @@ class ProcessingImage:
     @classmethod
     def edge_filter(cls, img, theres1=50, theres2=150):
         """
-            Aplica filtro de bordas para uma imagem passada como parametro
+        Detecta bordas com o filtro de Canny.
+
         Args:
-            img (_type_): _description_
-            theres1 (int, optional): _description_. Defaults to 50.
-            theres2 (int, optional): _description_. Defaults to 150.
+            img (numpy.ndarray): imagem (em tons de cinza ou máscara).
+            theres1 (int): limiar inferior: bordas mais fracas que isso são descartadas. Padrão 50.
+            theres2 (int): limiar superior: bordas mais fortes que isso são sempre mantidas. Padrão 150.
 
         Returns:
-            _type_: _description_
+            numpy.ndarray: imagem binária com as bordas em branco.
         """
         
         return openCv.Canny(img, theres1, theres2)

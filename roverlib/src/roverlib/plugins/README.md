@@ -6,7 +6,7 @@ Plugins são os **drivers de hardware** da RoverLib: cada um encapsula uma peça
 |---|---|---|---|
 | [`pin`](pin/) | GPIO e PWM da Raspberry Pi (C++/pybind11) | — (base dos outros) | `Pin`, `PinMode` |
 | [`motor`](motor/) | motor DC + ponte-H L298N | `VirtualMotor` | `MotorDriver`, `VirtualMotor` |
-| [`camera`](camera/) | Picamera2 / Camera Module 3 | `Webcam` (PC) | `open_camera`, `Camera`, `AfCamera`, `Webcam` |
+| [`camera`](camera/) | Picamera2 / Arducam IMX519 | `Webcam` (PC) | `open_camera`, `Camera`, `AfCamera`, `Webcam` |
 | [`lidar`](lidar/) | Lidar TF-Luna (UART) | `VirtualLidar` | `Lidar`, `VirtualLidar` |
 | [`PCAServos`](PCAServos/) | servos via PCA9685 (I²C) | `VirtualServo`, `VirtualContinuousServo` | `PCAServos`, `Servo`, `ContinuousServo` |
 

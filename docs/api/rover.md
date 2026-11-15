@@ -11,4 +11,4 @@ with Rover.from_config("config.yaml") as rover:
 
 ::: roverlib.rover.Rover
 
-::: roverlib.rover.ComponentNotAvailable
+`rover.camera`, `rover.lidar` e os demais geram `ComponentNotAvailable` quando o componente não foi configurado; veja [Configuração e erros](utilitarios.md).

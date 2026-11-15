@@ -36,6 +36,14 @@ pip install roverlib[cli]
 rover hello
 ```
 
+!!! warning "Ainda não publicada no PyPI"
+    Enquanto a RoverLib não estiver no PyPI, o `pip install roverlib[cli]` não funciona. Instale a partir do repositório:
+
+    ```bash
+    git clone https://github.com/Rover-Project/Rover.git
+    pip install "./Rover/roverlib[cli]"
+    ```
+
 A saída esperada é `RoverLib foi instalada corretamente.`. Siga para o [Primeiro projeto](primeiro-projeto.md).
 
 ## Na Raspberry Pi 5
@@ -66,11 +74,11 @@ pip install roverlib[cli]
 ### Verificando o hardware
 
 ```bash
-rpicam-hello --list-cameras     # a câmera deve aparecer na lista
-python -c "from roverlib.plugins.motor.motorDriver import PIN_AVAILABLE; print(PIN_AVAILABLE)"
+rpicam-hello --list-cameras     # a câmera (imx519) deve aparecer na lista
+python -c "from roverlib.plugins.pin import HARDWARE_AVAILABLE, gpio_base; print(HARDWARE_AVAILABLE, gpio_base())"
 ```
 
-O segundo comando deve imprimir `True`. Se imprimir `False`, os motores serão simulados; veja [Problemas comuns](#problemas-comuns).
+O segundo comando deve imprimir `True 571` na Raspberry Pi 5 (`True 512` na Pi 4): o módulo de GPIO foi compilado e encontrou os pinos. Se der erro ou `False`, os motores serão simulados; veja [Problemas comuns](#problemas-comuns).
 
 ### Servos da câmera (PCA9685)
 

@@ -23,7 +23,7 @@ python main.py
 
 | Exemplo | O que faz | Hardware |
 |---|---|---|
-| `circleDetect` | Detecta círculos vermelhos combinando Hough e contornos, com suavização entre frames | câmera ou webcam |
+| `circleDetect` | Detecta círculos **vermelhos** combinando Hough e contornos, com suavização entre frames (teste com uma bola ou tampa vermelha) | câmera ou webcam |
 | `lineDetect` | Segue uma pista (duas linhas) ou uma linha única com controle proporcional | câmera + motores |
 | `folowCircle` | Persegue uma bola vermelha usando PID na posição e no tamanho do círculo | câmera + motores |
 | `objectDetection` | Detecta objetos com YOLOv8n (requer `pip install roverlib[ai]`) | câmera |
@@ -34,8 +34,8 @@ python main.py
 | Exemplo | O que faz | Hardware |
 |---|---|---|
 | `cameraTracking` | A câmera acompanha um objeto vermelho movendo o pan-tilt (PAN 360°, TILT 180°) | câmera + servos (PCA9685) |
-| `continuousFocus` | Foco automático contínuo e captura de fotos | Camera Module 3 |
-| `slideFocus` | Ajuste manual do foco pelo teclado | Camera Module 3 |
+| `continuousFocus` | Foco automático contínuo e captura de fotos | câmera com autofoco (Arducam IMX519) |
+| `slideFocus` | Ajuste manual do foco pelo teclado | câmera com autofoco (Arducam IMX519) |
 
 ### Sensores
 
@@ -50,7 +50,10 @@ python main.py
 |---|---|---|
 | `roverKeypadControl` | Dirige o Rover pelo teclado, com visualização da câmera | motores + câmera |
 | `roverTkControl` | Interface gráfica (Tkinter) para testar os motores | motores |
-| `servoController` | Controle de dois servos pelo teclado, direto na GPIO (gpiozero) | servos na GPIO |
+| `servoController` | Controle de dois servos pelo teclado, direto na GPIO (gpiozero). Exemplo antigo: os servos do Rover hoje usam o PCA9685 (veja `cameraTracking`) | servos na GPIO |
+
+!!! note "YOLO e MediaPipe na Raspberry Pi"
+    `objectDetection` e `mediaPiper` dependem de bibliotecas grandes (`ultralytics`, `mediapipe`). Confira se há versão delas para o Python da sua Raspberry Pi antes de instalar o extra `[ai]`; o README de cada exemplo traz os passos.
 
 !!! note "Exemplos sem simulação"
     Os projetos completos foram escritos para o Rover e criam `Camera` e `Robot` diretamente. Os que usam só motores rodam no PC em modo simulação; os que usam `Camera`, Lidar ou servos diretamente precisam do hardware. O `cameraTracking` usa a classe `Rover` e roda no PC com webcam e servos simulados.

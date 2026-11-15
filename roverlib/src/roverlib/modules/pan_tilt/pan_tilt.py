@@ -27,11 +27,14 @@ class PanTilt:
     Movimenta a câmera do Rover.
 
     Exemplo:
-        with PanTilt() as camera_mount:
-            camera_mount.tilt_to(60)                 # inclina para 60°
-            camera_mount.pan_to(30)                  # gira até ~30° à direita
-            camera_mount.pan_left(20, duration=0.3)  # gira para a esquerda por 0,3 s
-            camera_mount.center()                    # volta a olhar para a frente
+
+    ```python
+    with PanTilt() as camera_mount:
+        camera_mount.tilt_to(60)                 # inclina para 60°
+        camera_mount.pan_to(30)                  # gira até ~30° à direita
+        camera_mount.pan_left(20, duration=0.3)  # gira para a esquerda por 0,3 s
+        camera_mount.center()                    # volta a olhar para a frente
+    ```
 
     Posição do PAN: 0° é a câmera olhando para a frente do Rover; positivo é a direita.
     O programa deve começar com a câmera de frente (o `cleanup()` a deixa assim ao terminar).

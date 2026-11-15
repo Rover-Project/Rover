@@ -45,7 +45,7 @@ roverlib/plugins/camera/
 |--------|---------|-----|
 | `CameraInterface` | `cameraInterface.py` | Classe base abstrata (`ABC`). Define os métodos obrigatórios `get_frame`, `start`, `stop` e `cleanup` |
 | `Camera` | `camera.py` | Câmera da Raspberry Pi via Picamera2. Controle de exposição, brilho, contraste, saturação, FPS, corte (ROI), foto e vídeo H.264 |
-| `AfCamera` | `autoFocus.py` | Herda de `Camera` e adiciona controle de autofoco para módulos com lente motorizada (ex.: Camera Module 3 / IMX708, Arducam IMX519) |
+| `AfCamera` | `autoFocus.py` | Herda de `Camera` e adiciona controle de autofoco para módulos com lente motorizada (ex.: Arducam IMX519, usada no Rover, ou Camera Module 3 / IMX708) |
 | `Webcam` | `webcam.py` | Captura simples via OpenCV. Implementa só o contrato da interface |
 
 ---
@@ -167,7 +167,7 @@ Valores fora do intervalo lançam `ValueError`. Para visão computacional, ajust
 
 | Método | Descrição |
 |--------|-----------|
-| `set_region_interest((x_start, y_start, x_end, y_end))` | Define um corte aplicado a cada `get_frame` |
+| `set_region_interest((x, y, largura, altura))` | Define um corte aplicado a cada `get_frame` |
 | `clear_region_interest()` | Remove o corte |
 | `set_format(format)` | Define a conversão de cor (`CameraFormat`) |
 
@@ -259,15 +259,15 @@ Use `open_camera(use_webcam=True)` para forçar a webcam, ou `use_webcam=False` 
 ```python
 from roverlib.plugins.camera import Camera
 
-cam = Camera(height=720, width=1280, fps=30, verticalFlip=True)
+cam = Camera(height=720, width=1280, fps=30)
 cam.start()
 
 cam.set_brightness(0.1)
 cam.set_contrast(1.3)
 cam.set_saturation(1.2)
 
-# Usa só a metade inferior da imagem (x_start, y_start, x_end, y_end)
-cam.set_region_interest((0, 360, 1280, 720))
+# Usa só a metade inferior da imagem (x, y, largura, altura)
+cam.set_region_interest((0, 360, 1280, 360))
 
 frame, instante = cam.get_frame_time()
 print(frame.shape, instante)  # (360, 1280, 3) ...

@@ -51,13 +51,15 @@ class VirtualMotor(MotorInterface):
 
     def set_movement(self, speed: float, direction="FORWARD"):
         """
-        Controla o movimento dos motor.
+        Gira o motor com uma velocidade e um sentido.
+
         Args:
-            speed (float): velociade de rotação que deve ser aplicada no motor.
-            direction (str, optional): direção de rotação do motor. Defaults to "forward".
+            speed (float): velocidade de 0 a 100 (porcentagem do PWM). Valores acima de 100 são limitados.
+            direction (str): `"FORWARD"` (frente), `"BACKWARD"` (trás) ou `"STOP"`. Aceita minúsculas. Padrão `"FORWARD"`.
+
         Raises:
-            UninitializedMotorError: Motor não foi inicializado.
-            DirectionInvalidMotorError: Direção de rotação inválida.
+            UninitializedMotorError: o motor não foi inicializado com `initialize()`.
+            DirectionInvalidMotorError: sentido diferente dos três aceitos.
         """
 
         # Faz um upper para evista erros de up case ou low case

@@ -17,24 +17,29 @@ def open_camera(height: int = 480, width: int = 640, fps: int = 30, index: int =
     Abre a câmera disponível e já a deixa pronta para capturar.
 
     Args:
-        height (int): altura dos frames (padrão 480)
-        width (int): largura dos frames (padrão 640)
-        fps (int): taxa de quadros (padrão 30)
-        index (int): índice da câmera (padrão 0)
-        use_webcam (bool, optional):
-            None (padrão) -> usa a Picamera2 se disponível; senão, a webcam.
-            True -> sempre usa a webcam (OpenCV).
-            False -> exige a Picamera2 (erro se não estiver disponível).
-        **picamera_options: opções extras da Camera (ex.: horizontalFlip=True, verticalFlip=True).
-                            Ignoradas quando a webcam é usada.
+        height (int): altura dos frames, em pixels. Padrão 480.
+        width (int): largura dos frames, em pixels. Padrão 640.
+        fps (int): quadros por segundo. Padrão 30.
+        index (int): qual câmera usar, se houver mais de uma. Padrão 0.
+        use_webcam (bool, optional): None (padrão) usa a Picamera2 se disponível e,
+            senão, a webcam; True sempre usa a webcam (OpenCV); False exige a Picamera2.
+        **picamera_options: opções extras da `Camera` (ex.: `horizontalFlip=True`,
+            `verticalFlip=True`). Ignoradas quando a webcam é usada.
 
-    Retorna:
-        Camera (Raspberry Pi) ou Webcam (PC), ambas com get_frame(), start(), stop() e cleanup().
+    Returns:
+        Camera | Webcam: a câmera já iniciada. As duas têm `get_frame()` (frames em BGR),
+            `start()`, `stop()` e `cleanup()`.
+
+    Raises:
+        CameraNotAvailable: `use_webcam=False` fora da Raspberry Pi.
 
     Exemplo:
-        cam = open_camera(480, 640)
-        frame = cam.get_frame()
-        cam.cleanup()
+
+    ```python
+    cam = open_camera(480, 640)
+    frame = cam.get_frame()
+    cam.cleanup()
+    ```
     """
     if use_webcam is None:
         use_webcam = not picamera_available()
